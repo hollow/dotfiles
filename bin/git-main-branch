@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if git rev-parse --verify --quiet master >/dev/null; then
+    echo master
+else
+    echo main
+fi

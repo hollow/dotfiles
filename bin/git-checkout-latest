@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+set -x
+
+git cleanup
+
+latest="$(git describe --abbrev=0 --tags 2>/dev/null || :)"
+if [[ -z ${latest} ]]; then
+    latest=$(git-main-branch)
+fi
+
+git checkout "${latest}"
+
+if [[ "${latest}" == "master" || "${latest}" == "main" ]]; then
+    git branch -q --set-upstream-to="origin/${latest}"
+    git pull -q --rebase --autostash
+fi
+
+git submodule update --no-fetch --checkout --recursive

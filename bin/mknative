@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+app_name="$1" && shift
+
+app_path="${HOME}/Applications/${app_name}.app"
+build_version="$(date +YYYYMMDDHHMMSS)"
+
+temp_path="$(mktemp -d)"
+cd "${temp_path}" || exit 1
+
+nativefier \
+    --name "${app_name}" \
+    --build-version "${build_version}" \
+    --platform mac \
+    --arch x64 \
+    --counter \
+    --bounce \
+    --fast-quit \
+    "$@"
+
+rm -rf "${app_path}"
+mv ./*/*.app "${app_path}"
+
+rm -rf "${temp_path}"
+exec open "${app_path}"

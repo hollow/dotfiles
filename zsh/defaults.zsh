@@ -21,8 +21,8 @@ mkdir -p "${XDG_DATA_HOME}"
 
 # path helpers
 _path_add() {
-    test -d "${2:P}" && \
-    eval "${1}=(\"${2:P}\" \$${1})"
+    test -d "${2}" && \
+    eval "${1}=(\"${2}\" \$${1})"
 }
 
 _path_add_bin() {

@@ -40,3 +40,10 @@ alias gp="git pull"
 alias gpr="git pull --rebase --autostash"
 alias grh="git reset HEAD"
 alias s="git status -sb ."
+
+clone() {
+    dir="$(clone-into-src "$@")"
+    if [[ -n "${dir}" ]]; then
+        cd "${dir}" || return
+    fi
+}
