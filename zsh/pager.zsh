@@ -1,5 +1,6 @@
 # improve less experience
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
+_brew_install less
 typeset -TUx LESS less ' '
 less=(
     "--HILITE-UNREAD"

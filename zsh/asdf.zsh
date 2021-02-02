@@ -48,7 +48,8 @@ _asdf_install() {
 
 # https://github.com/direnv/direnv
 # change environment variables based on the current directory
-_asdf_install direnv
+_brew_install direnv # for vscode
+_asdf_install direnv # for asdf integration
 
 _direnv_hook() {
     trap -- '' SIGINT

@@ -5,6 +5,9 @@ export GIT_AUTHOR_EMAIL="${DEFAULT_EMAIL}"
 export GIT_COMMITTER_NAME="${DEFAULT_NAME}"
 export GIT_COMMITTER_EMAIL="${DEFAULT_EMAIL}"
 
+# use git from homebrew
+_brew_install git
+
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
 # load git functions from ohmyzsh
 zinit for OMZL::git.zsh
@@ -26,6 +29,10 @@ _brew_install git-extras
 zinit for @wfxr/forgit
 export FORGIT_FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} --no-height --reverse"
 
+# https://github.com/defunkt/gist
+# command line gister
+_brew_install gist
+
 alias ga="git add --all"
 alias gap="git add --patch"
 alias gca="git commit --all"
@@ -41,6 +48,8 @@ alias gpr="git pull --rebase --autostash"
 alias grh="git reset HEAD"
 alias s="git status -sb ."
 
+# clone a repository into ~/src/<owner>/<name>
+# and cd into it afterwards
 clone() {
     dir="$(clone-into-src "$@")"
     if [[ -n "${dir}" ]]; then

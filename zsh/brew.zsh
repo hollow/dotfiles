@@ -77,22 +77,32 @@ _brew_install() {
 }
 
 # ensure a proper GNU based environment
+_brew_install -l \
+    curl \
+    ncurses \
+    readline \
+    openssl \
+    sqlite \
+    zlib \
+    icu4c \
+    libffi
+
+_brew_install -b \
+    gnu-getopt
+
+_brew_install -x \
+    coreutils \
+    debianutils \
+    findutils \
+    gnu-sed \
+    gnu-tar \
+    gnu-time \
+    python
+
 _brew_install \
-    -l ncurses \
-    -l readline \
-    -l openssl \
-    -l sqlite \
-    -l zlib \
-    -l icu4c \
-    -l libffi \
-    -b gnu-getopt \
-    -x coreutils \
-    -x findutils \
-    -x gnu-sed \
-    -x gnu-tar \
-    -x gnu-time \
-    -x python \
-    -0 zsh
+    bash \
+    xz \
+    zsh
 
 # install selected application(s)
 # mnemonic: [B]rew [I]nstall

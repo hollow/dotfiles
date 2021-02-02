@@ -14,6 +14,7 @@ source "${ZDOTDIR}"/bindings.zsh
 
 source "${ZDOTDIR}"/files.zsh
 source "${ZDOTDIR}"/git.zsh
+source "${ZDOTDIR}"/net.zsh
 source "${ZDOTDIR}"/ssh.zsh
 
 source "${ZDOTDIR}"/completion.zsh
