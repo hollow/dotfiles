@@ -1,26 +1,25 @@
-HISTFILE="${XDG_DATA_HOME}/zsh/history"
-HISTSIZE=50000
-SAVEHIST=10000
+# http://zsh.sourceforge.net/Doc/Release/Options.html#Description-of-Options
+# history configuration
+setopt extended_history       # record timestamp of command in HISTFILE
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_dups       # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_reduce_blanks     # remove superfluous blanks from each command line
+setopt hist_verify            # show command with history expansion to user before running it
+setopt inc_append_history     # immediately append to history file
+unsetopt share_history        # do not share command history data
 
-setopt extended_history
-setopt hist_expire_dups_first
-setopt hist_ignore_dups
-setopt hist_ignore_space
-setopt hist_reduce_blanks
-setopt hist_verify
+# http://zsh.sourceforge.net/Doc/Release/Parameters.html#Parameters-Used-By-The-Shell
+HISTFILE="${ZINIT[HOME_DIR]}/history"
+HISTSIZE=1000000000
+SAVEHIST=1000000000
 
-# https://github.com/zdharma/history-search-multi-word
-zstyle ":history-search-multi-word" page-size "11"
-zinit wait lucid for \
-    zdharma/history-search-multi-word
+# Start typing + [Up-Arrow] - fuzzy find history forward
+autoload -U up-line-or-beginning-search
+zle -N up-line-or-beginning-search
+bindkey "${terminfo[kcuu1]}" up-line-or-beginning-search
 
-# https://github.com/zsh-users/zsh-history-substring-search
-# zinit wait lucid for \
-#     zsh-users/zsh-history-substring-search
-
-# Bind UP and DOWN arrow keys for subsstring search.
-# https://github.com/zsh-users/zsh-history-substring-search#usage
-# bindkey "${terminfo[kcuu1]}" history-substring-search-up
-# bindkey "${terminfo[kcud1]}" history-substring-search-down
-# bindkey '^[[A' history-substring-search-up
-# bindkey '^[[B' history-substring-search-down
+# Start typing + [Down-Arrow] - fuzzy find history backward
+autoload -U down-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey "${terminfo[kcud1]}" down-line-or-beginning-search

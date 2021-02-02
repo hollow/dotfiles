@@ -1,0 +1,50 @@
+[alias]
+	aliases = config --get-regexp alias
+	amend = commit --amend --reuse-message=HEAD
+	branches = branch -a
+	ci = commit
+	co = checkout
+	cp = cherry-pick
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %Cblue(%an)%Creset' --abbrev-commit --date=relative
+	ls = ls-tree -r HEAD
+	ref = rev-parse HEAD
+	st = status -s
+	tags = tag -l
+
+[advice]
+	detachedHead = false
+
+[color]
+	ui = true
+
+[core]
+	pager = delta
+
+[credential]
+	helper = osxkeychain
+
+[delta]
+	syntax-theme = "Solarized (dark)"
+	features = line-numbers decorations
+	whitespace-error-style = 22 reverse
+
+[delta "decorations"]
+	commit-decoration-style = bold yellow box ul
+	file-style = bold yellow ul
+	file-decoration-style = none
+	hunk-header-decoration-style = yellow box
+
+[diff]
+    colorMoved = default
+
+[interactive]
+    diffFilter = delta --color-only
+
+[push]
+	followTags = true
+
+[pull]
+	ff = only
+
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/

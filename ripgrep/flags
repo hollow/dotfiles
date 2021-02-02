@@ -1,0 +1,10 @@
+--color=always
+--column
+--follow
+--hidden
+--line-buffered
+--line-number
+--no-heading
+--smart-case
+--trim
+--with-filename

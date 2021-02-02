@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 export DOT_SOURCE_DIR="${${(%):-%x}:P:h}"
-source "${DOT_SOURCE_DIR}"/zsh/boot.zsh
+source "${DOT_SOURCE_DIR}"/zsh/defaults.zsh
 
 echo "DOT_SOURCE_DIR=${DOT_SOURCE_DIR}"
 echo "XDG_CONFIG_HOME=${XDG_CONFIG_HOME}"
@@ -18,9 +18,7 @@ else
 fi
 
 echo "${XDG_CONFIG_HOME}/zsh/env -> ${HOME}/.zshenv"
-ln -nfs "${XDG_CONFIG_HOME}"/zsh/env "${HOME}"/.zshenv || exit 1
+ln -nfs "${XDG_CONFIG_HOME}"/zsh/config.zsh "${HOME}"/.zshenv || exit 1
 
-source "${DOT_SOURCE_DIR}"/zsh/zinit.zsh || exit 1
-zinit self-update || exit 1
-
+source "${XDG_CONFIG_HOME}"/zsh/config.zsh || exit 1
 exec zsh -i

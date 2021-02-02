@@ -1,19 +1,50 @@
+# https://github.com/zdharma/zinit
+# ZSH plugin manager
 declare -A ZINIT
-
 ZINIT[BIN_DIR]="${XDG_CONFIG_HOME}"/zinit/bin
-ZINIT[HOME_DIR]="${XDG_DATA_HOME}"/zinit
-ZINIT[ZCOMPDUMP_PATH]="${XDG_DATA_HOME}"/zcompdump
-
+ZINIT[HOME_DIR]="${XDG_CACHE_HOME}"/zinit
+ZINIT[ZCOMPDUMP_PATH]="${ZINIT[HOME_DIR]}"/zcompdump
+ZINIT[COMPINIT_OPTS]="-C"
 source "${ZINIT[BIN_DIR]}"/zinit.zsh
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
 
-zinit light-mode for \
-    zinit-zsh/z-a-rust \
-    zinit-zsh/z-a-readurl \
-    zinit-zsh/z-a-patch-dl \
-    zinit-zsh/z-a-bin-gem-node
+# https://github.com/ohmyzsh/ohmyzsh/tree/master/lib
+# OMZ and extensions
+zinit for \
+	zinit-zsh/z-a-bin-gem-node \
+	OMZL::functions.zsh \
+	OMZL::spectrum.zsh \
+	atload"unalias _" \
+	OMZL::misc.zsh
 
-zinit wait lucid for \
-    OMZL::clipboard.zsh \
-    OMZP::zsh_reload
+# clear orphaned completions and plugins and recompile
+# mnemonic: [Z]init [C]ompile
+zc() {
+	zi cclear
+	zi delete --clean --yes
+	zi compinit
+	zi compile --all
+}
+
+# Update Zinit and all plugins and completions
+# mnemonic: [Z]init [Up]date
+zup() {
+	zi delete --clean --yes
+	zi cclear
+	zi self-update
+	zi update --all --reset
+	zi compinit
+	zi compile --all
+}
+
+# Replace the current shell process with a new one
+# mnemonic: [Z]init [R]e-[E]xec
+zre() {
+	exec zsh
+}
+
+# Remove Zinit cache and start from scratch
+# mnemonic: [Z]init Reset[X]
+zx() {
+	rm -rf "${XDG_CACHE_HOME}"
+	exec zsh
+}
