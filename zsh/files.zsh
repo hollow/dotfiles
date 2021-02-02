@@ -22,7 +22,7 @@ alias l="exa --all --long"
 # A simple, fast and user-friendly alternative to 'find'
 _brew_install fd
 
-# https://dystroy.org/broot/
+# https://github.com/Canop/broot
 # A new way to see and navigate directory trees
 _brew_install broot
 zinit lucid wait for \

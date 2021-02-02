@@ -7,12 +7,11 @@ ZLE_SPACE_SUFFIX_CHARS=$'&|'
 
 # https://github.com/Aloxaf/fzf-tab
 # zsh completion menu replacement with fzf
-# zinit lucid wait for \
-#     atinit"zicompinit; zicdreplay" \
-#     @Aloxaf/fzf-tab
+zinit lucid wait for \
+    atinit"zicompinit; zicdreplay" \
+    @Aloxaf/fzf-tab
 
 # https://github.com/zdharma/fast-syntax-highlighting
 # Syntax-highlighting for Zshell
 zinit lucid wait for \
-    atinit"zicompinit; zicdreplay" \
     @zdharma/fast-syntax-highlighting

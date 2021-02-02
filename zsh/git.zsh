@@ -2,6 +2,8 @@
 # personal information to git/config
 export GIT_AUTHOR_NAME="${DEFAULT_NAME}"
 export GIT_AUTHOR_EMAIL="${DEFAULT_EMAIL}"
+export GIT_COMMITTER_NAME="${DEFAULT_NAME}"
+export GIT_COMMITTER_EMAIL="${DEFAULT_EMAIL}"
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
 # load git functions from ohmyzsh

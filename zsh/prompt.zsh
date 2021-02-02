@@ -1,8 +1,7 @@
 # http://zsh.sourceforge.net/Doc/Release/Options.html#Description-of-Options
 setopt prompt_subst
 
-# https://github.com/seebi/dircolors-solarized
-# Solarized Theme for dircolors
+# https://github.com/trapd00r/LS_COLORS
 zinit for \
     atclone"dircolors -b LS_COLORS > dircolors.zsh" \
     atpull'%atclone' run-atpull \
