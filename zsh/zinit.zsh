@@ -21,6 +21,7 @@ zinit for \
 zc() {
 	zi cclear
 	zi delete --clean --yes
+	zi cclear
 	zi compinit
 	zi compile --all
 }
@@ -28,6 +29,7 @@ zc() {
 # Update Zinit and all plugins and completions
 # mnemonic: [Z]init [Up]date
 zup() {
+	zi cclear
 	zi delete --clean --yes
 	zi cclear
 	zi self-update

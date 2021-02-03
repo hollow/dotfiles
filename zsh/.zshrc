@@ -18,3 +18,9 @@ source "${ZDOTDIR}"/net.zsh
 source "${ZDOTDIR}"/ssh.zsh
 
 source "${ZDOTDIR}"/completion.zsh
+
+up() {
+    bup
+    zup
+    zre
+}

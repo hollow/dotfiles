@@ -48,7 +48,7 @@ _asdf_install() {
 
 # https://github.com/direnv/direnv
 # change environment variables based on the current directory
-_brew_install direnv # for vscode
+_brew_install direnv
 _asdf_install direnv # for asdf integration
 
 # make sure we're not using the slow asdf exec shim
