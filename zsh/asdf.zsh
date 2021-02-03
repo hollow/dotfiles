@@ -51,9 +51,15 @@ _asdf_install() {
 _brew_install direnv # for vscode
 _asdf_install direnv # for asdf integration
 
+# make sure we're not using the slow asdf exec shim
+# otherwise our prompt will take >300ms each time
+direnv() {
+    "${HOMEBREW_PREFIX}"/bin/direnv "$@"
+}
+
 _direnv_hook() {
     trap -- '' SIGINT
-    eval "$("${ASDF_DATA_DIR}"/shims/direnv export zsh)"
+    eval "$(direnv export zsh)"
     trap - SIGINT
 }
 
