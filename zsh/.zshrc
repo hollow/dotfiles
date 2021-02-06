@@ -1,26 +1,25 @@
-source "${ZDOTDIR}"/defaults.zsh
-source "${ZDOTDIR}"/zinit.zsh
+source "${ZDOTDIR}"/init.zsh
 
-source "${ZDOTDIR}"/brew.zsh
-source "${ZDOTDIR}"/asdf.zsh
+zsource brew
+zsource asdf
 
 _path_add path "${XDG_CONFIG_HOME}"/bin
 
-source "${ZDOTDIR}"/fzf.zsh
-source "${ZDOTDIR}"/pager.zsh
-source "${ZDOTDIR}"/prompt.zsh
-source "${ZDOTDIR}"/history.zsh
-source "${ZDOTDIR}"/bindings.zsh
+zsource fzf
+zsource pager
+zsource prompt
+zsource history
+zsource bindings
 
-source "${ZDOTDIR}"/files.zsh
-source "${ZDOTDIR}"/git.zsh
-source "${ZDOTDIR}"/net.zsh
-source "${ZDOTDIR}"/ssh.zsh
+zsource dir
+zsource git
+zsource net
+zsource ssh
 
-source "${ZDOTDIR}"/completion.zsh
+zsource completion
 
 up() {
-    bup
-    zup
+    bup && \
+    zup && \
     zre
 }

@@ -32,17 +32,17 @@ pg() {
 # Page man/help output automatically with bat
 # mnemonic: [P]age [H]elp text
 ph() {
-    ${=PAGER} -l man "$@"
+    pg -l man "$@"
 }
 
 # follow file and colorize with bat
 # menmonic: [T]ail [F]ollow
 tf() {
-    tail -f "$@" | ${=PAGER} -l log
+    tail -f "$@" | pg -l log
 }
 
 # Sort Output and page it with bat
 # mnemonic: [S]ort [L]ess
 sl() {
-    sort -u | ${=PAGER}
+    sort -u | pg
 }

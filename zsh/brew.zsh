@@ -13,9 +13,12 @@ if [[ ! -e /usr/local/bin/brew ]]; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-# hard-coded homebrew path
+# add homebrew to path
 _path_add_bin "${HOMEBREW_PREFIX}"
 _path_add_lib "${HOMEBREW_PREFIX}"
+
+# homebrew zsh function path
+export HOMEBREW_ZSH_FUNCTIONS="${HOMEBREW_PREFIX}"/share/zsh/site-functions
 
 # always use color
 export HOMEBREW_COLOR=1
@@ -59,8 +62,7 @@ _brew_install() {
             continue
         fi
 
-        local pkg_name="${pkg_name##*/}"
-        local pkg_path="$(_brew_pkg_path "${pkg_name}")"
+        local pkg_path="$(_brew_pkg_path "${pkg_name##*/}")"
 
         if [[ ! -d "${pkg_path}" ]]; then
             brew install "${pkg_name}"
@@ -100,6 +102,7 @@ _brew_install -x \
 
 _brew_install \
     bash \
+    gnupg \
     xz \
     zsh
 

@@ -5,7 +5,9 @@ export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}"/asdf/config
 export ASDF_VERSIONS_FILE="${XDG_CONFIG_HOME}"/asdf/versions
 export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME="${ASDF_VERSIONS_FILE}"
 
-zinit for @asdf-vm/asdf
+zinit light-mode lucid for \
+    @asdf-vm/asdf
+
 _path_add path "${ASDF_DATA_DIR}/shims"
 
 _asdf_need_plugin() {

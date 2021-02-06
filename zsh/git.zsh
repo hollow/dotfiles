@@ -10,11 +10,11 @@ _brew_install git
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
 # load git functions from ohmyzsh
-zinit for OMZL::git.zsh
+zinit light-mode lucid for \
+    atinit'zstyle ":completion:*:*:git:*" script "${HOMEBREW_ZSH_FUNCTIONS}"/git-completion.bash' \
+    OMZL::git.zsh
 
 # make sure completion can find bash helpers
-zstyle ':completion:*:*:git:*' script \
-    "${HOMEBREW_PREFIX}"/share/zsh/site-functions/git-completion.bash
 
 # https://github.com/dandavison/delta
 # A viewer for git and diff output
@@ -26,7 +26,9 @@ _brew_install git-extras
 
 # https://github.com/wfxr/forgit
 # interactive git tools
-zinit for @wfxr/forgit
+zinit light-mode lucid for \
+    @wfxr/forgit
+
 export FORGIT_FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} --no-height --reverse"
 
 # https://github.com/defunkt/gist

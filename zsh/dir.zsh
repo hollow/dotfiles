@@ -35,7 +35,7 @@ _brew_install diskus
 # https://github.com/Canop/broot
 # A new way to see and navigate directory trees
 _brew_install broot
-zinit lucid wait for \
+zinit light-mode lucid for \
     atclone'broot --print-shell-function zsh > broot.zsh' \
     atpull'%atclone' run-atpull \
     atload'source broot.zsh' \
@@ -43,10 +43,10 @@ zinit lucid wait for \
     @zdharma/null
 
 # cd helpers
-alias -g ...='../..'
-alias -g ....='../../..'
-alias -g .....='../../../..'
-alias -g ......='../../../../..'
+alias -g ...='cd ../..'
+alias -g ....='cd ../../..'
+alias -g .....='cd ../../../..'
+alias -g ......='cd ../../../../..'
 
 mkcd() {
     mkdir -p "$1" && cd "$1"

@@ -2,7 +2,7 @@
 setopt prompt_subst
 
 # https://github.com/trapd00r/LS_COLORS
-zinit for \
+zinit light-mode lucid for \
     atclone"dircolors -b LS_COLORS > dircolors.zsh" \
     atpull'%atclone' run-atpull \
     atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
@@ -11,11 +11,12 @@ zinit for \
 
 # https://github.com/romkatv/powerlevel10k
 # beautiful and functional prompt
-zinit for \
+zinit light-mode lucid for \
     atload"source ${ZDOTDIR}/p10k.zsh; _p9k_precmd" \
     nocd depth=1 \
     @romkatv/powerlevel10k
 
 # https://github.com/hlissner/zsh-autopair
 # auto-close and delete matching delimiters
-zinit lucid wait for @hlissner/zsh-autopair
+zinit light-mode lucid for \
+    @hlissner/zsh-autopair

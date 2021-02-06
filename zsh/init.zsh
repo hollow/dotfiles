@@ -1,3 +1,5 @@
+source "${ZDOTDIR}"/defaults.zsh
+
 # https://github.com/zdharma/zinit
 # ZSH plugin manager
 declare -A ZINIT
@@ -16,12 +18,20 @@ source "${ZINIT[BIN_DIR]}"/zinit.zsh
 
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/lib
 # OMZ and extensions
-zinit for \
-	zinit-zsh/z-a-bin-gem-node \
+zinit light-mode lucid for \
 	OMZL::functions.zsh \
 	OMZL::spectrum.zsh \
 	atload"unalias _" \
 	OMZL::misc.zsh
+
+# Load a zsh file with zinit to
+# get traces and benchmarks
+zsource() {
+	zinit light-mode lucid for \
+		atload"source '${ZDOTDIR}'/${1}.zsh" \
+		as"null" id-as"ZSH::${1}" \
+		@zdharma/null
+}
 
 # Update Zinit and all plugins and completions
 # mnemonic: [Z]init [Up]date
