@@ -96,8 +96,7 @@ _brew_install -x \
     findutils \
     gnu-sed \
     gnu-tar \
-    gnu-time \
-    python
+    gnu-time
 
 _brew_install \
     bash \
