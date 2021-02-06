@@ -136,9 +136,7 @@ bz() {
 bup() {
     softwareupdate --verbose --install --all && \
     brew update && \
-    brew bundle install && \
     brew upgrade && \
     brew autoremove && \
     brew cleanup -s
-    # TODO: zx && zre
 }

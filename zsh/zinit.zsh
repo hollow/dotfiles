@@ -23,16 +23,6 @@ zinit for \
 	atload"unalias _" \
 	OMZL::misc.zsh
 
-# clear orphaned completions and plugins and recompile
-# mnemonic: [Z]init [C]ompile
-zc() {
-	zi cclear
-	zi delete --clean --yes
-	zi cclear
-	zi compinit
-	zi compile --all
-}
-
 # Update Zinit and all plugins and completions
 # mnemonic: [Z]init [Up]date
 zup() {
