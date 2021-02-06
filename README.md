@@ -1,5 +1,12 @@
 # dotfiles
 
+## Installation
+
+```sh
+git clone https://github.com/hollow/dotfiles ~/.config
+exec zsh ~/.config/install.zsh
+```
+
 ## Awesome Tools
 
 - https://github.com/BurntSushi/ripgrep

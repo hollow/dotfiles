@@ -5,6 +5,13 @@ ZINIT[BIN_DIR]="${XDG_CONFIG_HOME}"/zinit/bin
 ZINIT[HOME_DIR]="${XDG_CACHE_HOME}"/zinit
 ZINIT[ZCOMPDUMP_PATH]="${ZINIT[HOME_DIR]}"/zcompdump
 ZINIT[COMPINIT_OPTS]="-C"
+
+if [[ ! -e "${ZINIT[BIN_DIR]}"/zinit.zsh ]]; then
+	pushd "${ZDOTDIR}"
+	git submodules update --init
+	popd
+fi
+
 source "${ZINIT[BIN_DIR]}"/zinit.zsh
 
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/lib
