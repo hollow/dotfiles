@@ -2,7 +2,6 @@
 
 ## Awesome Tools
 
-- https://github.com/Aloxaf/fzf-tab
 - https://github.com/asdf-vm/asdf
 - https://github.com/BurntSushi/ripgrep
 - https://github.com/Canop/broot
@@ -22,3 +21,5 @@
 - https://github.com/wfxr/forgit
 - https://github.com/zdharma/fast-syntax-highlighting
 - https://github.com/zdharma/zinit
+- https://github.com/zsh-users/zsh-autosuggestions
+- https://github.com/zsh-users/zsh-completions
