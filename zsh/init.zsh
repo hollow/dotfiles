@@ -21,7 +21,7 @@ source "${ZINIT[BIN_DIR]}"/zinit.zsh
 zinit light-mode lucid for \
 	OMZL::functions.zsh \
 	OMZL::spectrum.zsh \
-	atload"unalias _" \
+	atload"unalias _ afind" \
 	OMZL::misc.zsh
 
 # Load a zsh file with zinit to
@@ -29,7 +29,7 @@ zinit light-mode lucid for \
 zsource() {
 	zinit light-mode lucid for \
 		atload"source '${ZDOTDIR}'/${1}.zsh" \
-		as"null" id-as"ZSH::${1}" \
+		as"null" id-as"zshrc/${1}" \
 		@zdharma/null
 }
 
