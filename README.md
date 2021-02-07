@@ -4,7 +4,8 @@
 
 ```sh
 git clone https://github.com/hollow/dotfiles ~/.config
-exec zsh ~/.config/install.zsh
+ln -nfs ~/.config/zsh/config.zsh ~/.zshenv
+exec zsh
 ```
 
 ## Awesome Tools
