@@ -7,7 +7,7 @@ setopt pushdminus
 # https://github.com/ogham/exa
 # A modern replacement for ‘ls’
 _brew_install exa
-alias exa="exa --header --group-directories-first --group --links --git"
+alias exa="exa --header --group --links --git"
 alias l="exa --all --long"
 
 # https://github.com/sharkdp/fd
