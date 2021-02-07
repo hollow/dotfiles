@@ -41,3 +41,7 @@ _brew_install speedtest-cli
 # https://github.com/jpoliv/wakeonlan
 # wake up computers via Wake-On-LAN magic packets
 _brew_install wakeonlan
+
+_brew_install wget
+export WGETRC="${XDG_CONFIG_HOME}"/wgetrc
+alias wget="wget --hsts-file='${XDG_CACHE_HOME}/wget-hsts'"
