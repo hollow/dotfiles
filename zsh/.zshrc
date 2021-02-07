@@ -17,12 +17,15 @@ zsource gpg
 zsource net
 zsource ssh
 zsource git
-zsource java
 zsource vim
+
 
 if [[ "${OSTYPE}" == darwin* ]]; then
     zsource macos
 fi
+
+zsource android
+zsource java
 
 if _has_secret home-assistant; then
     zsource home-assistant
