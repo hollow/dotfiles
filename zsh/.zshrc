@@ -24,6 +24,10 @@ if [[ "${OSTYPE}" == darwin* ]]; then
     zsource macos
 fi
 
+if _has_secret home-assistant; then
+    zsource home-assistant
+fi
+
 zsource completion
 
 up() {
