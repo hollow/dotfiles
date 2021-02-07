@@ -1,21 +1,15 @@
 # https://github.com/Homebrew/brew
 # The missing package manager for macOS
 
-# only for MacOS
-if [[ -d /Applications ]]; then
-    export HOMEBREW_PREFIX="/usr/local"
-else
-    return
-fi
-
-# install homebrew if missing
-if [[ ! -e /usr/local/bin/brew ]]; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-
 # add homebrew to path
+export HOMEBREW_PREFIX="/usr/local"
 _path_add_bin "${HOMEBREW_PREFIX}"
 _path_add_lib "${HOMEBREW_PREFIX}"
+
+# install homebrew if missing
+if ! (( $+commands[brew] )); then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
 # homebrew zsh function path
 export HOMEBREW_ZSH_FUNCTIONS="${HOMEBREW_PREFIX}"/share/zsh/site-functions
@@ -103,6 +97,9 @@ _brew_install -x \
 _brew_install \
     bash \
     gnupg \
+    jq \
+    tree \
+    wget \
     xz \
     zsh
 
