@@ -12,9 +12,10 @@ zsource history
 zsource bindings
 
 zsource dir
-zsource git
+zsource proc
 zsource net
 zsource ssh
+zsource git
 
 zsource completion
 
