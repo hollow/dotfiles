@@ -3,7 +3,7 @@ source "${ZDOTDIR}"/init.zsh
 zsource brew
 zsource asdf
 
-_path_add path "${XDG_CONFIG_HOME}"/bin
+path=("${XDG_CONFIG_HOME}"/bin ${path})
 
 zsource fzf
 zsource pager
