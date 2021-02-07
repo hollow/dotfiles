@@ -14,6 +14,9 @@
 [advice]
 	detachedHead = false
 
+[commit]
+	gpgSign = true
+
 [color]
 	ui = true
 

@@ -96,7 +96,6 @@ _brew_install -x \
 
 _brew_install \
     bash \
-    gnupg \
     jq \
     tree \
     wget \

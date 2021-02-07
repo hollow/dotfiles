@@ -2,6 +2,13 @@
 # use latest openssh from homebrew
 _brew_install openssh
 
+# symlink ~/.ssh as openssh does not support XDG
+ssh_link="${HOME}/.ssh"
+ssh_conf="${XDG_CONFIG_HOME}/ssh"
+if [[ "$(readlink "${ssh_link}")" != "${ssh_conf}" ]]; then
+    ln -nfs "${ssh_conf}" "${ssh_link}"
+fi
+
 # https://github.com/mobile-shell/mosh
 # mobile shell with roaming and local echo
 _brew_install mosh
@@ -10,11 +17,9 @@ _brew_install mosh
 # ssh server & client auditing
 _brew_install ssh-audit
 
-# load ssh keys into agent
-zinit light-mode lucid for \
-    atinit'zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519' \
-    OMZP::ssh-agent
-
+# connect to a live/rescue system without
+# host key check or known hosts
+# mnemonic: [SSH] to [Live] system
 sshlive() {
     ssh \
         -o "StrictHostKeyChecking no" \

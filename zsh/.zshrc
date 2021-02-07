@@ -13,6 +13,7 @@ zsource bindings
 
 zsource dir
 zsource proc
+zsource gpg
 zsource net
 zsource ssh
 zsource git
