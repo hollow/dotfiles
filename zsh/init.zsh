@@ -29,7 +29,7 @@ zinit light-mode lucid for \
 zsource() {
 	zinit light-mode lucid for \
 		atload"source '${ZDOTDIR}'/${1}.zsh" \
-		as"null" id-as"zshrc/${1}" \
+		as"null" id-as"zshrc/${1}" nocd \
 		@zdharma/null
 }
 

@@ -18,6 +18,7 @@ zsource net
 zsource ssh
 zsource git
 zsource vim
+zsource tmux
 
 if [[ "${OSTYPE}" == darwin* ]]; then
     zsource macos
