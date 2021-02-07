@@ -23,16 +23,34 @@ export PAGER="bat --plain"
 export MANPAGER="sh -c 'col -bx | ${=PAGER} -l man'"
 export MANROFFOPT="-c"
 
+# https://github.com/dbrgn/tealdeer
+# very fast implementation of tldr
+_brew_install tealdeer
+export TEALDEER_CONFIG_DIR="${XDG_CONFIG_HOME}"/teeldear
+export TEALDEER_CACHE_DIR="${XDG_CACHE_HOME}"/teeldear
+
+# update tldr cache during zinit update
+zinit light-mode lucid for \
+    atclone"mkdir -p '${TEALDEER_CACHE_DIR}'; tldr --update" \
+    atpull'%atclone' run-atpull \
+    as"null" id-as'dbrgn/tealdeer' \
+    @zdharma/null
+
+# show tldr or man page or help text of command
+help() {
+    if tldr -l | grep -q "^${1}$"; then
+        tldr "$1"
+    elif man "$1" &>/dev/null; then
+        man "$1"
+    else
+        "$1" --help | ${=PAGER} -l man
+    fi
+}
+
 # Page generic output automatically with bat
 # mnemonic: [P]a[G]er
 pg() {
     ${=PAGER} "$@"
-}
-
-# Page man/help output automatically with bat
-# mnemonic: [P]age [H]elp text
-ph() {
-    pg -l man "$@"
 }
 
 # follow file and colorize with bat
@@ -42,7 +60,11 @@ tf() {
 }
 
 # Sort Output and page it with bat
-# mnemonic: [S]ort [L]ess
-sl() {
+# mnemonic: [S]ort [P]age
+sp() {
     sort -u | pg
 }
+
+# for historical reasons
+# mnemonic: [S]ort [L]ess
+alias sl=sp
