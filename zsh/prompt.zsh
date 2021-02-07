@@ -20,3 +20,12 @@ zinit light-mode lucid for \
 # auto-close and delete matching delimiters
 zinit light-mode lucid for \
     @hlissner/zsh-autopair
+
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/clipboard.zsh
+# setup os dependant clipboard
+zinit light-mode lucid for \
+	OMZL::clipboard.zsh
+
+# https://github.com/mptre/yank
+# yank terminal output to clipboard
+_brew_install yank
