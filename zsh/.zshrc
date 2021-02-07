@@ -17,6 +17,7 @@ zsource gpg
 zsource net
 zsource ssh
 zsource git
+zsource java
 
 zsource completion
 
