@@ -1,15 +1,19 @@
 [alias]
-	aliases = config --get-regexp alias
-	amend = commit --amend --reuse-message=HEAD
-	branches = branch -a
+	aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
+	amend = ci --amend --reuse-message=HEAD
+	changes = status --untracked-files=no --short
 	ci = commit
 	co = checkout
-	cp = cherry-pick
-	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %Cblue(%an)%Creset' --abbrev-commit --date=relative
+	dc = df --cached
+	df = diff --ignore-space-change
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	ls = ls-tree -r HEAD
-	ref = rev-parse HEAD
-	st = status -s
+	new = !sh -c 'git lg $1@{1}..$1@{0} "$@"'
+	rank = shortlog -sn --no-merges
+	st = status --short --branch
+	stat = df --stat
 	tags = tag -l
+	whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
 
 [advice]
 	detachedHead = false
@@ -20,28 +24,12 @@
 [color]
 	ui = true
 
-[core]
-	pager = delta
-
 [credential]
 	helper = osxkeychain
 
-[delta]
-	syntax-theme = "Solarized (dark)"
-	features = line-numbers decorations
-	whitespace-error-style = 22 reverse
-
-[delta "decorations"]
-	commit-decoration-style = bold yellow box ul
-	file-style = bold yellow ul
-	file-decoration-style = none
-	hunk-header-decoration-style = yellow box
-
 [diff]
     colorMoved = default
-
-[interactive]
-    diffFilter = delta --color-only
+	renames = copies
 
 [push]
 	followTags = true

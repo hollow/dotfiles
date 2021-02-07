@@ -35,20 +35,20 @@ export FORGIT_FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} --no-height --reverse"
 # command line gister
 _brew_install gist
 
+alias c="git changes"
 alias ga="git add --all"
 alias gap="git add --patch"
-alias gca="git commit --all"
-alias gcaa="git commit --all --amend"
-alias gcm="git checkout master"
-alias gcu="git checkout upstream"
-alias gd="git diff -b"
-alias gdc="gd --cached"
-alias gdm="gd master"
+alias gcm="git co \$(git main-branch)"
+alias gcu="git co upstream"
+alias gd="git df"
+alias gdc="git dc"
+alias gdm="git df \$(git main-branch)"
+alias gdu="git df upstream"
 alias gl="git lg"
 alias gp="git pull"
 alias gpr="git pull --rebase --autostash"
 alias grh="git reset HEAD"
-alias s="git status -sb ."
+alias s="git st"
 
 # clone a repository into ~/src/<owner>/<name>
 # and cd into it afterwards
