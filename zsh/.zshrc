@@ -28,6 +28,10 @@ if _has_secret home-assistant; then
     zsource home-assistant
 fi
 
+if _has_secret threema; then
+    zsource threema
+fi
+
 zsource completion
 
 up() {
