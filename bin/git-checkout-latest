@@ -3,16 +3,11 @@
 set -e
 set -x
 
-git cleanup
-
-latest="$(git describe --abbrev=0 --tags 2>/dev/null || :)"
-if [[ -z ${latest} ]]; then
-    latest=$(git-main-branch)
-fi
-
+main="$(git main-branch)"
+latest="$(git latest)"
 git checkout "${latest}"
 
-if [[ "${latest}" == "master" || "${latest}" == "main" ]]; then
+if [[ "${latest}" == "${main}" ]]; then
     git branch -q --set-upstream-to="origin/${latest}"
     git pull -q --rebase --autostash
 fi
