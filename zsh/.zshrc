@@ -20,6 +20,10 @@ zsource git
 zsource java
 zsource vim
 
+if [[ "${OSTYPE}" == darwin* ]]; then
+    zsource macos
+fi
+
 zsource completion
 
 up() {
