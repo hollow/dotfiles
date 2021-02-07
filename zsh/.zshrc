@@ -19,7 +19,6 @@ zsource ssh
 zsource git
 zsource vim
 
-
 if [[ "${OSTYPE}" == darwin* ]]; then
     zsource macos
 fi
