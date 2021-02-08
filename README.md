@@ -20,7 +20,7 @@ Zinit will initialize
 as package and version managers.
 
 Additionally
-[direnv](ttps://github.com/direnv/direnv)
+[direnv](https://github.com/direnv/direnv)
 is installed for project related environment management.
 
 The following zsh plugins are available by default:
