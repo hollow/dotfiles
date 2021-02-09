@@ -1,1 +1,4 @@
+config.*
+environment*
+id_*
 known_hosts
