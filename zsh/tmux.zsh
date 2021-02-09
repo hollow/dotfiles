@@ -12,15 +12,24 @@ function _zsh_tmux_plugin_run() {
         command tmux "$@"
         return $?
     else
-        local session="${ITERM_PROFILE:+iterm}"
-        command tmux ${ITERM_PROFILE+-CC} \
-            new-session -A -s ${session:-default}
+        command tmux new-session -A -s "${ZSH_TMUX_SESSION_NAME}"
         exit
     fi
 }
 
-# Autostart if not already in tmux and enabled.
-if [[ -z "$TMUX" && -z "$VIM" && "$ZSH_TMUX_AUTOSTARTED" != "true" ]]; then
-    export ZSH_TMUX_AUTOSTARTED=true
+_zsh_tmux_session_name="default"
+
+if [[ "${TERM_PROGRAM}" == "iTerm.app" ]]; then
+    _zsh_tmux_session_name="iterm"
+elif [[ "${TERM_PROGRAM}" == "vscode" ]]; then
+    _zsh_tmux_session_name="${PWD#${HOME}/}"
+    _zsh_tmux_session_name="${_zsh_tmux_session_name#.}"
+    _zsh_tmux_session_name="${_zsh_tmux_session_name/./-}"
+fi
+
+if [[ -z "${TMUX}" && "${ZSH_TMUX_SESSION_NAME}" != "${_zsh_tmux_session_name}" ]]; then
+    export ZSH_TMUX_SESSION_NAME="${_zsh_tmux_session_name}"
     _zsh_tmux_plugin_run
 fi
+
+unset _zsh_tmux_session_name
