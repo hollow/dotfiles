@@ -24,8 +24,10 @@ if [[ "${OSTYPE}" == darwin* ]]; then
     zsource macos
 fi
 
-zsource android
 zsource java
+zsource python
+
+zsource android
 
 if _has_secret home-assistant; then
     zsource home-assistant
