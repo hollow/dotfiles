@@ -28,14 +28,10 @@ zsource java
 zsource python
 
 zsource android
-
-if _has_secret home-assistant; then
-    zsource home-assistant
-fi
-
-if _has_secret threema; then
-    zsource threema
-fi
+zsource docker
+zsource home-assistant
+zsource threema
+zsource vagrant
 
 zsource completion
 

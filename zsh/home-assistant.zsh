@@ -5,6 +5,9 @@
 # export HASS_SERVER=...
 # export HASS_TOKEN=...
 # secrets encrypt home-assistant
+if ! _has_secret home-assistant; then
+    return
+fi
 
 # https://github.com/home-assistant-ecosystem/home-assistant-cli
 # command line utility for home assistant

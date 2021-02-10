@@ -4,6 +4,9 @@
 # cat threema
 # THREEMA_ID=...
 # secrets encrypt threema
+if ! _has_secret threema; then
+    return
+fi
 
 if [[ "${OSTYPE}" == darwin* ]]; then
     zinit light-mode lucid for \
