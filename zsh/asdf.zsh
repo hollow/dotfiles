@@ -1,69 +1,42 @@
 # https://github.com/asdf-vm/asdf
 # The extendable version manager
+zinit light-mode lucid for \
+    atinit'export ASDF_DIR="${PWD}" && path=("${PWD}/bin" $path)' \
+    atload'source "${ASDF_DIR}/lib/asdf.sh"' as"null" \
+    @asdf-vm/asdf
+
 export ASDF_DATA_DIR="${XDG_CACHE_HOME}"/asdf
 export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}"/asdf/config
 export ASDF_VERSIONS_FILE="${XDG_CONFIG_HOME}"/asdf/versions
 export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME="${ASDF_VERSIONS_FILE}"
 
-zinit light-mode lucid for \
-    @asdf-vm/asdf
-
-_path_add path "${ASDF_DATA_DIR}/shims"
-
-_asdf_need_plugin() {
-    local name="$1"
-    if [[ ! -d "${ASDF_DATA_DIR}/plugins/${name}" ]]; then
-        asdf plugin add "${name}" 1>&2 || return 1
-        asdf plugin update "${name}" 1>&2 || return 1
-    fi
-}
-
-_asdf_install_version() {
-    _asdf_need_plugin "$1" || return 1
-
-    local name="$1"
-    local version="${2:-$(asdf latest "$1")}"
-    local install_dir="${ASDF_DATA_DIR}/installs/${name}/${version}"
-
-    if [[ ! -d "${install_dir}" ]]; then
-        asdf install "${name}" "${version}" 1>&2 || return 1
-        asdf reshim || return 1
-    fi
-}
-
-_asdf_install_from_file() {
-    local pattern="${2:-.*}"
-    while read -r name version; do
-        if [[ "${name}" =~ "^${pattern}$" ]]; then
-            _asdf_install_version "${name}" "${version}"
-        fi
-    done <"$1"
-}
-
-_asdf_install() {
-    _asdf_install_from_file "${ASDF_VERSIONS_FILE}" "${1}"
-}
-
 # https://github.com/direnv/direnv
 # change environment variables based on the current directory
 _brew_install direnv
-_asdf_install direnv # for asdf integration
 
 _direnv_hook() {
-    trap -- '' SIGINT
-    eval "$("${HOMEBREW_PREFIX}"/bin/direnv export zsh)"
-    trap - SIGINT
+    if [[ ! -d "${ASDF_DATA_DIR}/plugins/direnv" ]]; then
+        asdf plugin add direnv &>2
+    fi
+
+    if [[ ! -d "${ASDF_DATA_DIR}/installs/direnv/${ASDF_DIRENV_VERSION}" ]]; then
+        asdf plugin update direnv &>2
+        asdf install direnv &>2
+    fi
+
+    asdf direnv hook zsh
 }
 
-typeset -ag precmd_functions;
-if [[ -z ${precmd_functions[(r)_direnv_hook]} ]]; then
-    precmd_functions=( _direnv_hook ${precmd_functions[@]} )
-fi
+# no need for a global versions file
+# force the direnv version via env
+export ASDF_DIRENV_VERSION=2.27.0
 
-typeset -ag chpwd_functions;
-if [[ -z ${chpwd_functions[(r)_direnv_hook]} ]]; then
-    chpwd_functions=( _direnv_hook ${chpwd_functions[@]} )
-fi
+zinit light-mode lucid for \
+    atclone'_direnv_hook > direnv.zsh' \
+    atpull'%atclone' run-atpull \
+    atload'source direnv.zsh' \
+    as"null" id-as'direnv/direnv' \
+    @zdharma/null
 
 # install one or more versions of specified language
 # mnemonic: [A]sdf [I]nstall
