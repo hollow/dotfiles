@@ -29,8 +29,6 @@ _asdf_install_version() {
         asdf install "${name}" "${version}" 1>&2 || return 1
         asdf reshim || return 1
     fi
-
-    echo "${version}"
 }
 
 _asdf_install_from_file() {
@@ -43,9 +41,7 @@ _asdf_install_from_file() {
 }
 
 _asdf_install() {
-    local name="$1"
-    local version="$(_asdf_install_from_file "${ASDF_VERSIONS_FILE}" "${name}")"
-    asdf global "${name}" "${version}" 1>&2
+    _asdf_install_from_file "${ASDF_VERSIONS_FILE}" "${1}"
 }
 
 # https://github.com/direnv/direnv
@@ -53,15 +49,9 @@ _asdf_install() {
 _brew_install direnv
 _asdf_install direnv # for asdf integration
 
-# make sure we're not using the slow asdf exec shim
-# otherwise our prompt will take >300ms each time
-direnv() {
-    "${HOMEBREW_PREFIX}"/bin/direnv "$@"
-}
-
 _direnv_hook() {
     trap -- '' SIGINT
-    eval "$(direnv export zsh)"
+    eval "$("${HOMEBREW_PREFIX}"/bin/direnv export zsh)"
     trap - SIGINT
 }
 
