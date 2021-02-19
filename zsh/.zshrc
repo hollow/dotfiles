@@ -3,8 +3,6 @@ source "${ZDOTDIR}"/init.zsh
 zsource brew
 zsource asdf
 
-path=("${XDG_CONFIG_HOME}"/bin ${path})
-
 zsource fzf
 zsource pager
 zsource prompt
@@ -34,6 +32,8 @@ zsource threema
 zsource vagrant
 
 zsource completion
+
+path=("${XDG_CONFIG_HOME}"/bin ${path})
 
 up() {
     bup && \
