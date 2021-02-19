@@ -94,6 +94,7 @@ _brew_install \
     bash \
     jq \
     tree \
+    wget \
     xz \
     zsh
 

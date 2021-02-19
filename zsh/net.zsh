@@ -42,6 +42,9 @@ _brew_install speedtest-cli
 # wake up computers via Wake-On-LAN magic packets
 _brew_install wakeonlan
 
-_brew_install wget
-export WGETRC="${XDG_CONFIG_HOME}"/wgetrc
-alias wget="wget --hsts-file='${XDG_CACHE_HOME}/wget-hsts'"
+# https://github.com/ducaale/xh
+# Yet another HTTPie clone in Rust.
+_brew_install xh
+alias dl="xh -d"
+alias ht=xh
+alias http=xh

@@ -8,7 +8,7 @@ export USER=${USER:-$(whoami)}
 export LANG="${LANG:-en_US.UTF-8}"
 export LC_CTYPE="${LC_CTYPE:-$LANG}"
 
-# make sure xdg directories work
+# make sure XDG directories work
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
@@ -16,6 +16,10 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 mkdir -p "${XDG_CACHE_HOME}"
 mkdir -p "${XDG_CONFIG_HOME}"
 mkdir -p "${XDG_DATA_HOME}"
+
+# make wget XDG compliant
+export WGETRC="${XDG_CONFIG_HOME}"/wgetrc
+alias wget="wget --hsts-file='${XDG_CACHE_HOME}/wget-hsts'"
 
 # path helpers
 _path_add() {
