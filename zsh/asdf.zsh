@@ -5,7 +5,7 @@ _asdf_setup_path() {
     _path_add_bin "${PWD}"
 }
 
-zinit light-mode lucid for \
+zinit lucid for \
     atinit'_asdf_setup_path' \
     atload'source lib/asdf.sh' \
     as"null" \
@@ -37,7 +37,7 @@ _direnv_generate_hook() {
     asdf direnv hook zsh > hook.zsh
 }
 
-zinit light-mode lucid for \
+zinit lucid for \
     atclone'_direnv_generate_hook' \
     atpull'%atclone' run-atpull \
     atload'source hook.zsh' \

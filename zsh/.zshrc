@@ -1,13 +1,16 @@
 source "${ZDOTDIR}"/init.zsh
 
+zsource bindings
+zsource completion
+zsource history
+zsource prompt
+
 zsource brew
 zsource asdf
 
 zsource fzf
 zsource pager
-zsource prompt
-zsource history
-zsource bindings
+zsource clipboard
 
 zsource dir
 zsource proc
@@ -36,10 +39,10 @@ zsource home-assistant
 zsource threema
 zsource vagrant
 
-zsource completion
+# our local bin overrides everything
+_path_add_bin "${XDG_CONFIG_HOME}"
 
-path=("${XDG_CONFIG_HOME}"/bin ${path})
-
+# system update helper
 up() {
     bup && \
     zup && \

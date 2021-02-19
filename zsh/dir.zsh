@@ -4,6 +4,14 @@ setopt auto_pushd
 setopt pushd_ignore_dups
 setopt pushdminus
 
+# https://github.com/trapd00r/LS_COLORS
+zinit lucid for \
+    atclone"dircolors -b LS_COLORS > dircolors.zsh" \
+    atpull'%atclone' run-atpull \
+    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
+    pick"dircolors.zsh" nocompile'!' \
+    @trapd00r/LS_COLORS
+
 # https://github.com/ogham/exa
 # A modern replacement for ‘ls’
 _brew_install exa
@@ -35,7 +43,7 @@ _brew_install diskus
 # https://github.com/Canop/broot
 # A new way to see and navigate directory trees
 _brew_install broot
-zinit light-mode lucid for \
+zinit lucid for \
     atclone'broot --print-shell-function zsh > broot.zsh' \
     atpull'%atclone' run-atpull \
     atload'source broot.zsh' \

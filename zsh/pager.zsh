@@ -34,7 +34,7 @@ export TEALDEER_CONFIG_DIR="${XDG_CONFIG_HOME}"/teeldear
 export TEALDEER_CACHE_DIR="${XDG_CACHE_HOME}"/teeldear
 
 # update tldr cache during zinit update
-zinit light-mode lucid for \
+zinit lucid for \
     atclone"mkdir -p '${TEALDEER_CACHE_DIR}'; tldr --update" \
     atpull'%atclone' run-atpull \
     as"null" id-as'dbrgn/tealdeer' \

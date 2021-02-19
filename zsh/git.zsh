@@ -3,7 +3,7 @@ _brew_install git
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
 # load git functions from ohmyzsh
-zinit light-mode lucid for \
+zinit lucid for \
     atinit'zstyle ":completion:*:*:git:*" script "${HOMEBREW_ZSH_FUNCTIONS}"/git-completion.bash' \
     OMZL::git.zsh
 

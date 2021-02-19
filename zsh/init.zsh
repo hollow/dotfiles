@@ -18,7 +18,7 @@ source "${ZINIT[BIN_DIR]}"/zinit.zsh
 
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/lib
 # OMZ and extensions
-zinit light-mode lucid for \
+zinit lucid for \
 	OMZL::functions.zsh \
 	OMZL::spectrum.zsh \
 	atload"unalias _ afind" \
@@ -27,10 +27,7 @@ zinit light-mode lucid for \
 # Load a zsh file with zinit to
 # get traces and benchmarks
 zsource() {
-	zinit light-mode lucid for \
-		atload"source '${ZDOTDIR}'/${1}.zsh" \
-		as"null" id-as"zshrc/${1}" nocd \
-		@zdharma/null
+	source "${ZDOTDIR}/${1}.zsh"
 }
 
 # Update Zinit and all plugins and completions
