@@ -57,12 +57,6 @@ pg() {
     ${=PAGER} "$@"
 }
 
-# follow file and colorize with bat
-# menmonic: [T]ail [F]ollow
-tf() {
-    tail -f "$@" | pg -l log
-}
-
 # Sort Output and page it with bat
 # mnemonic: [S]ort [P]age
 sp() {
