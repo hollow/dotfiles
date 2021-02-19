@@ -1,6 +1,5 @@
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/completion.zsh
-zinit light-mode lucid for \
-    OMZL::completion.zsh
+zinit lucid for OMZL::completion.zsh
 
 # do not eat space character after completion
 # https://superuser.com/questions/613685/how-stop-zsh-from-eating-space-before-pipe-symbol

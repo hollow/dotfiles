@@ -10,5 +10,4 @@ zinit lucid for \
 
 # https://github.com/hlissner/zsh-autopair
 # auto-close and delete matching delimiters
-zinit lucid for \
-    @hlissner/zsh-autopair
+zinit lucid for @hlissner/zsh-autopair

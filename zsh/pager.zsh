@@ -33,12 +33,12 @@ _brew_install tealdeer
 export TEALDEER_CONFIG_DIR="${XDG_CONFIG_HOME}"/teeldear
 export TEALDEER_CACHE_DIR="${XDG_CACHE_HOME}"/teeldear
 
-# update tldr cache during zinit update
-zinit lucid for \
-    atclone"mkdir -p '${TEALDEER_CACHE_DIR}'; tldr --update" \
-    atpull'%atclone' run-atpull \
-    as"null" id-as'dbrgn/tealdeer' \
-    @zdharma/null
+# update tldr cache during global update
+_tealdeer_update() {
+    mkdir -p "${TEALDEER_CACHE_DIR}"
+    tldr --update
+}
+_update_append _tealdeer_update
 
 # show tldr or man page or help text of command
 help() {

@@ -1,3 +1,9 @@
+# hook into global update
+_macos_update() {
+    softwareupdate --verbose --install --all
+}
+_update_insert _macos_update
+
 # https://github.com/jiahaog/nativefier
 # wrap web apps in native mac apps
 _brew_install nativefier

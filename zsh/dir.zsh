@@ -43,12 +43,7 @@ _brew_install diskus
 # https://github.com/Canop/broot
 # A new way to see and navigate directory trees
 _brew_install broot
-zinit lucid for \
-    atclone'broot --print-shell-function zsh > broot.zsh' \
-    atpull'%atclone' run-atpull \
-    atload'source broot.zsh' \
-    as"null" id-as'Canop/broot' \
-    @zdharma/null
+eval "$(broot --print-shell-function zsh)"
 
 # cd helpers
 alias -g ...='cd ../..'

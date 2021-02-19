@@ -41,10 +41,3 @@ zsource vagrant
 
 # our local bin overrides everything
 _path_add_bin "${XDG_CONFIG_HOME}"
-
-# system update helper
-up() {
-    bup && \
-    zup && \
-    zre
-}

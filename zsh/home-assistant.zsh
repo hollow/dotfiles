@@ -11,31 +11,10 @@ fi
 # https://github.com/home-assistant-ecosystem/home-assistant-cli
 # command line utility for home assistant
 _brew_install homeassistant-cli
-
-# generate static homeassistant-cli zsh completion
-zinit lucid for \
-    atclone'hass-cli completion zsh > _hass-cli.zsh' \
-    atpull'%atclone' run-atpull \
-    atload'source hass-cli.zsh' \
-    pick"/dev/null" \
-    id-as'home-assistant-ecosystem/home-assistant-cli' \
-    @zdharma/null
-
-# generate static asdf direnv hook
-# to speed up zshrc loading times
-_direnv_generate_hook() {
-    asdf plugin add direnv
-    asdf plugin update direnv
-    asdf install direnv
-    asdf direnv hook zsh > hook.zsh
+_hass_update() {
+    hass-cli completion zsh >/usr/local/share/zsh/site-functions/_hass-cli
 }
-
-zinit lucid for \
-    atclone'_direnv_generate_hook' \
-    atpull'%atclone' run-atpull \
-    atload'source hook.zsh' \
-    as"null" id-as'direnv/direnv' \
-    @zdharma/null
+_update_append _hass_update
 
 # wrap home assistant interface in native mac app
 if [[ "${OSTYPE}" == darwin* ]]; then

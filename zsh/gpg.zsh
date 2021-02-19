@@ -4,13 +4,11 @@ _brew_install gnupg
 export GNUPGHOME="${XDG_CONFIG_HOME}"/gnupg
 
 # load ssh keys into agent
-zinit lucid for \
-    OMZP::gpg-agent
+zinit lucid for OMZP::gpg-agent
 
 # https://github.com/chuwy/zsh-secrets
 # store gpg encrypted environment variables
-zinit lucid for \
-    @chuwy/zsh-secrets
+zinit lucid for @chuwy/zsh-secrets
 
 export RECEPIENT="$(gpg --with-colons --list-secret-keys | sed -nr 's/^uid:.*<(.*)>.*/\1/p')"
 export SECRETS_STORAGE="${XDG_CONFIG_HOME}/secrets"

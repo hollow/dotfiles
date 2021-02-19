@@ -54,3 +54,18 @@ zx() {
 	rm -rf "${XDG_CACHE_HOME}"
 	exec zsh
 }
+
+# global update functionality
+typeset -ag _update_hooks
+_update_append() { _update_hooks=(${_update_hooks} "$1") }
+_update_insert() { _update_hooks=("$1" ${_update_hooks}) }
+
+up() {
+    for f in ${_update_hooks}; do
+        echo ">>> ${f}"
+        ${f}
+        echo
+    done
+    zup
+    zre
+}

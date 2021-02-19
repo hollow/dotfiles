@@ -68,6 +68,15 @@ _brew_install() {
     done
 }
 
+# hook into global update
+_brew_upgrade() {
+    brew update && \
+    brew upgrade && \
+    brew autoremove && \
+    brew cleanup -s
+}
+_update_insert _brew_upgrade
+
 # ensure a proper GNU based environment
 _brew_install -l \
     curl \
@@ -124,14 +133,4 @@ bz() {
     for pkg_name in "$@"; do
         brew uninstall --zap "${pkg_name}"
     done
-}
-
-# update all homebrew packages
-# mnemonic: [B]rew [Up]grade
-bup() {
-    softwareupdate --verbose --install --all && \
-    brew update && \
-    brew upgrade && \
-    brew autoremove && \
-    brew cleanup -s
 }
