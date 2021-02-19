@@ -25,6 +25,7 @@ fi
 zsource golang
 zsource java
 zsource python
+zsource ruby
 
 zsource android
 zsource docker
