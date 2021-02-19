@@ -22,6 +22,7 @@ if [[ "${OSTYPE}" == darwin* ]]; then
     zsource macos
 fi
 
+zsource golang
 zsource java
 zsource python
 
