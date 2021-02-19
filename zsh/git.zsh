@@ -45,7 +45,7 @@ alias gl="git lg"
 alias gp="git pull"
 alias gpr="git pull --rebase --autostash"
 alias grh="git reset HEAD"
-alias s="git st"
+alias s="git st ."
 
 # clone a repository into ~/src/<owner>/<name>
 # and cd into it afterwards
