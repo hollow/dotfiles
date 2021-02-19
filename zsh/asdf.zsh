@@ -30,6 +30,7 @@ _direnv_hook() {
 # no need for a global versions file
 # force the direnv version via env
 export ASDF_DIRENV_VERSION=2.27.0
+export DIRENV_WARN_TIMEOUT="5m"
 
 zinit light-mode lucid for \
     atclone'_direnv_hook > direnv.zsh' \
