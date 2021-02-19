@@ -44,8 +44,9 @@ zinit light-mode lucid for \
 ai() {
     local fzf=("fzf" "--preview" "asdf info")
     local plugin=${1:-$(asdf plugin list all | $fzf | awk '{print $1}')}
-    _asdf_need_plugin "$plugin" || return 1
+    asdf plugin add "${plugin}"
+    asdf plugin update "${plugin}"
     for version in $(asdf list all $plugin | $fzf --tac -m); do
-        _asdf_install_version $plugin $version || return 1
+        asdf install "${plugin}" "${version}"
     done
 }
