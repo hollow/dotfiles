@@ -12,7 +12,7 @@ zinit light-mode lucid for \
 zinit light-mode lucid for \
     @chuwy/zsh-secrets
 
-export RECEPIENT="${DEFAULT_EMAIL}"
+export RECEPIENT="$(gpg --with-colons --list-secret-keys | sed -nr 's/^uid:.*<(.*)>.*/\1/p')"
 export SECRETS_STORAGE="${XDG_CONFIG_HOME}/secrets"
 mkdir -p "${SECRETS_STORAGE}"
 

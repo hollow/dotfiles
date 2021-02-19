@@ -1,5 +1,3 @@
-source "${ZDOTDIR}"/config.zsh
-
 # we have color support all the time
 export EDITOR=${EDITOR:-vim}
 export SHELL=${SHELL:-$ZSH_ARGZERO}

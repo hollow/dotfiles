@@ -1,10 +1,3 @@
-# set these here from config.zsh instead of adding
-# personal information to git/config
-export GIT_AUTHOR_NAME="${DEFAULT_NAME}"
-export GIT_AUTHOR_EMAIL="${DEFAULT_EMAIL}"
-export GIT_COMMITTER_NAME="${DEFAULT_NAME}"
-export GIT_COMMITTER_EMAIL="${DEFAULT_EMAIL}"
-
 # use git from homebrew
 _brew_install git
 
@@ -14,22 +7,26 @@ zinit light-mode lucid for \
     atinit'zstyle ":completion:*:*:git:*" script "${HOMEBREW_ZSH_FUNCTIONS}"/git-completion.bash' \
     OMZL::git.zsh
 
-# make sure completion can find bash helpers
-
-# https://github.com/dandavison/delta
-# A viewer for git and diff output
-_brew_install git-delta
+# Git & GitHub Secrets
+# https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token
+#
+# > secrets decrypt git
+# export GIT_AUTHOR_NAME="John Developer"
+# export GIT_AUTHOR_EMAIL="john@developer.com"
+# export GIT_COMMITTER_NAME="${GIT_AUTHOR_NAME}"
+# export GIT_COMMITTER_EMAIL="${GIT_AUTHOR_EMAIL}"
+# export GITHUB_TOKEN="123456789abcdef"
+# echo ${GITHUB_TOKEN} > "${HOME}"/.gist
+_has_secret git
 
 # https://github.com/tj/git-extras
 # lots of git utilities
 _brew_install git-extras
 
-# https://github.com/wfxr/forgit
-# interactive git tools
-zinit light-mode lucid for \
-    @wfxr/forgit
-
-export FORGIT_FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} --no-height --reverse"
+# https://github.com/github/hub
+# a command-line tool that makes git easier to use with GitHub
+_brew_install hub
+alias git=hub
 
 # https://github.com/defunkt/gist
 # command line gister

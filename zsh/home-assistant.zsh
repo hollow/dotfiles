@@ -1,10 +1,9 @@
 # Home Assistant
 # https://www.home-assistant.io/
 #
-# cat home-assistant
+# > secrets decrypt home-assistant
 # export HASS_SERVER=...
 # export HASS_TOKEN=...
-# secrets encrypt home-assistant
 if ! _has_secret home-assistant; then
     return
 fi

@@ -26,10 +26,6 @@ export HOMEBREW_FORCE_BREWED_CURL=1
 export HOMEBREW_FORCE_BREWED_GIT=1
 export HOMEBREW_FORCE_VENDOR_RUBY=1
 
-# set git config just in case
-export HOMEBREW_GIT_EMAIL="${DEFAULT_EMAIL}"
-export HOMEBREW_GIT_NAME="${DEFAULT_NAME}"
-
 # store a bundle of all installed applications
 export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/brew/packages"
 export HOMEBREW_BUNDLE_NO_LOCK=1
