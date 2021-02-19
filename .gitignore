@@ -1,3 +1,4 @@
 **/*.zwc
-secrets
+gcloud
 iterm2
+secrets
