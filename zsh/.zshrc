@@ -27,6 +27,7 @@ zsource python
 
 zsource android
 zsource docker
+zsource gcloud
 zsource home-assistant
 zsource threema
 zsource vagrant

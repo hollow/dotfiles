@@ -33,9 +33,14 @@ _make_native() {
 _brew_install mas
 
 # fast replacement for `brew install --cask <pkg>`
+_cask_path() {
+    local cask_path="${HOMEBREW_PREFIX}/Caskroom/$1"
+    echo "${cask_path}"
+    test -d "${cask_path}"
+}
+
 _cask_install() {
-    local cask_path="${HOMEBREW_PREFIX}/Caskroom/${1}"
-    if [[ ! -d "${cask_path}" ]]; then
-        brew install --cask "${1}"
+    if ! _cask_path "$1" >/dev/null; then
+        brew install --cask "$1"
     fi
 }
