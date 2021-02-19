@@ -16,13 +16,12 @@ source "${ASDF_DIR}"/lib/asdf.sh
 # https://github.com/direnv/direnv
 # change environment variables based on the current directory
 _brew_install direnv
+eval "$(direnv hook zsh)"
+alias da="direnv allow"
 
 # accept long running asdf installs
 # without warning messages
 export DIRENV_WARN_TIMEOUT="5m"
-
-# hook direnv into zsh
-eval "$(direnv hook zsh)"
 
 # install one or more versions of specified language
 # mnemonic: [A]sdf [I]nstall
