@@ -27,6 +27,7 @@ zsource java
 zsource python
 zsource ruby
 zsource rust
+zsource terraform
 
 zsource android
 zsource docker
