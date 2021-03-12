@@ -30,14 +30,18 @@ zsource java
 zsource python
 zsource ruby
 zsource rust
+
+zsource docker
+zsource vagrant
+
+zsource ansible
+zsource gcloud
 zsource terraform
 
 zsource android
-zsource docker
-zsource gcloud
 zsource home-assistant
 zsource threema
-zsource vagrant
+zsource vscode
 
 # our local bin overrides everything
 _path_add_bin "${XDG_CONFIG_HOME}"

@@ -1,5 +1,6 @@
 **/*.zwc
+docker
 gcloud
+ghorg
 iterm2
 secrets
-docker
