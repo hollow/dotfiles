@@ -1,6 +1,6 @@
 # https://github.com/xxxserxxx/gotop
 # graphical activity monitor
-_brew_install gotop
+# TODO (BROKEN ON M1): _brew_install gotop
 
 # https://github.com/htop-dev/htop
 # an interactive process viewer

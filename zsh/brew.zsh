@@ -2,7 +2,12 @@
 # The missing package manager for macOS
 
 # add homebrew to path
-export HOMEBREW_PREFIX="/usr/local"
+if [[ -d /opt/homebrew ]]
+    export HOMEBREW_PREFIX="/opt/homebrew"
+else
+    export HOMEBREW_PREFIX="/usr/local"
+fi
+
 _path_add_bin "${HOMEBREW_PREFIX}"
 _path_add_lib "${HOMEBREW_PREFIX}"
 
@@ -20,11 +25,6 @@ export HOMEBREW_COLOR=1
 # we do not need these
 export HOMEBREW_NO_ANALYTICS=1
 export HOMEBREW_NO_COMPAT=1
-
-# use recent versions installed by ourselves
-export HOMEBREW_FORCE_BREWED_CURL=1
-export HOMEBREW_FORCE_BREWED_GIT=1
-export HOMEBREW_FORCE_VENDOR_RUBY=1
 
 # store a bundle of all installed applications
 export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/brew/packages"

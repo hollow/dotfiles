@@ -4,7 +4,7 @@ _brew_install dnstop
 
 # https://github.com/ogham/dog
 # command-line DNS client
-_brew_install dog
+# TODO (BROKEN ON M1): _brew_install dog
 
 # https://github.com/imapsync/imapsync
 # imap transfer tool
@@ -28,7 +28,7 @@ _brew_install nmap
 
 # https://github.com/ntop/ntopng
 # network traffic monitor
-_brew_install ntopng
+# TODO (BROKEN ON M1): _brew_install ntopng
 
 # https://github.com/denilsonsa/prettyping
 # colorful, compact wrapper for ping

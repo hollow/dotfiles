@@ -10,7 +10,7 @@ ZINIT[COMPINIT_OPTS]="-C"
 
 if [[ ! -e "${ZINIT[BIN_DIR]}"/zinit.zsh ]]; then
 	pushd "${ZDOTDIR}"
-	git submodules update --init
+	git submodule update --init
 	popd
 fi
 
