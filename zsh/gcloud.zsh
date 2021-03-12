@@ -7,3 +7,4 @@ _path_add_bin "$(_cask_path google-cloud-sdk)"/latest/google-cloud-sdk
 export BOTO_CONFIG="${XDG_CONFIG_HOME}/boto/config"
 export BOTO_PATH="${XDG_CONFIG_HOME}/boto"
 echo "[GSUtil]\nstate_dir = ${XDG_CACHE_HOME}/gsutil" > "${BOTO_PATH}/state_dir"
+alias gs=gsutil
