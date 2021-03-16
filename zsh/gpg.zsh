@@ -3,7 +3,7 @@
 _brew_install gnupg
 export GNUPGHOME="${XDG_CONFIG_HOME}"/gnupg
 
-cat > gnupg/gpg-agent.conf <<EOF
+cat > "${GNUPGHOME}"/gpg-agent.conf <<EOF
 pinentry-program ${HOMEBREW_PREFIX}/bin/pinentry-mac
 enable-ssh-support
 EOF
