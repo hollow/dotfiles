@@ -12,7 +12,7 @@ fi
 # command line utility for home assistant
 _brew_install homeassistant-cli
 _hass_update() {
-    hass-cli completion zsh >/usr/local/share/zsh/site-functions/_hass-cli
+    hass-cli completion zsh > "${HOMEBREW_PREFIX}"/share/zsh/site-functions/_hass-cli
 }
 _update_append _hass_update
 
