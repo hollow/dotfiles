@@ -32,7 +32,6 @@ zsource ruby
 zsource rust
 
 zsource docker
-zsource vagrant
 
 zsource ansible
 zsource gcloud
