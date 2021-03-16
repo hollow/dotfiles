@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+cd "$(realpath -m "$0"/..)"
 
-echo -e "\n>>> creating new gpg secret key backup\n"
+echo -e "\n>>> creating new dotfile backup\n"
 
 read -erp "private key id: " -i "${RECEPIENT}" RECEPIENT
 read -erp "bitwarden server url: " -i "${BW_URL:-$(bw config server)}" BW_URL
@@ -10,7 +11,7 @@ bw --quiet config server "${BW_URL}"
 
 item="{
     type: 2,
-    name: \"GPG Secret Key (${RECEPIENT}) ($(date +%Y%m%dT%H%M%SZ))\",
+    name: \"dotfiles backup ($(date +%Y%m%dT%H%M%SZ))\",
     notes: \"To restore from backup download attachment, unpack and run restore.sh\",
     secureNote: { type: 0 }
 }"
@@ -37,9 +38,14 @@ gpg --export-ownertrust >"${tmp}"/ownertrust.txt
 echo ">>> generating revocation certificate"
 printf "Y\n0\n\nY\n" | gpg --command-fd 0 --gen-revoke "${RECEPIENT}" >"${tmp}"/revoke.crt
 
+echo ">>> collectiong zsh secrets"
+mkdir -p "${tmp}"/secrets
+cp -a "${XDG_CONFIG_HOME}"/secrets/* "${tmp}"/secrets
+
 echo -e "\n\n>>> backup complete - creating archive"
-cp -a "$(dirname "$0")"/restore.sh "${tmp}"/restore.sh
+cp -a "${XDG_CONFIG_HOME}"/restore.sh "${tmp}"/restore.sh
 tar cjvpf "${RECEPIENT}".tar.xz -C "${tmp}" .
+trap '{ rm -f -- "${RECEPIENT}".tar.xz; }' EXIT
 
 echo -e "\n>>> uploading archive to bitwarden"
 item="$(bw get template item | jq ". + ${item}" | bw encode | bw create item | jq -r .id)"
