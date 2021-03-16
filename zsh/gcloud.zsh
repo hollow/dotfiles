@@ -1,6 +1,15 @@
 # https://cloud.google.com/sdk/gcloud
-_cask_install google-cloud-sdk
-_path_add_bin "$(_cask_path google-cloud-sdk)"/latest/google-cloud-sdk
+paths=("${ASDF_DATA_DIR}"/installs/gcloud/*/(NOn))
+
+if [[ ! -r "${paths[1]}"/path.zsh.inc ]]; then
+    asdf plugin add gcloud
+    asdf install gcloud latest
+fi
+
+paths=("${ASDF_DATA_DIR}"/installs/gcloud/*/(NOn))
+source ${paths[1]}/completion.zsh.inc
+source ${paths[1]}/path.zsh.inc
+unset paths
 
 # make sure gsutil adheres to XDG
 # https://github.com/GoogleCloudPlatform/gsutil/issues/991
