@@ -2,7 +2,7 @@
 # The missing package manager for macOS
 
 # add homebrew to path
-if [[ -d /opt/homebrew ]]
+if [[ -d /opt/homebrew ]]; then
     export HOMEBREW_PREFIX="/opt/homebrew"
 else
     export HOMEBREW_PREFIX="/usr/local"
