@@ -5,8 +5,8 @@ export TERM=${TERM:-xterm-256color}
 export USER=${USER:-$(whoami)}
 
 # fallback to sane locale
-export LANG="${LANG:-en_US.UTF-8}"
-export LC_CTYPE="${LC_CTYPE:-$LANG}"
+export LANG="en_US.UTF-8"
+export LC_CTYPE="$LANG"
 
 # make sure XDG directories work
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
