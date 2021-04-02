@@ -4,13 +4,13 @@
 # > secrets decrypt threema
 # THREEMA_ID=...
 if ! _has_secret threema; then
-    return
+   return
 fi
 
 if [[ "${OSTYPE}" == darwin* ]]; then
-    zinit lucid for \
-        atclone"_make_native Threema https://web.threema.ch" \
-        atpull'%atclone' run-atpull \
-        as"null" id-as'native/threema' \
-        @zdharma/null
+   zinit lucid for \
+      atclone"_make_native Threema https://web.threema.ch --icon '${XDG_CONFIG_HOME}/threema/app.icns'" \
+      atpull'%atclone' run-atpull \
+      as"null" id-as'native/threema' \
+      @zdharma/null
 fi

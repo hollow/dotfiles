@@ -12,14 +12,14 @@ fi
 # command line utility for home assistant
 _brew_install homeassistant-cli
 _hass_update() {
-    hass-cli completion zsh > "${HOMEBREW_PREFIX}"/share/zsh/site-functions/_hass-cli
+    hass-cli completion zsh >"${HOMEBREW_PREFIX}"/share/zsh/site-functions/_hass-cli
 }
 _update_append _hass_update
 
 # wrap home assistant interface in native mac app
 if [[ "${OSTYPE}" == darwin* ]]; then
     zinit lucid for \
-        atclone"_make_native 'Home Assistant' '${HASS_SERVER}'" \
+        atclone"_make_native 'Home Assistant' '${HASS_SERVER}' --icon '${XDG_CONFIG_HOME}/home-assistant/app.icns'" \
         atpull'%atclone' run-atpull \
         as"null" id-as'native/home-assistant' \
         @zdharma/null
