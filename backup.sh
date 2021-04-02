@@ -3,6 +3,11 @@
 set -euo pipefail
 cd "$(realpath -m "$0"/..)"
 
+if ! type -P bw; then
+    echo -e "\n>>> installing bitwarden-cli\n"
+    brew install bitwarden-cli
+fi
+
 echo -e "\n>>> creating new dotfile backup\n"
 
 read -erp "private key id: " -i "${RECEPIENT}" RECEPIENT

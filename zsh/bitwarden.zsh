@@ -1,2 +1,0 @@
-_brew_install bitwarden-cli
-_cask_install bitwarden

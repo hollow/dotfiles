@@ -33,7 +33,6 @@ zsource rust
 
 zsource android
 zsource ansible
-zsource bitwarden
 zsource docker
 zsource gcloud
 zsource home-assistant
