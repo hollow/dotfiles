@@ -9,6 +9,11 @@ if [[ "$(readlink "${ssh_link}")" != "${ssh_conf}" ]]; then
     ln -nfs "${ssh_conf}" "${ssh_link}"
 fi
 
+# load GnuPG SSH Key
+# > secrets decrypt ssh
+# echo KEYGRIP > "${XDG_CONFIG_HOME}"/gnupg/sshcontrol
+_has_secret ssh
+
 # https://github.com/mobile-shell/mosh
 # mobile shell with roaming and local echo
 _brew_install mosh
