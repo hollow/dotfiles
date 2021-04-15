@@ -15,6 +15,6 @@ ta() {
 }
 
 # make terraform adhere to XDG
-export TF_CLI_CONFIG_FILE="${XDG_CONFIG_HOME}"/terraform/config
-export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}"/terraform/plugin-cache
-mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+ln -nfs "${XDG_CONFIG_HOME}"/terraform/config "${HOME}"/.terraformrc
+ln -nfs "${XDG_CONFIG_HOME}"/terraform "${HOME}"/.terraform.d
+mkdir -p "${XDG_CACHE_HOME}"/terraform/plugin-cache
