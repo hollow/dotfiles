@@ -13,9 +13,42 @@ export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME="${ASDF_VERSIONS_FILE}"
 # load asdf function
 source "${ASDF_DIR}"/lib/asdf.sh
 
+# return latest install path for given plugin
+_asdf_plugin_path() {
+    echo "${ASDF_DATA_DIR}"/plugins/$1
+}
+
+_asdf_install_path() {
+    local paths=("${ASDF_DATA_DIR}"/installs/$1/${2:-*}/(NOn))
+    echo "${paths[1]}"
+}
+
+# install latest version of given plugin
+_asdf_install() {
+    if [[ ! -e "$(_asdf_plugin_path "$1")" ]]; then
+        asdf plugin add "$1" 1>&2
+    fi
+    if [[ ! -e "$(_asdf_install_path "$1" "$2")" ]]; then
+        asdf install "$1" "${2:-latest}" 1>&2
+    fi
+}
+
+# hook into global update
+_asdf_upgrade() {
+    local plugins=($(asdf plugin list))
+    for plugin in $plugins; do
+        echo -e "\n>>> updating asdf plugin $plugin"
+        asdf plugin update "$plugin"
+        asdf install "$plugin" "$(asdf latest "$plugin")"
+    done
+}
+_update_insert _asdf_upgrade
+
+
 # https://github.com/direnv/direnv
 # change environment variables based on the current directory
 _brew_install direnv
+_asdf_install direnv
 eval "$(direnv hook zsh)"
 alias da="direnv allow"
 
