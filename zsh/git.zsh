@@ -27,6 +27,10 @@ _brew_install git-extras
 _brew_install hub
 alias git=hub
 
+# https://github.com/cli/cli
+# GitHub’s official command line tool
+_brew_install gh
+
 # https://github.com/defunkt/gist
 # command line gister
 _brew_install gist

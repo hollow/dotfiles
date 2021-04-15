@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+
+gh repo list --limit 99999 $1 | awk '{ print $1 }' |
+    parallel -a - \
+        --bar \
+        --keep-order \
+        --tagstring "[{}]" \
+        git-clone-clean-main https://github.com/{} "${HOME}/src/{}"

@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
 
 main="$(git main-branch)"
-latest="$(git latest)"
-git checkout "${latest}"
+
+if [[ "$1" == "main" ]]; then
+    latest="${main}"
+else
+    latest="$(git latest)"
+fi
 
 if [[ "${latest}" == "${main}" ]]; then
-    git branch -q --set-upstream-to="origin/${latest}"
-    git pull -q --rebase --autostash
+    [[ $TRACE -eq 1 ]] && set -x
+    git checkout --quiet "${latest}"
+    git branch --quiet --set-upstream-to="origin/${latest}"
+    git pull --quiet --rebase --autostash
+else
+    [[ $TRACE -eq 1 ]] && set -x
+    git checkout --quiet "${latest}"
 fi
 
 git submodule update --no-fetch --checkout --recursive

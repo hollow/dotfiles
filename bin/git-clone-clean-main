@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+
+repo="$1"
+repo_path="$2"
+
+if [[ ! -e "${repo_path}" ]]; then
+    (
+        [[ $TRACE -eq 1 ]] && set -x
+        git clone "${repo}" "${repo_path}"
+    )
+fi
+
+cd "${repo_path}"
+
+git cleanup
+git checkout-latest main

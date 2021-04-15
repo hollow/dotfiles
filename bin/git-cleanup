@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
+[[ $TRACE -eq 1 ]] && set -x
 
-git fetch \
+git fetch --quiet \
     --all \
     --tags \
     --prune \
     --prune-tags
 
-git gc --aggressive
+git gc --quiet
 
-git submodule init
-git submodule sync --recursive
+git submodule init --quiet
+git submodule sync --quiet --recursive
 
-git submodule foreach \
-    git fetch \
+git submodule --quiet foreach \
+    git fetch --quiet \
         --all \
         --tags \
         --prune \
         --prune-tags
 
-git submodule foreach git gc --aggressive
+git submodule --quiet foreach \
+    git gc --quiet
