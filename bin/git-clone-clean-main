@@ -12,6 +12,11 @@ if [[ ! -e "${repo_path}" ]]; then
     )
 fi
 
+if [[ -e "${repo_path}/.noclone" ]]; then
+    echo "skipping (${repo_path}/.noclone exists)"
+    exit
+fi
+
 cd "${repo_path}"
 
 git cleanup
