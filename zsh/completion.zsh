@@ -11,12 +11,6 @@ zinit wait lucid for \
     atinit"zicompinit; zicdreplay" \
     @zdharma/fast-syntax-highlighting
 
-# https://github.com/zsh-users/zsh-completions
-# additional completion definitions for zsh
-zinit wait lucid for \
-    blockf atpull"zinit creinstall -q ." \
-    @zsh-users/zsh-completions
-
 # https://github.com/zsh-users/zsh-autosuggestions
 # fish-like autosuggestions for zsh
 zinit wait lucid for \
