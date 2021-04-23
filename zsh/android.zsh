@@ -1,8 +1,4 @@
 if [[ "${OSTYPE}" == darwin* ]]; then
-    # https://github.com/ganeshrvel/openmtp
-    # advanced android file transfer application
-    _cask_install openmtp
-
     # https://developer.android.com/studio/releases/platform-tools.html
     # Android SDK Platform-Tools
     _cask_install android-platform-tools
