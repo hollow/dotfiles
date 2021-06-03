@@ -58,6 +58,8 @@ typeset -TUx LD_LIBRARY_PATH ld_library_path
 typeset -TUx PKG_CONFIG_PATH pkg_config_path
 
 path=(
+    "/usr/local/sbin"
+    "/usr/local/bin"
     "/usr/sbin"
     "/usr/bin"
     "/sbin"
