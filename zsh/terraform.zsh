@@ -1,5 +1,4 @@
 # https://www.terraform.io/
-_brew_install terraform
 alias tf=terraform
 
 # make terraform adhere to XDG
