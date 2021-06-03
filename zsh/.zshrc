@@ -31,6 +31,7 @@ zsource python
 zsource ruby
 zsource rust
 
+zsource aws
 zsource android
 zsource ansible
 zsource gcloud
