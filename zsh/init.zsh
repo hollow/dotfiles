@@ -18,7 +18,7 @@ source "${ZINIT[BIN_DIR]}"/zinit.zsh
 
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/lib
 # OMZ and extensions
-zinit lucid for \
+zinit for \
 	OMZL::functions.zsh \
 	OMZL::spectrum.zsh \
 	atload"unalias _ afind" \

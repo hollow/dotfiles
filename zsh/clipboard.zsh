@@ -1,6 +1,6 @@
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/clipboard.zsh
 # setup os dependant clipboard
-zinit lucid for OMZL::clipboard.zsh
+zinit for OMZL::clipboard.zsh
 
 # https://github.com/mptre/yank
 # yank terminal output to clipboard

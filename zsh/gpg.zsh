@@ -9,11 +9,11 @@ enable-ssh-support
 EOF
 
 # load ssh keys into agent
-zinit lucid for OMZP::gpg-agent
+zinit for OMZP::gpg-agent
 
 # https://github.com/chuwy/zsh-secrets
 # store gpg encrypted environment variables
-zinit lucid for @chuwy/zsh-secrets
+zinit for @chuwy/zsh-secrets
 
 export RECEPIENT="$(gpg --with-colons --list-secret-keys | sed -nr 's/^uid:.*<(.*)>.*/\1/p')"
 export SECRETS_STORAGE="${XDG_CONFIG_HOME}/secrets"

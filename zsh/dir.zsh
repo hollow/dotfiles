@@ -5,7 +5,7 @@ setopt pushd_ignore_dups
 setopt pushdminus
 
 # https://github.com/trapd00r/LS_COLORS
-zinit lucid for \
+zinit for \
     atclone"dircolors -b LS_COLORS > dircolors.zsh" \
     atpull'%atclone' run-atpull \
     atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \

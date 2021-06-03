@@ -4,7 +4,7 @@ _brew_install git
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
 # load git functions from ohmyzsh
 zstyle ":completion:*:*:git:*" script "${HOMEBREW_ZSH_FUNCTIONS}"/git-completion.bash
-zinit lucid for OMZL::git.zsh
+zinit for OMZL::git.zsh
 
 # Git & GitHub Secrets
 # https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token

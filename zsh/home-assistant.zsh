@@ -18,7 +18,7 @@ _update_append _hass_update
 
 # wrap home assistant interface in native mac app
 if [[ "${OSTYPE}" == darwin* ]]; then
-    zinit lucid for \
+    zinit for \
         atclone"_make_native 'Home Assistant' '${HASS_SERVER}' --icon '${XDG_CONFIG_HOME}/home-assistant/app.icns'" \
         atpull'%atclone' run-atpull \
         as"null" id-as'native/home-assistant' \

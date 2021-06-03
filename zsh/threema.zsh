@@ -8,7 +8,7 @@ if ! _has_secret threema; then
 fi
 
 if [[ "${OSTYPE}" == darwin* ]]; then
-   zinit lucid for \
+   zinit for \
       atclone"_make_native Threema https://web.threema.ch --icon '${XDG_CONFIG_HOME}/threema/app.icns'" \
       atpull'%atclone' run-atpull \
       as"null" id-as'native/threema' \
