@@ -24,9 +24,6 @@
 [color]
 	ui = true
 
-[credential]
-	helper = osxkeychain
-
 [diff]
 	colorMoved = default
 	renames = copies
