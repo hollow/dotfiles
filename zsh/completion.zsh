@@ -6,9 +6,11 @@ zinit for OMZL::completion.zsh
 ZLE_SPACE_SUFFIX_CHARS=$'&|'
 
 # https://github.com/zdharma/fast-syntax-highlighting
-# Syntax-highlighting for Zshell
-zinit for @zdharma/fast-syntax-highlighting
-
 # https://github.com/zsh-users/zsh-autosuggestions
-# fish-like autosuggestions for zsh
-zinit for @zsh-users/zsh-autosuggestions
+zinit wait lucid light-mode for \
+  atinit"zicompinit; zicdreplay" \
+      @zdharma/fast-syntax-highlighting \
+  atload"_zsh_autosuggest_start" \
+      @zsh-users/zsh-autosuggestions \
+  blockf atpull'zinit creinstall -q .' \
+      @zsh-users/zsh-completions
