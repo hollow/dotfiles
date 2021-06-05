@@ -5,7 +5,10 @@ zsource completion
 zsource history
 zsource prompt
 
-zsource brew
+if [[ "${OSTYPE}" == darwin* ]]; then
+    zsource brew
+fi
+
 zsource asdf
 
 zsource fzf
@@ -13,7 +16,6 @@ zsource pager
 zsource clipboard
 
 zsource dir
-zsource proc
 zsource gpg
 zsource net
 zsource ssh
@@ -27,7 +29,6 @@ fi
 
 zsource golang
 zsource java
-zsource python
 zsource ruby
 zsource rust
 

@@ -1,7 +1,6 @@
 # https://cloud.google.com/sdk/gcloud
-_cask_install google-cloud-sdk
-source "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
-source "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
+# source "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
+# source "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
 
 # make sure gsutil adheres to XDG
 # https://github.com/GoogleCloudPlatform/gsutil/issues/991

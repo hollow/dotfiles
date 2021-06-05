@@ -1,12 +1,5 @@
 # https://github.com/tmux/tmux
 # terminal multiplexer
-_brew_install tmux
-
-# https://github.com/tmuxinator/tmuxinator
-# manage complex tmux sessions easily
-_brew_install tmuxinator
-
-# wrapper function for tmux
 function tmux() {
     if [[ $# -gt 0 ]]; then
         command tmux "$@"

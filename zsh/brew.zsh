@@ -37,37 +37,6 @@ export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
 export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
 export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
 
-# fast replacement for `brew info <pkg>`
-_brew_pkg_path() {
-    echo "${HOMEBREW_PREFIX}"/opt/"$1"
-}
-
-# fast replacement for `brew install <pkg>`
-_brew_install() {
-    local _add_opt=
-
-    for pkg_name in "$@"; do
-        if [[ "${pkg_name}" == "-"* ]]; then
-            _add_opt="${pkg_name}"
-            continue
-        fi
-
-        local pkg_path="$(_brew_pkg_path "${pkg_name##*/}")"
-
-        if [[ ! -d "${pkg_path}" ]]; then
-            brew install "${pkg_name}"
-        fi
-
-        if [[ "${_add_opt}" == "-b" ]]; then
-            _path_add_bin "${pkg_path}"
-        elif [[ "${_add_opt}" == "-x" ]]; then
-            _path_add_lex "${pkg_path}"
-        elif [[ "${_add_opt}" == "-l" ]]; then
-            _path_add_lib "${pkg_path}"
-        fi
-    done
-}
-
 # hook into global update
 _brew_upgrade() {
     brew update && \
@@ -78,48 +47,21 @@ _brew_upgrade() {
 _update_insert _brew_upgrade
 
 # ensure a proper GNU based environment
-_brew_install -l \
-    curl \
-    ncurses \
-    readline \
-    openssl \
-    sqlite \
-    zlib \
-    icu4c \
-    libffi
-
-_brew_install -b \
-    gnu-getopt
-
-_brew_install -x \
-    coreutils \
-    debianutils \
-    findutils \
-    gnu-sed \
-    gnu-tar \
-    gnu-time
-
-_brew_install \
-    bash \
-    jq \
-    tree \
-    wget \
-    xz \
-    zsh
-
-# install selected application(s)
-# mnemonic: [B]rew [I]nstall
-bi() {
-    local fzf=("fzf" "--preview" "brew info {}")
-
-    if [[ $# -eq 0 ]]; then
-        set -- $(brew formulae | $fzf -m)
-    fi
-
-    for pkg_name in "$@"; do
-        _brew_install "${pkg_name}"
-    done
-}
+_path_add_lib "${HOMEBREW_PREFIX}"/opt/curl
+_path_add_lib "${HOMEBREW_PREFIX}"/opt/ncurses
+_path_add_lib "${HOMEBREW_PREFIX}"/opt/readline
+_path_add_lib "${HOMEBREW_PREFIX}"/opt/openssl
+_path_add_lib "${HOMEBREW_PREFIX}"/opt/sqlite
+_path_add_lib "${HOMEBREW_PREFIX}"/opt/zlib
+_path_add_lib "${HOMEBREW_PREFIX}"/opt/icu4c
+_path_add_lib "${HOMEBREW_PREFIX}"/opt/libffi
+_path_add_bin "${HOMEBREW_PREFIX}"/opt/gnu-getopt
+_path_add_lex "${HOMEBREW_PREFIX}"/opt/coreutils
+_path_add_lex "${HOMEBREW_PREFIX}"/opt/debianutils
+_path_add_lex "${HOMEBREW_PREFIX}"/opt/findutils
+_path_add_lex "${HOMEBREW_PREFIX}"/opt/gnu-sed
+_path_add_lex "${HOMEBREW_PREFIX}"/opt/gnu-tar
+_path_add_lex "${HOMEBREW_PREFIX}"/opt/gnu-time
 
 # uninstall (zap) selected application(s)
 # mnemonic: [B]rew [Z]ap

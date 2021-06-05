@@ -1,8 +1,5 @@
 # https://openjdk.java.net/
 # open-source implementation of the Java Platform
-_brew_install -l openjdk
-
-# make sure the MacOS system wrapper can find openjdk
 if [[ "${OSTYPE}" == darwin* ]]; then
     jdk_link="/Library/Java/JavaVirtualMachines/openjdk.jdk"
     jdk_brew="${HOMEBREW_PREFIX}/opt/openjdk/libexec/openjdk.jdk"

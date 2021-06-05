@@ -1,7 +1,6 @@
 # improve less experience
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
-_brew_install less
-
+export PAGER="less"
 export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
 mkdir -p "${LESSHISTFILE:h}"
 
@@ -17,10 +16,8 @@ less=(
 
 # https://github.com/sharkdp/bat
 # A cat(1) clone with wings
-_brew_install bat eth-p/software/bat-extras
 export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config
 export BAT_PAGER="less"
-export PAGER="bat --plain"
 
 # use bat as colorizing man pager
 # https://github.com/sharkdp/bat#man
@@ -29,20 +26,21 @@ export MANROFFOPT="-c"
 
 # https://github.com/dbrgn/tealdeer
 # very fast implementation of tldr
-_brew_install tealdeer
 export TEALDEER_CONFIG_DIR="${XDG_CONFIG_HOME}"/teeldear
 export TEALDEER_CACHE_DIR="${XDG_CACHE_HOME}"/teeldear
 
 # update tldr cache during global update
-_tealdeer_update() {
-    mkdir -p "${TEALDEER_CACHE_DIR}"
-    tldr --update
-}
-_update_append _tealdeer_update
+if (( $+commands[tldr] )); then
+    _tealdeer_update() {
+        mkdir -p "${TEALDEER_CACHE_DIR}"
+        tldr --update
+    }
+    _update_append _tealdeer_update
+fi
 
 # show tldr or man page or help text of command
 help() {
-    if tldr -l | grep -q "^${1}$"; then
+    if (( $+commands[tldr] )) && tldr -l | grep -q "^${1}$"; then
         tldr "$1"
     elif man "$1" &>/dev/null; then
         man "$1"

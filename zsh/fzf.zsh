@@ -1,8 +1,5 @@
 # https://github.com/junegunn/fzf
 # A command-line fuzzy finder
-_brew_install fzf
-
-# unfortunately fzf does not support config files
 typeset -TUx FZF_DEFAULT_OPTS fzf_default_opts ' '
 fzf_default_opts=(
     "--ansi"
@@ -23,7 +20,11 @@ export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers,changes --wrap never --co
 export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:wrap:hidden"
 export FZF_ALT_C_OPTS="--preview 'exa -T {}'"
 
-source "$(_brew_pkg_path fzf)"/shell/key-bindings.zsh
+if [[ "${OSTYPE}" == darwin* ]]; then
+    source "${HOMEBREW_PREFIX}"/opt/fzf/shell/key-bindings.zsh
+else
+    source "/usr/share/doc/fzf/examples/key-bindings.zsh"
+fi
 
 # Find matches in files and edit them
 # mnemonic: [F]ind in [F]ile

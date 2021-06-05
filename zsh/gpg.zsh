@@ -1,12 +1,10 @@
 # https://gnupg.org/
 # GNU Privacy Guard
-_brew_install gnupg
 export GNUPGHOME="${XDG_CONFIG_HOME}"/gnupg
 
-cat > "${GNUPGHOME}"/gpg-agent.conf <<EOF
-pinentry-program ${HOMEBREW_PREFIX}/bin/pinentry-mac
-enable-ssh-support
-EOF
+# cat > "${GNUPGHOME}"/gpg-agent.conf <<EOF
+# pinentry-program ${HOMEBREW_PREFIX}/bin/pinentry-mac
+# EOF
 
 # load ssh keys into agent
 zinit for OMZP::gpg-agent

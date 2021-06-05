@@ -1,6 +1,3 @@
-# use git from homebrew
-_brew_install git
-
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/git.zsh
 # load git functions from ohmyzsh
 zstyle ":completion:*:*:git:*" script "${HOMEBREW_ZSH_FUNCTIONS}"/git-completion.bash
@@ -18,22 +15,9 @@ zinit for OMZL::git.zsh
 # echo ${GITHUB_TOKEN} > "${HOME}"/.gist
 _has_secret git
 
-# https://github.com/tj/git-extras
-# lots of git utilities
-_brew_install git-extras
-
 # https://github.com/github/hub
 # a command-line tool that makes git easier to use with GitHub
-_brew_install hub
 alias git=hub
-
-# https://github.com/cli/cli
-# GitHub’s official command line tool
-_brew_install gh
-
-# https://github.com/defunkt/gist
-# command line gister
-_brew_install gist
 
 alias c="git changes"
 alias ga="git add --all"

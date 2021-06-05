@@ -14,36 +14,30 @@ zinit for \
 
 # https://github.com/ogham/exa
 # A modern replacement for ‘ls’
-_brew_install exa
 alias exa="exa --header --group --links --git"
 alias l="exa --all --long"
 
 # https://github.com/sharkdp/fd
 # A simple, fast and user-friendly alternative to 'find'
-_brew_install fd
+if (( $+commands[fdfind] )); then
+    alias fd=fdfind
+fi
 
 # https://github.com/BurntSushi/ripgrep
 # fast grep replacement
-_brew_install ripgrep
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/flags"
-
-# https://github.com/chmln/sd
-# intuitive sed replacement
-_brew_install sd
 
 # https://github.com/muesli/duf
 # a better 'df' alternative
-_brew_install duf
-alias df=duf
-
-# https://github.com/sharkdp/diskus
-# minimal, fast alternative to 'du -sh'
-_brew_install diskus
+if (( $+commands[duf] )); then
+    alias df=duf
+fi
 
 # https://github.com/Canop/broot
 # A new way to see and navigate directory trees
-_brew_install broot
-eval "$(broot --print-shell-function zsh)"
+if (( $+commands[broot] )); then
+    eval "$(broot --print-shell-function zsh)"
+fi
 
 # cd helpers
 alias -g ...='cd ../..'

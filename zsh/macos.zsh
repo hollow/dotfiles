@@ -6,9 +6,6 @@ _update_insert _macos_update
 
 # https://github.com/jiahaog/nativefier
 # wrap web apps in native mac apps
-_brew_install nativefier
-
-# wrapper for default nativefier app creation
 _make_native() {
     local app_name="$1" && shift
     local app_path="/Applications/${app_name}.app"
@@ -34,21 +31,4 @@ _make_native() {
 
     popd
     rm -rf "${temp_path}"
-}
-
-# https://github.com/mas-cli/mas
-# mac app store command line interface
-_brew_install mas
-
-# fast replacement for `brew install --cask <pkg>`
-_cask_path() {
-    local cask_path="${HOMEBREW_PREFIX}/Caskroom/$1"
-    echo "${cask_path}"
-    test -d "${cask_path}"
-}
-
-_cask_install() {
-    if ! _cask_path "$1" >/dev/null; then
-        brew install --cask "$1"
-    fi
 }
