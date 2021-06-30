@@ -1,46 +1,369 @@
-source "${ZDOTDIR}"/init.zsh
+# User information (for git, gpg, etc)
+export USER_NAME="Benedikt Böhm"
+export USER_EMAIL="bb@xnull.de"
 
-zsource bindings
-zsource completion
-zsource history
-zsource prompt
+# Force locale to english
+export LANG="en_US.UTF-8"
+export LC_CTYPE=$LANG
 
-if [[ "${OSTYPE}" == darwin* ]]; then
-    zsource brew
-fi
+# User paths
+export ZDOTDIR=${${(%):-%x}:A:h}
+export XDG_CONFIG_HOME=${ZDOTDIR:h}
+export XDG_CACHE_HOME=$HOME/.cache
+export XDG_DATA_HOME=$HOME/.local/share
 
-zsource asdf
+# System paths
+typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
+typeset -TUx MANPATH manpath=(${(s[:])$(manpath)})
+typeset -TUx FPATH fpath=($ZDOTDIR ${fpath[@]})
 
-zsource fzf
-zsource pager
-zsource clipboard
+# History configuration
+# https://zsh.sourceforge.io/Doc/Release/Options.html#History
+setopt extended_history       # record timestamp of command in HISTFILE
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_all_dups   # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_reduce_blanks     # remove superfluous blanks from each command line
+setopt hist_verify            # show command with history expansion to user before running it
+setopt inc_append_history     # immediately append to history file
+unsetopt share_history        # do not share command history data
 
-zsource dir
-zsource gpg
-zsource net
-zsource ssh
-zsource git
-zsource vim
-zsource tmux
+HISTSIZE=1000000000 SAVEHIST=1000000000
+HISTFILE="${XDG_DATA_HOME}/zsh/history"
+mkdir -p "${HISTFILE:h}"
 
-if [[ "${OSTYPE}" == darwin* ]]; then
-    zsource macos
-fi
+# Pager configuration
+# https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
+export PAGER="less" LESS="-iMRW -x4"
+export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
+mkdir -p "${LESSHISTFILE:h}"
+sl() { sort -u | less }
 
-zsource golang
-zsource java
-zsource ruby
-zsource rust
+# SSH configuration
+ln -nfs "${XDG_CONFIG_HOME}"/ssh "${HOME}"/.ssh
+ssu() { ssh -t "$1" sudo -Hi }
 
-zsource aws
-zsource android
-zsource ansible
-zsource gcloud
-zsource home-assistant
-zsource terraform
+# zinit: zsh plugin manager
+# https://github.com/zdharma/zinit
+autoload -Uz zinit && zinit \
+    for OMZL::{clipboard,key-bindings}.zsh
 
-zsource threema
-zsource vscode
+alias zre="exec zsh"
+alias zx="rm -rf ~/.cache && zre"
 
-# our local bin overrides everything
-_path_add path "${XDG_CONFIG_HOME}"/bin
+# homebrew: the missing package manager for macOS
+# https://github.com/Homebrew/brew
+export HOMEBREW_PREFIX=${HOMEBREW_PREFIX:-"/opt/homebrew"}
+export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
+export HOMEBREW_BUNDLE_NO_LOCK=1
+export HOMEBREW_AUTO_UPDATE_SECS=86400
+export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
+export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
+export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
+
+zinit if'@is-macos' id-as'brew' as'null' run-atpull \
+    atclone'[[ -e "${HOMEBREW_PREFIX}" ]] || bash install.sh' \
+    atpull'"${HOMEBREW_PREFIX}/bin/brew" update' \
+    atpull'"${HOMEBREW_PREFIX}/bin/brew" upgrade' \
+    atpull'"${HOMEBREW_PREFIX}/bin/brew" autoremove' \
+    atpull'"${HOMEBREW_PREFIX}/bin/brew" cleanup -s' \
+    atload'eval $("${HOMEBREW_PREFIX}/bin/brew" shellenv)' \
+    atload'fpath=("${HOMEBREW_PREFIX}/share/zsh/site-functions" ${(@)fpath})' \
+    for Homebrew/install
+
+alias bbd="brew bundle dump -f"
+alias bz="brew uninstall --zap"
+
+# coreutils: ensure proper GNU environment
+# https://www.gnu.org/software/coreutils/
+zinit if'@is-macos' run-atpull \
+    wait'!(( ${+commands[brew]} ))' \
+    atpull'"${HOMEBREW_PREFIX}/bin/brew" upgrade ${ICE[id-as]}' \
+    atload'[[ -e "${HOMEBREW_PREFIX}/opt/${ICE[id-as]}" ]] || brew install ${ICE[id-as]}' \
+    atload'path=("${HOMEBREW_PREFIX}/opt/${ICE[id-as]}/libexec/gnubin" ${(@)path})' \
+    atload'manpath=("${HOMEBREW_PREFIX}/opt/${ICE[id-as]}/libexec/gnuman" ${(@)manpath})' \
+    for coreutils findutils gnu-sed gnu-tar gnu-time
+
+zinit if'@is-macos' run-atpull \
+    wait'!(( ${+commands[brew]} ))' \
+    atpull'"${HOMEBREW_PREFIX}/bin/brew" upgrade ${ICE[id-as]}' \
+    atload'[[ -e "${HOMEBREW_PREFIX}/opt/${ICE[id-as]}" ]] || brew install ${ICE[id-as]}' \
+    for gnupg less parallel tree watch
+
+# powerlevel10k: prompt on steroids
+# https://github.com/romkatv/powerlevel10k
+zinit wait'!' nocd depth'1' \
+    atload'source "${ZDOTDIR}"/.p10k.zsh' \
+    atload'_p9k_precmd' \
+    for romkatv/powerlevel10k
+
+# zsh-syntax-highlighting: feature rich syntax highlighting
+# https://github.com/zdharma/fast-syntax-highlighting
+zinit wait \
+    atinit'zicompinit && zicdreplay' \
+    for zdharma/fast-syntax-highlighting
+
+# zsh-autosuggestions: fish-like autosuggestions
+# https://github.com/zsh-users/zsh-autosuggestions
+zinit wait \
+    atload'_zsh_autosuggest_start' \
+    for zsh-users/zsh-autosuggestions
+
+# zsh-completions: additional completion definitions
+# https://github.com/zsh-users/zsh-completions
+zinit wait blockf \
+    atpull'zinit creinstall -q .' \
+    for zsh-users/zsh-completions
+
+# zsh-autopair: auto-close and delete matching delimiters
+# https://github.com/hlissner/zsh-autopair
+zinit wait \
+    for hlissner/zsh-autopair
+
+# zsh-manydots: expand ... to ../..
+# https://github.com/knu/zsh-manydots-magic
+zinit wait \
+    atload'setopt autocd' \
+    pick'manydots-magic' \
+    for knu/zsh-manydots-magic
+
+# zoxide: a smarter cd command
+# https://github.com/ajeetdsouza/zoxide
+# TODO: zinit zoxide
+mkcd() { mkdir -p "$1" && "$1" }
+
+# asdf: extendable version manager
+# https://github.com/asdf-vm/asdf
+export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME="${XDG_CONFIG_HOME}/.tool-versions"
+export ASDF_DATA_DIR="${XDG_CACHE_HOME}/asdf"
+export ASDF_USER_SHIMS="${ASDF_DATA_DIR}/shims"
+export ASDF_DIR="${ZINIT[PLUGINS_DIR]}/asdf"
+export ASDF_BIN="${ASDF_DIR}/bin"
+path=(${ASDF_BIN} ${(@)path})
+
+# Override CPU architecture detection to make asdf
+# download amd64 binaries that work with rosetta
+@is-macos && export ASDF_HASHICORP_OVERWRITE_ARCH="amd64"
+
+autoload -Uz .asdf-install .asdf-upgrade
+zinit run-atpull \
+    atclone'.asdf-upgrade' \
+    atpull'.asdf-upgrade latest' \
+    atload'eval "$(asdf exec direnv hook zsh)"' \
+    for @asdf-vm/asdf
+
+alias da="direnv allow"
+
+# bat: cat(1) clone with wings
+# https://github.com/sharkdp/bat
+zinit wait from'gh-r' lbin'!' \
+    mv'**/bat.zsh _bat' \
+    for @sharkdp/bat
+
+export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'" MANROFFOPT="-c"
+
+# bottom: cross-platform graphical process/system monitor
+# https://github.com/ClementTsang/bottom
+zinit wait from'gh-r' lbin'!' \
+    for ClementTsang/bottom
+
+# dircolors: proper colors for `ls` and co
+# https://github.com/trapd00r/LS_COLORS
+zinit wait'!(( ${+commands[dircolors]} ))' \
+    id-as'dircolors' \
+    atclone'dircolors -b LS_COLORS > dircolors.zsh' \
+    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
+    pick'dircolors.zsh' nocompile'!' \
+    for trapd00r/LS_COLORS
+
+# dog: command-line DNS client
+# https://github.com/ogham/dog
+zinit wait from'gh-r' lbin'!' \
+    mv'**/dog.zsh _dog' \
+    for ogham/dog
+
+# duf: better `df` alternative
+# https://github.com/muesli/duf
+zinit wait from'gh-r' lbin'!' \
+    atload'alias df=duf' \
+    for @muesli/duf
+
+# exa: modern replacement for `ls`
+# https://github.com/ogham/exa
+zinit wait from'gh-r' lbin'!' \
+    mv'**/exa.zsh _exa' \
+    atload'alias ls="exa -ghH"' \
+    for ogham/exa
+
+alias l="ls --all --long"
+bindkey -s "\el" "l\n"
+
+# fd: simple, fast and user-friendly alternative to `find`
+# https://github.com/sharkdp/fd
+zinit wait from'gh-r' lbin'!' \
+    for @sharkdp/fd
+
+# fzf: command-line fuzzy finder
+# https://github.com/junegunn/fzf
+zinit wait from'gh-r' lbin'!' \
+    for junegunn/fzf
+
+# gh: GitHubs official command line tool
+# https://github.com/cli/cli
+zinit wait from'gh-r' lbin'!' \
+    id-as'gh' \
+    for cli/cli
+
+# git: distributed version control system
+# https://github.com/git/git
+export GIT_AUTHOR_NAME="${USER_NAME}"
+export GIT_AUTHOR_EMAIL="${USER_EMAIL}"
+export GIT_COMMITTER_NAME="${GIT_AUTHOR_NAME}"
+export GIT_COMMITTER_EMAIL="${GIT_AUTHOR_EMAIL}"
+
+autoload -Uz clone
+
+alias c="git changes"
+alias ga="git add --all"
+alias gap="git add --patch"
+alias gcm="git co \$(git main-branch)"
+alias gcu="git co upstream"
+alias gd="git df"
+alias gdc="git dc"
+alias gdm="git df \$(git main-branch)"
+alias gdu="git df upstream"
+alias gl="git lg"
+alias gp="git pull"
+alias gpr="git pull --rebase --autostash"
+alias grh="git reset HEAD"
+alias s="git st ."
+
+# glow: render markdown on the cli
+# https://github.com/charmbracelet/glow
+zinit wait from'gh-r' lbin'!' \
+    for charmbracelet/glow
+
+# gnupg: GNU privacy guard
+# https://gnupg.org/
+export GNUPGHOME="${XDG_CONFIG_HOME}"/gnupg
+export GPG_TTY=${TTY}
+
+# grex: generate regular expressions from user-provided test cases
+# https://github.com/pemistahl/grex
+zinit wait from'gh-r' lbin'!' \
+    for pemistahl/grex
+
+# hexyl: command-line hex viewer
+# https://github.com/sharkdp/hexyl
+zinit wait from'gh-r' lbin'!' \
+    for @sharkdp/hexyl
+
+# hub: git with GitHub extensions
+# https://github.com/github/hub
+zinit wait'!(( ${+functions[asdf]} ))' \
+    atclone'.asdf-install hub latest' \
+    atpull'%atclone' run-atpull \
+    for hub
+
+# insect: high precision scientific calculator
+# https://github.com/sharkdp/insect
+zinit wait from'gh-r' lbin'!insect-* -> insect' \
+    for @sharkdp/insect
+
+# keychain: SSH/GPG agent manager
+# https://github.com/funtoo/keychain
+zinit wait as'null' lbin'!' \
+    atload'eval "$(keychain --eval --quiet --inherit any --absolute --dir "${XDG_DATA_HOME}/keychain" --agents ssh,gpg id_rsa id_ed25519 ${USER_EMAIL})"' \
+    for funtoo/keychain
+
+# mcrcon: Rcon client for Minecraft
+# https://github.com/Tiiffi/mcrcon
+zinit wait make lbin'!' \
+    for Tiiffi/mcrcon
+
+# pastel: generate, analyze, convert and manipulate colors
+# https://github.com/sharkdp/pastel
+zinit wait from'gh-r' lbin'!' \
+    for @sharkdp/pastel
+
+# python: programming language
+# https://docs.python.org/3/
+export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+# TODO: install with asdf when arm64 is fixed
+alias python="python3"
+
+# poetry: python dependency management
+# https://github.com/python-poetry/poetry
+zinit wait'!(( ${+commands[poetry]} ))' \
+    atclone'poetry completions zsh > _poetry' \
+    for poetry
+
+alias pa="poetry add"
+alias pi="poetry install"
+
+# procs: A modern replacement for ps
+# https://github.com/dalance/procs
+zinit wait from'gh-r' lbin'!' \
+    for dalance/procs
+
+# pw: a simple pwgen replacement
+# https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/genpass/genpass-monkey
+autoload -Uz @genpass && pw() {
+    @genpass && tee >(clipcopy) <<< "${REPLY}"
+}
+
+# ripgrep: fast grep replacement
+# https://github.com/BurntSushi/ripgrep
+export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
+zinit wait from'gh-r' lbin'!**/rg' \
+    for BurntSushi/ripgrep
+
+# sd: intuitive find & replace
+# https://github.com/chmln/sd
+zinit wait from'gh-r' lbin'!sd-* -> sd' \
+    for chmln/sd
+
+# xh: friendly and fast tool for sending HTTP requests
+# https://github.com/ducaale/xh
+zinit wait from'gh-r' lbin'!' \
+    for ducaale/xh
+
+# youtube-dl: download YouTube content
+# https://github.com/ytdl-org/youtube-dl
+zinit wait \
+    for ytdl-org/youtube-dl
+
+alias yta="youtube-dl -x --audio-format mp3"
+
+# always open completion menu on first tab
+zstyle ':completion:*' menu yes select
+
+# use approximate completion with error correction
+zstyle ':completion:*' completer _complete _correct _approximate
+
+# case insensitive, partial-word and substring completion
+zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
+
+# improve completion output format
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format "%F{yellow}%B--- %d%b"
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format "%F{red}No matches for:%f %d"
+zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
+zstyle ':completion:*' group-name ''
+
+# Use caching so that commands like apt and dpkg complete are useable
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}"/zsh
+
+# Complete . and .. special directories
+zstyle ':completion:*' special-dirs true
+
+# kill/ps completion
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:*:*:processes' command "ps -u $USERNAME -o pid,user,comm -w -w"
+
+# Words are complete shell command arguments
+autoload -Uz select-word-style
+select-word-style shell

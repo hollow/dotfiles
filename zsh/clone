@@ -1,0 +1,24 @@
+#!zsh
+
+autoload -Uz @uri-parse
+
+local repo_url="$1"
+
+if [[ -z "${repo_url}" ]]; then
+    print -P "usage: %N <url>"
+    return 1
+fi
+
+if [[ "${repo_url}" != *':'* ]]; then
+    repo_url="https://github.com/${repo_url}"
+fi
+
+@uri-parse rpath ${repo_url} || return
+local repo_rpath="${REPLY}"
+local repo_apath="${HOME}/src/${repo_rpath})"
+
+if [[ ! -e "${repo_apath}" ]]; then
+    git clone "${repo_url}" "${repo_apath}" || return
+fi
+
+cd "${repo_apath}"

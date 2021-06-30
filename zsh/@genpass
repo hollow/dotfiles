@@ -1,0 +1,17 @@
+#!zsh
+
+# Generate a password made of 26 alphanumeric characters
+# with the security margin of at least 128 bits.
+
+zmodload zsh/system || return
+
+REPLY=""
+
+{
+    local -r chars=abcdefghjkmnpqrstvwxyz0123456789
+    local c
+    repeat 26; do
+        sysread -s1 c || return
+        REPLY+="${chars[#c%$#chars+1]}"
+    done
+} </dev/urandom

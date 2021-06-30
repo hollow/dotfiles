@@ -4,10 +4,7 @@
 
 ```sh
 git clone https://github.com/hollow/dotfiles ~/.config
-
-rm ~/.zshenv
-echo 'export ZDOTDIR="${HOME}/.config/zsh"' > ~/.zshenv
-
+rm -f ~/.zsh* && ln -nfs ~/.config/zsh/.zshrc ~/.zshrc
 exec zsh
 ```
 

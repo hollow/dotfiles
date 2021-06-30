@@ -18,11 +18,11 @@
 [advice]
 	detachedHead = false
 
-[commit]
-	gpgSign = true
-
 [color]
 	ui = true
+
+[commit]
+   gpgSign = true
 
 [diff]
 	colorMoved = default

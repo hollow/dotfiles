@@ -1,0 +1,43 @@
+#!zsh
+
+if ! (( ${+functions[asdf]} )); then
+    source "${ZINIT[PLUGINS_DIR]}/asdf/lib/asdf.sh"
+fi
+
+local plugin=${1:-$(asdf plugin list all | fzf | awk '{print $1}')}
+if [[ -z "${plugin}" ]]; then
+    return 0
+fi
+
+if [[ ! -e "${ASDF_DATA_DIR}/plugins/${plugin}" ]]; then
+    +zinit-message "{cmd}>>> asdf plugin add ${plugin}"
+    asdf plugin add "${plugin}"
+else
+    +zinit-message "{cmd}>>> asdf plugin update ${plugin}"
+    asdf plugin update "${plugin}"
+fi
+
+local versions=()
+case "$2" in
+latest)
+    versions=($(asdf list all "${plugin}"))
+    versions=("${versions[-1]}")
+    ;;
+
+"")
+    versions=($(asdf list all ${plugin} | fzf --tac -m))
+    ;;
+
+*)
+    versions=(${=2})
+    ;;
+esac
+
+local version
+for version (${versions}); do
+    if [[ ! -e "${ASDF_DATA_DIR}"/installs/${plugin}/${version} ]]; then
+        +zinit-message "{cmd}>>> asdf install ${plugin} ${version}"
+        asdf install "${plugin}" "${version}"
+        asdf global  "${plugin}" "${version}"
+    fi
+done
