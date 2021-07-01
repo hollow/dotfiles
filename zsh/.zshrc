@@ -6,16 +6,16 @@ export USER_EMAIL="bb@xnull.de"
 export LANG="en_US.UTF-8"
 export LC_CTYPE=$LANG
 
-# User paths
-export ZDOTDIR=${${(%):-%x}:A:h}
-export XDG_CONFIG_HOME=${ZDOTDIR:h}
-export XDG_CACHE_HOME=$HOME/.cache
-export XDG_DATA_HOME=$HOME/.local/share
+# Configure paths
+source "${${(%):-%x}:A:h}/.path.zsh"
 
-# System paths
-typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
-typeset -TUx MANPATH manpath=(${(s[:])$(manpath)})
-typeset -TUx FPATH fpath=($ZDOTDIR ${fpath[@]})
+# Key bindings
+bindkey "${terminfo[khome]}" beginning-of-line
+bindkey "${terminfo[kend]}"  end-of-line
+
+# Words are complete shell command arguments
+autoload -Uz select-word-style
+select-word-style shell
 
 # History configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
@@ -32,6 +32,32 @@ HISTSIZE=1000000000 SAVEHIST=1000000000
 HISTFILE="${XDG_DATA_HOME}/zsh/history"
 mkdir -p "${HISTFILE:h}"
 
+# Completion configuration
+# https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Completion-System-Configuration
+zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}"/zsh
+
+# Use approximate completion with error correction
+zstyle ':completion:*' completer _complete _correct _approximate
+
+# Case insensitive, partial-word and substring completion
+zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
+
+# Complete . and .. special directories
+zstyle ':completion:*' special-dirs true
+
+# Improve completion output format
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%d'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*:corrections' format '%d (errors: %e)'
+
+# kill/ps completion
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:*:*:processes' command "ps -u $USERNAME -o pid,user,comm -w -w"
+
 # Pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 export PAGER="less" LESS="-iMRW -x4"
@@ -39,98 +65,80 @@ export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 mkdir -p "${LESSHISTFILE:h}"
 sl() { sort -u | less }
 
+# Editor configuration
+export EDITOR="vim"
+
 # SSH configuration
 ln -nfs "${XDG_CONFIG_HOME}"/ssh "${HOME}"/.ssh
 ssu() { ssh -t "$1" sudo -Hi }
 
 # zinit: zsh plugin manager
 # https://github.com/zdharma/zinit
-autoload -Uz zinit && zinit \
-    for OMZL::{clipboard,key-bindings}.zsh
-
+autoload -Uz zinit
 alias zre="exec zsh"
 alias zx="rm -rf ~/.cache && zre"
 
-# homebrew: the missing package manager for macOS
-# https://github.com/Homebrew/brew
-export HOMEBREW_PREFIX=${HOMEBREW_PREFIX:-"/opt/homebrew"}
-export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
-export HOMEBREW_BUNDLE_NO_LOCK=1
-export HOMEBREW_AUTO_UPDATE_SECS=86400
-export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
-export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
-export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
-
-zinit if'@is-macos' id-as'brew' as'null' run-atpull \
-    atclone'[[ -e "${HOMEBREW_PREFIX}" ]] || bash install.sh' \
-    atpull'"${HOMEBREW_PREFIX}/bin/brew" update' \
-    atpull'"${HOMEBREW_PREFIX}/bin/brew" upgrade' \
-    atpull'"${HOMEBREW_PREFIX}/bin/brew" autoremove' \
-    atpull'"${HOMEBREW_PREFIX}/bin/brew" cleanup -s' \
-    atload'eval $("${HOMEBREW_PREFIX}/bin/brew" shellenv)' \
-    atload'fpath=("${HOMEBREW_PREFIX}/share/zsh/site-functions" ${(@)fpath})' \
-    for Homebrew/install
-
-alias bbd="brew bundle dump -f"
-alias bz="brew uninstall --zap"
-
-# coreutils: ensure proper GNU environment
-# https://www.gnu.org/software/coreutils/
-zinit if'@is-macos' run-atpull \
-    wait'!(( ${+commands[brew]} ))' \
-    atpull'"${HOMEBREW_PREFIX}/bin/brew" upgrade ${ICE[id-as]}' \
-    atload'[[ -e "${HOMEBREW_PREFIX}/opt/${ICE[id-as]}" ]] || brew install ${ICE[id-as]}' \
-    atload'path=("${HOMEBREW_PREFIX}/opt/${ICE[id-as]}/libexec/gnubin" ${(@)path})' \
-    atload'manpath=("${HOMEBREW_PREFIX}/opt/${ICE[id-as]}/libexec/gnuman" ${(@)manpath})' \
-    for coreutils findutils gnu-sed gnu-tar gnu-time
-
-zinit if'@is-macos' run-atpull \
-    wait'!(( ${+commands[brew]} ))' \
-    atpull'"${HOMEBREW_PREFIX}/bin/brew" upgrade ${ICE[id-as]}' \
-    atload'[[ -e "${HOMEBREW_PREFIX}/opt/${ICE[id-as]}" ]] || brew install ${ICE[id-as]}' \
-    for gnupg less parallel tree watch
-
-# powerlevel10k: prompt on steroids
 # https://github.com/romkatv/powerlevel10k
 zinit wait'!' nocd depth'1' \
     atload'source "${ZDOTDIR}"/.p10k.zsh' \
     atload'_p9k_precmd' \
     for romkatv/powerlevel10k
 
-# zsh-syntax-highlighting: feature rich syntax highlighting
 # https://github.com/zdharma/fast-syntax-highlighting
 zinit wait \
     atinit'zicompinit && zicdreplay' \
     for zdharma/fast-syntax-highlighting
 
-# zsh-autosuggestions: fish-like autosuggestions
-# https://github.com/zsh-users/zsh-autosuggestions
+# https://github.com/hlissner/zsh-autopair
 zinit wait \
-    atload'_zsh_autosuggest_start' \
-    for zsh-users/zsh-autosuggestions
+    for hlissner/zsh-autopair
 
-# zsh-completions: additional completion definitions
+# https://github.com/knu/zsh-manydots-magic
+zinit wait \
+    pick'manydots-magic' \
+    for knu/zsh-manydots-magic
+
 # https://github.com/zsh-users/zsh-completions
 zinit wait blockf \
     atpull'zinit creinstall -q .' \
     for zsh-users/zsh-completions
 
-# zsh-autopair: auto-close and delete matching delimiters
-# https://github.com/hlissner/zsh-autopair
-zinit wait \
-    for hlissner/zsh-autopair
+# homebrew: the missing package manager for macOS
+# https://github.com/Homebrew/brew
+export HOMEBREW_PREFIX=${HOMEBREW_PREFIX:-"/opt/homebrew"}
+export HOMEBREW_FPATH="${HOMEBREW_PREFIX}/share/zsh/site-functions"
+export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
+export HOMEBREW_BUNDLE_NO_LOCK=1
+export HOMEBREW_AUTO_UPDATE_SECS=86400
+export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
+export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
+export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
+alias brew="${HOMEBREW_PREFIX}/bin/brew"
 
-# zsh-manydots: expand ... to ../..
-# https://github.com/knu/zsh-manydots-magic
-zinit wait \
-    atload'setopt autocd' \
-    pick'manydots-magic' \
-    for knu/zsh-manydots-magic
+zinit if'@is-macos' run-atpull \
+    atpull'brew update' \
+    atpull'brew upgrade' \
+    atpull'brew autoremove' \
+    atpull'brew cleanup -s' \
+    atload'[[ -e "${HOMEBREW_PREFIX}" ]] || bash install.sh' \
+    atload'eval $(brew shellenv) && .path-add fpath ${HOMEBREW_FPATH}' \
+    atload'alias bbd="brew bundle dump -f"' \
+    atload'alias bz="brew uninstall --zap"' \
+    id-as'brew' as'null' \
+    for Homebrew/install
 
-# zoxide: a smarter cd command
-# https://github.com/ajeetdsouza/zoxide
-# TODO: zinit zoxide
-mkcd() { mkdir -p "$1" && "$1" }
+# Install core packages
+autoload -Uz pkg-install
+pkg-install coreutils
+pkg-install findutils
+pkg-install gnu-sed
+pkg-install gnu-tar
+pkg-install gnu-time
+pkg-install gnupg
+pkg-install less
+pkg-install parallel
+pkg-install tree
+pkg-install watch
 
 # asdf: extendable version manager
 # https://github.com/asdf-vm/asdf
@@ -139,43 +147,48 @@ export ASDF_DATA_DIR="${XDG_CACHE_HOME}/asdf"
 export ASDF_USER_SHIMS="${ASDF_DATA_DIR}/shims"
 export ASDF_DIR="${ZINIT[PLUGINS_DIR]}/asdf"
 export ASDF_BIN="${ASDF_DIR}/bin"
-path=(${ASDF_BIN} ${(@)path})
+export ASDF_HASHICORP_OVERWRITE_ARCH="amd64"
 
-# Override CPU architecture detection to make asdf
-# download amd64 binaries that work with rosetta
-@is-macos && export ASDF_HASHICORP_OVERWRITE_ARCH="amd64"
-
-autoload -Uz .asdf-install .asdf-upgrade
-zinit run-atpull \
-    atclone'.asdf-upgrade' \
-    atpull'.asdf-upgrade latest' \
-    atload'eval "$(asdf exec direnv hook zsh)"' \
+zinit autoload'asdf-install' \
+    atload'path=(${ASDF_BIN} ${(@)path})' \
     for @asdf-vm/asdf
-
-alias da="direnv allow"
 
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
+export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'" MANROFFOPT="-c"
+
 zinit wait from'gh-r' lbin'!' \
     mv'**/bat.zsh _bat' \
     for @sharkdp/bat
-
-export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
-export MANPAGER="sh -c 'col -bx | bat -l man -p'" MANROFFOPT="-c"
 
 # bottom: cross-platform graphical process/system monitor
 # https://github.com/ClementTsang/bottom
 zinit wait from'gh-r' lbin'!' \
     for ClementTsang/bottom
 
+# clipcopy: cross platform clipboard alias
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/clipboard.zsh
+zinit wait \
+    for OMZL::clipboard.zsh
+
 # dircolors: proper colors for `ls` and co
 # https://github.com/trapd00r/LS_COLORS
-zinit wait'!(( ${+commands[dircolors]} ))' \
-    id-as'dircolors' \
+zinit wait \
     atclone'dircolors -b LS_COLORS > dircolors.zsh' \
-    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
     pick'dircolors.zsh' nocompile'!' \
+    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
+    id-as'dircolors' \
     for trapd00r/LS_COLORS
+
+# direnv: change environment based on the current directory
+# https://github.com/direnv/direnv
+zinit wait \
+    atclone'asdf-install direnv current' \
+    atpull'asdf-install direnv latest' run-atpull \
+    atload'eval "$(asdf exec direnv hook zsh)"' \
+    atload'alias da="direnv allow"' \
+    for direnv
 
 # dog: command-line DNS client
 # https://github.com/ogham/dog
@@ -194,20 +207,45 @@ zinit wait from'gh-r' lbin'!' \
 zinit wait from'gh-r' lbin'!' \
     mv'**/exa.zsh _exa' \
     atload'alias ls="exa -ghH"' \
+    atload'alias l="ls --all --long"' \
     for ogham/exa
-
-alias l="ls --all --long"
-bindkey -s "\el" "l\n"
 
 # fd: simple, fast and user-friendly alternative to `find`
 # https://github.com/sharkdp/fd
 zinit wait from'gh-r' lbin'!' \
+    mv'**/fd.1 ${ZPFX}/man/man1/fd.1' \
     for @sharkdp/fd
 
 # fzf: command-line fuzzy finder
 # https://github.com/junegunn/fzf
-zinit wait from'gh-r' lbin'!' \
-    for junegunn/fzf
+zinit wait \
+    atclone'asdf-install fzf current' \
+    atpull'asdf-install fzf latest' run-atpull \
+    cp'$(asdf where fzf)/shell/completion.zsh -> _fzf_completion' \
+    cp'$(asdf where fzf)/shell/key-bindings.zsh -> key-bindings.zsh' \
+    cp'$(asdf where fzf)/man/man1/fzf-tmux.1 -> ${ZPFX}/man/man1/fzf-tmux.1' \
+    cp'$(asdf where fzf)/man/man1/fzf.1 -> ${ZPFX}/man/man1/fzf.1' \
+    for fzf
+
+typeset -TUx FZF_DEFAULT_OPTS fzf_default_opts ' '
+fzf_default_opts=(
+    "--ansi"
+    "--cycle"
+    "--preview-window='right:60%'"
+    "--bind='?:toggle-preview'"
+    "--prompt='❯ '"
+    "--color='bg+:#073642,bg:#002b36,spinner:#719e07,hl:#586e75'"
+    "--color='fg:#839496,header:#586e75,info:#cb4b16,pointer:#719e07'"
+    "--color='marker:#719e07,fg+:#839496,prompt:#719e07,hl+:#719e07'"
+)
+
+# fzf-tab: tab completion on steriods
+# https://github.com/Aloxaf/fzf-tab
+zinit wait \
+    for Aloxaf/fzf-tab
+
+zstyle ':fzf-tab:*' switch-group ',' '.'
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -ghH -al $realpath'
 
 # gh: GitHubs official command line tool
 # https://github.com/cli/cli
@@ -247,7 +285,6 @@ zinit wait from'gh-r' lbin'!' \
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GNUPGHOME="${XDG_CONFIG_HOME}"/gnupg
-export GPG_TTY=${TTY}
 
 # grex: generate regular expressions from user-provided test cases
 # https://github.com/pemistahl/grex
@@ -261,9 +298,9 @@ zinit wait from'gh-r' lbin'!' \
 
 # hub: git with GitHub extensions
 # https://github.com/github/hub
-zinit wait'!(( ${+functions[asdf]} ))' \
-    atclone'.asdf-install hub latest' \
-    atpull'%atclone' run-atpull \
+zinit wait \
+    atclone'asdf-install hub current' \
+    atpull'asdf-install hub latest' run-atpull \
     for hub
 
 # insect: high precision scientific calculator
@@ -274,7 +311,7 @@ zinit wait from'gh-r' lbin'!insect-* -> insect' \
 # keychain: SSH/GPG agent manager
 # https://github.com/funtoo/keychain
 zinit wait as'null' lbin'!' \
-    atload'eval "$(keychain --eval --quiet --inherit any --absolute --dir "${XDG_DATA_HOME}/keychain" --agents ssh,gpg id_rsa id_ed25519 ${USER_EMAIL})"' \
+    atload'source ${ZDOTDIR}/.keychain.zsh' \
     for funtoo/keychain
 
 # mcrcon: Rcon client for Minecraft
@@ -295,12 +332,14 @@ alias python="python3"
 
 # poetry: python dependency management
 # https://github.com/python-poetry/poetry
-zinit wait'!(( ${+commands[poetry]} ))' \
+zinit wait \
+    atclone'asdf-install poetry current' \
     atclone'poetry completions zsh > _poetry' \
+    atpull'asdf-install poetry latest' run-atpull \
+    atpull'poetry completions zsh > _poetry' \
+    atload'alias pa="poetry add"' \
+    atload'alias pi="poetry install"' \
     for poetry
-
-alias pa="poetry add"
-alias pi="poetry install"
 
 # procs: A modern replacement for ps
 # https://github.com/dalance/procs
@@ -319,6 +358,19 @@ export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
 zinit wait from'gh-r' lbin'!**/rg' \
     for BurntSushi/ripgrep
 
+# ruby: programming language
+# https://www.ruby-lang.org
+export GEM_HOME="${XDG_DATA_HOME}"/gem
+export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
+export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
+export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
+export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
+
+zinit wait \
+    atclone'asdf-install ruby current' \
+    atpull'asdf-install ruby latest' run-atpull \
+    for ruby
+
 # sd: intuitive find & replace
 # https://github.com/chmln/sd
 zinit wait from'gh-r' lbin'!sd-* -> sd' \
@@ -332,38 +384,10 @@ zinit wait from'gh-r' lbin'!' \
 # youtube-dl: download YouTube content
 # https://github.com/ytdl-org/youtube-dl
 zinit wait \
+    atload'alias yta="youtube-dl -x --audio-format mp3"' \
     for ytdl-org/youtube-dl
 
-alias yta="youtube-dl -x --audio-format mp3"
-
-# always open completion menu on first tab
-zstyle ':completion:*' menu yes select
-
-# use approximate completion with error correction
-zstyle ':completion:*' completer _complete _correct _approximate
-
-# case insensitive, partial-word and substring completion
-zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
-
-# improve completion output format
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*:descriptions' format "%F{yellow}%B--- %d%b"
-zstyle ':completion:*:messages' format '%d'
-zstyle ':completion:*:warnings' format "%F{red}No matches for:%f %d"
-zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
-zstyle ':completion:*' group-name ''
-
-# Use caching so that commands like apt and dpkg complete are useable
-zstyle ':completion:*' use-cache yes
-zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}"/zsh
-
-# Complete . and .. special directories
-zstyle ':completion:*' special-dirs true
-
-# kill/ps completion
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
-zstyle ':completion:*:*:*:*:processes' command "ps -u $USERNAME -o pid,user,comm -w -w"
-
-# Words are complete shell command arguments
-autoload -Uz select-word-style
-select-word-style shell
+# zoxide: a smarter cd command
+# https://github.com/ajeetdsouza/zoxide
+# TODO: zinit zoxide
+mkcd() { mkdir -p "$1" && "$1" }

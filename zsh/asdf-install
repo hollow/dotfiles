@@ -10,18 +10,20 @@ if [[ -z "${plugin}" ]]; then
 fi
 
 if [[ ! -e "${ASDF_DATA_DIR}/plugins/${plugin}" ]]; then
-    +zinit-message "{cmd}>>> asdf plugin add ${plugin}"
     asdf plugin add "${plugin}"
 else
-    +zinit-message "{cmd}>>> asdf plugin update ${plugin}"
     asdf plugin update "${plugin}"
 fi
 
-local versions=()
+local -a versions=()
 case "$2" in
+current)
+    local -A current=($(<${ASDF_DEFAULT_TOOL_VERSIONS_FILENAME}))
+    versions=(${current[plugin]:-$(asdf latest ${plugin})})
+    ;;
+
 latest)
-    versions=($(asdf list all "${plugin}"))
-    versions=("${versions[-1]}")
+    versions=($(asdf latest ${plugin}))
     ;;
 
 "")
@@ -36,7 +38,6 @@ esac
 local version
 for version (${versions}); do
     if [[ ! -e "${ASDF_DATA_DIR}"/installs/${plugin}/${version} ]]; then
-        +zinit-message "{cmd}>>> asdf install ${plugin} ${version}"
         asdf install "${plugin}" "${version}"
         asdf global  "${plugin}" "${version}"
     fi

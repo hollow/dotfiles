@@ -1,6 +1,0 @@
-#!zsh
-
-(( ${+ICE[debug]} )) && {
-    autoload -Uz @inspect && @inspect "${(@)@[2,-1]}"
-    +zinit-message "{pre}${funcstack[2]}: {msg}${1} {obj}${(@)reply}"
-}

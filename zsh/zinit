@@ -62,6 +62,10 @@ source "${ZINIT[BIN_DIR]}"/zinit.zsh
 zinit for zinit-zsh/z-a-default-ice
 zinit default-ice --quiet lucid light-mode
 
+# z-a-patch-dl: downloads files and applies patches
+# https://github.com/zinit-zsh/z-a-patch-dl
+zinit for zinit-zsh/z-a-patch-dl
+
 # z-a-linkbin: install symlinks into PATH
 # https://github.com/NICHOLAS85/z-a-linkbin
 zinit for NICHOLAS85/z-a-linkbin
