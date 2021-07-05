@@ -14,7 +14,7 @@ export XDG_DATA_HOME="${HOME}/.local/share"
 
 # System paths
 typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
-typeset -TUx MANPATH manpath=(${(s[:])$(manpath)})
+typeset -TUx MANPATH manpath=(${(s[:])$(env -u MANPATH manpath)})
 typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
 
 # Error handling
