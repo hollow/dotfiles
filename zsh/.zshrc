@@ -6,16 +6,23 @@ export USER_EMAIL="bb@xnull.de"
 export LANG="en_US.UTF-8"
 export LC_CTYPE=$LANG
 
-# Configure paths
-source "${${(%):-%x}:A:h}/.path.zsh"
+# User paths
+export ZDOTDIR=${${(%):-%x}:A:h}
+export XDG_CONFIG_HOME=${ZDOTDIR:h}
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_DATA_HOME="${HOME}/.local/share"
 
-# Key bindings
-bindkey "${terminfo[khome]}" beginning-of-line
-bindkey "${terminfo[kend]}"  end-of-line
+# System paths
+typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
+typeset -TUx MANPATH manpath=(${(s[:])$(manpath)})
+typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
 
-# Words are complete shell command arguments
-autoload -Uz select-word-style
-select-word-style shell
+# Error handling
+autoload -Uz add-zsh-hook die
+add-zsh-hook precmd die
+
+# Load custom functions
+autoload -Uz path-{add,mkdirname}
 
 # History configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
@@ -29,13 +36,12 @@ setopt inc_append_history     # immediately append to history file
 unsetopt share_history        # do not share command history data
 
 HISTSIZE=1000000000 SAVEHIST=1000000000
-HISTFILE="${XDG_DATA_HOME}/zsh/history"
-mkdir -p "${HISTFILE:h}"
+HISTFILE=$(path-mkdirname "${XDG_DATA_HOME}/zsh/history")
 
 # Completion configuration
 # https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Completion-System-Configuration
 zstyle ':completion:*' use-cache yes
-zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}"/zsh
+zstyle ':completion:*' cache-path $(path-mkdirname "${XDG_CACHE_HOME}/zsh")
 
 # Use approximate completion with error correction
 zstyle ':completion:*' completer _complete _correct _approximate
@@ -56,31 +62,40 @@ zstyle ':completion:*:corrections' format '%d (errors: %e)'
 
 # kill/ps completion
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
-zstyle ':completion:*:*:*:*:processes' command "ps -u $USERNAME -o pid,user,comm -w -w"
+zstyle ':completion:*:*:*:*:processes' command "ps -u ${USERNAME} -o pid,user,comm -w -w"
 
 # Pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
-export PAGER="less" LESS="-iMRW -x4"
-export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
-mkdir -p "${LESSHISTFILE:h}"
+export PAGER="less"
+export LESS="-iMRSW -x4"
+export LESSHISTFILE=$(path-mkdirname "${XDG_DATA_HOME}/less/history")
 sl() { sort -u | less }
 
 # Editor configuration
-export EDITOR="vim"
+export EDITOR="${commands[code]:-${commands[vim]}}"
 
 # SSH configuration
-ln -nfs "${XDG_CONFIG_HOME}"/ssh "${HOME}"/.ssh
+ln -nfs "${XDG_CONFIG_HOME}/ssh" "${HOME}/.ssh"
 ssu() { ssh -t "$1" sudo -Hi }
+
+# Key bindings
+bindkey -e
+bindkey -M emacs "${terminfo[khome]}" beginning-of-line
+bindkey -M emacs "${terminfo[kend]}"  end-of-line
+
+# Words are complete shell command arguments
+autoload -Uz select-word-style
+select-word-style shell
 
 # zinit: zsh plugin manager
 # https://github.com/zdharma/zinit
 autoload -Uz zinit
 alias zre="exec zsh"
-alias zx="rm -rf ~/.cache && zre"
+alias zx="rm -rf ${XDG_CACHE_HOME} && zre"
 
 # https://github.com/romkatv/powerlevel10k
 zinit wait'!' nocd depth'1' \
-    atload'source "${ZDOTDIR}"/.p10k.zsh' \
+    atload'source "${ZDOTDIR}/.p10k.zsh"' \
     atload'_p9k_precmd' \
     for romkatv/powerlevel10k
 
@@ -106,39 +121,40 @@ zinit wait blockf \
 # homebrew: the missing package manager for macOS
 # https://github.com/Homebrew/brew
 export HOMEBREW_PREFIX=${HOMEBREW_PREFIX:-"/opt/homebrew"}
-export HOMEBREW_FPATH="${HOMEBREW_PREFIX}/share/zsh/site-functions"
 export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
 export HOMEBREW_BUNDLE_NO_LOCK=1
 export HOMEBREW_AUTO_UPDATE_SECS=86400
 export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
 export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
 export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
-alias brew="${HOMEBREW_PREFIX}/bin/brew"
 
 zinit if'@is-macos' run-atpull \
+    autoload'brew' \
     atpull'brew update' \
     atpull'brew upgrade' \
     atpull'brew autoremove' \
     atpull'brew cleanup -s' \
-    atload'[[ -e "${HOMEBREW_PREFIX}" ]] || bash install.sh' \
-    atload'eval $(brew shellenv) && .path-add fpath ${HOMEBREW_FPATH}' \
     atload'alias bbd="brew bundle dump -f"' \
     atload'alias bz="brew uninstall --zap"' \
     id-as'brew' as'null' \
     for Homebrew/install
 
-# Install core packages
-autoload -Uz pkg-install
-pkg-install coreutils
-pkg-install findutils
-pkg-install gnu-sed
-pkg-install gnu-tar
-pkg-install gnu-time
-pkg-install gnupg
-pkg-install less
-pkg-install parallel
-pkg-install tree
-pkg-install watch
+
+zinit if'@is-macos' \
+    atclone'brew upstall ${ICE[id-as]}' \
+    atpull'%atclone' run-atpull \
+    atload'brew add-path ${ICE[id-as]}' \
+    for \
+    coreutils \
+    findutils \
+    gnu-sed \
+    gnu-tar \
+    gnu-time \
+    gnupg \
+    less \
+    parallel \
+    tree \
+    watch
 
 # asdf: extendable version manager
 # https://github.com/asdf-vm/asdf
@@ -149,8 +165,9 @@ export ASDF_DIR="${ZINIT[PLUGINS_DIR]}/asdf"
 export ASDF_BIN="${ASDF_DIR}/bin"
 export ASDF_HASHICORP_OVERWRITE_ARCH="amd64"
 
-zinit autoload'asdf-install' \
-    atload'path=(${ASDF_BIN} ${(@)path})' \
+autoload -Uz asdf
+
+zinit as'null' \
     for @asdf-vm/asdf
 
 # bat: cat(1) clone with wings
@@ -158,13 +175,13 @@ zinit autoload'asdf-install' \
 export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'" MANROFFOPT="-c"
 
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     mv'**/bat.zsh _bat' \
     for @sharkdp/bat
 
 # bottom: cross-platform graphical process/system monitor
 # https://github.com/ClementTsang/bottom
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     for ClementTsang/bottom
 
 # clipcopy: cross platform clipboard alias
@@ -184,27 +201,34 @@ zinit wait \
 # direnv: change environment based on the current directory
 # https://github.com/direnv/direnv
 zinit wait \
-    atclone'asdf-install direnv current' \
-    atpull'asdf-install direnv latest' run-atpull \
-    atload'eval "$(asdf exec direnv hook zsh)"' \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
+    atload'eval "$(asdf exec ${ICE[id-as]} hook zsh)"' \
     atload'alias da="direnv allow"' \
     for direnv
 
+# dnscontrol: synchronize DNS
+# https://github.com/StackExchange/dnscontrol
+zinit wait from'gh-r' bpick"*Darwin*" \
+    lbin'dnscontrol-* -> dnscontrol'\
+    for StackExchange/dnscontrol
+
 # dog: command-line DNS client
 # https://github.com/ogham/dog
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     mv'**/dog.zsh _dog' \
     for ogham/dog
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     atload'alias df=duf' \
     for @muesli/duf
 
 # exa: modern replacement for `ls`
 # https://github.com/ogham/exa
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     mv'**/exa.zsh _exa' \
     atload'alias ls="exa -ghH"' \
     atload'alias l="ls --all --long"' \
@@ -212,15 +236,16 @@ zinit wait from'gh-r' lbin'!' \
 
 # fd: simple, fast and user-friendly alternative to `find`
 # https://github.com/sharkdp/fd
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     mv'**/fd.1 ${ZPFX}/man/man1/fd.1' \
     for @sharkdp/fd
 
 # fzf: command-line fuzzy finder
 # https://github.com/junegunn/fzf
 zinit wait \
-    atclone'asdf-install fzf current' \
-    atpull'asdf-install fzf latest' run-atpull \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
     cp'$(asdf where fzf)/shell/completion.zsh -> _fzf_completion' \
     cp'$(asdf where fzf)/shell/key-bindings.zsh -> key-bindings.zsh' \
     cp'$(asdf where fzf)/man/man1/fzf-tmux.1 -> ${ZPFX}/man/man1/fzf-tmux.1' \
@@ -249,7 +274,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -ghH -al $realpath'
 
 # gh: GitHubs official command line tool
 # https://github.com/cli/cli
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     id-as'gh' \
     for cli/cli
 
@@ -279,7 +304,7 @@ alias s="git st ."
 
 # glow: render markdown on the cli
 # https://github.com/charmbracelet/glow
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     for charmbracelet/glow
 
 # gnupg: GNU privacy guard
@@ -288,62 +313,78 @@ export GNUPGHOME="${XDG_CONFIG_HOME}"/gnupg
 
 # grex: generate regular expressions from user-provided test cases
 # https://github.com/pemistahl/grex
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     for pemistahl/grex
 
 # hexyl: command-line hex viewer
 # https://github.com/sharkdp/hexyl
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     for @sharkdp/hexyl
 
 # hub: git with GitHub extensions
 # https://github.com/github/hub
 zinit wait \
-    atclone'asdf-install hub current' \
-    atpull'asdf-install hub latest' run-atpull \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
     for hub
 
 # insect: high precision scientific calculator
 # https://github.com/sharkdp/insect
-zinit wait from'gh-r' lbin'!insect-* -> insect' \
+zinit wait from'gh-r' lbin'insect-* -> insect' \
     for @sharkdp/insect
+
+# just: a command runner
+# https://github.com/casey/just
+zinit wait from'gh-r' lbin \
+    atclone'./just --completions zsh > _just' \
+    atclone'cp -v **/just.1 ${ZPFX}/man/man1/just.1' \
+    atpull'%atclone' run-atpull \
+    for casey/just
 
 # keychain: SSH/GPG agent manager
 # https://github.com/funtoo/keychain
-zinit wait as'null' lbin'!' \
+zinit wait as'null' lbin \
     atload'source ${ZDOTDIR}/.keychain.zsh' \
     for funtoo/keychain
 
 # mcrcon: Rcon client for Minecraft
 # https://github.com/Tiiffi/mcrcon
-zinit wait make lbin'!' \
+zinit wait make lbin \
     for Tiiffi/mcrcon
 
 # pastel: generate, analyze, convert and manipulate colors
 # https://github.com/sharkdp/pastel
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     for @sharkdp/pastel
 
 # python: programming language
 # https://docs.python.org/3/
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-# TODO: install with asdf when arm64 is fixed
-alias python="python3"
+
+# TODO: use asdf when python plugin support arm64
+zinit if'@is-macos' \
+    atclone'brew upstall ${ICE[id-as]}' \
+    atpull'%atclone' run-atpull \
+    for python@3.9
 
 # poetry: python dependency management
 # https://github.com/python-poetry/poetry
+export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
+
 zinit wait \
-    atclone'asdf-install poetry current' \
-    atclone'poetry completions zsh > _poetry' \
-    atpull'asdf-install poetry latest' run-atpull \
-    atpull'poetry completions zsh > _poetry' \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atclone'asdf exec poetry completions zsh > _poetry' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atpull'asdf exec poetry completions zsh > _poetry' \
+    atload'asdf add-path ${ICE[id-as]}' \
     atload'alias pa="poetry add"' \
     atload'alias pi="poetry install"' \
     for poetry
 
 # procs: A modern replacement for ps
 # https://github.com/dalance/procs
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     for dalance/procs
 
 # pw: a simple pwgen replacement
@@ -355,7 +396,7 @@ autoload -Uz @genpass && pw() {
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
-zinit wait from'gh-r' lbin'!**/rg' \
+zinit wait from'gh-r' lbin'**/rg' \
     for BurntSushi/ripgrep
 
 # ruby: programming language
@@ -367,18 +408,19 @@ export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
 export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
 
 zinit wait \
-    atclone'asdf-install ruby current' \
-    atpull'asdf-install ruby latest' run-atpull \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
     for ruby
 
 # sd: intuitive find & replace
 # https://github.com/chmln/sd
-zinit wait from'gh-r' lbin'!sd-* -> sd' \
+zinit wait from'gh-r' lbin'sd-* -> sd' \
     for chmln/sd
 
 # xh: friendly and fast tool for sending HTTP requests
 # https://github.com/ducaale/xh
-zinit wait from'gh-r' lbin'!' \
+zinit wait from'gh-r' lbin \
     for ducaale/xh
 
 # youtube-dl: download YouTube content

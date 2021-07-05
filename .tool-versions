@@ -1,13 +1,6 @@
-bitwarden v1.16.0
-consul 1.10.0
+bitwarden v1.17.0
 direnv 2.28.0
 fzf 0.27.2
 hub v2.14.2
-levant v0.3.0
-nomad 1.1.2
-packer 1.7.3
 poetry 1.1.7
 ruby 3.0.1
-terraform 1.0.1
-vault 1.7.3
-waypoint 0.4.0

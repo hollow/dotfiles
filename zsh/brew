@@ -1,0 +1,37 @@
+#!zsh
+
+autoload -Uz die
+trap die EXIT
+
+autoload -Uz path-add
+
+brew() {
+    if [[ $1 == "add-path" ]]; then
+        path-add path "${HOMEBREW_PREFIX}/opt/$2/libexec/gnubin"
+        path-add manpath "${HOMEBREW_PREFIX}/opt/$2/libexec/gnuman"
+
+    elif [[ $1 == "upstall" ]]; then
+        if [[ -e "${HOMEBREW_PREFIX}/opt/$2" ]]; then
+            brew upgrade $2
+        else
+            brew install $2
+        fi
+
+    else
+        "${HOMEBREW_PREFIX}/bin/brew" "$@"
+    fi
+}
+
+if [[ "${OSTYPE}" == darwin* ]]; then
+    if [[ ! -e "${HOMEBREW_PREFIX}/bin/brew" ]]; then
+        bash "${ZINIT[PLUGINS_DIR]}/brew/install.sh" || \
+            die "brew installation failed"
+    fi
+
+    path-add path "${HOMEBREW_PREFIX}/bin"
+    path-add path "${HOMEBREW_PREFIX}/sbin"
+    path-add manpath "${HOMEBREW_PREFIX}/share/man"
+    path-add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+fi
+
+brew "$@"

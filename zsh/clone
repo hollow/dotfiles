@@ -15,7 +15,7 @@ fi
 
 @uri-parse rpath ${repo_url} || return
 local repo_rpath="${REPLY}"
-local repo_apath="${HOME}/src/${repo_rpath})"
+local repo_apath="${HOME}/src/${repo_rpath}"
 
 if [[ ! -e "${repo_apath}" ]]; then
     git clone "${repo_url}" "${repo_apath}" || return
