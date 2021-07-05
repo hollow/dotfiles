@@ -210,7 +210,7 @@ zinit wait \
 
 # dnscontrol: synchronize DNS
 # https://github.com/StackExchange/dnscontrol
-zinit wait from'gh-r' bpick"*Darwin*" \
+zinit wait from'gh-r' bpick"*-$(uname)" \
     lbin'dnscontrol-* -> dnscontrol'\
     for StackExchange/dnscontrol
 
@@ -222,7 +222,7 @@ zinit wait from'gh-r' lbin \
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
-zinit wait from'gh-r' lbin \
+zinit wait from'gh-r' bpick'*.tar.gz' lbin \
     atload'alias df=duf' \
     for @muesli/duf
 
