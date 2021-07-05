@@ -21,9 +21,6 @@
 [color]
 	ui = true
 
-[commit]
-   gpgSign = true
-
 [diff]
 	colorMoved = default
 	renames = copies
