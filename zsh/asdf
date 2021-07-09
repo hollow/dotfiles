@@ -11,7 +11,7 @@ path-add path "${ASDF_BIN}"
 
 asdf() {
     if [[ $1 == "add-path" ]]; then
-        path-add path "$(asdf where $2)/bin"
+        path-add path "$(asdf where $2)/${3:-bin}"
 
     elif [[ $1 == "install-fast" ]]; then
         local plugin=${2:-$(asdf plugin list all | fzf | awk '{print $1}')}
@@ -53,7 +53,7 @@ asdf() {
             asdf install ${plugin} ${version} || die "install failed"
         fi
 
-        if [[ $2 == latest ]]; then
+        if [[ $3 == latest || $3 == current ]]; then
             asdf global ${plugin} ${version}
         fi
 

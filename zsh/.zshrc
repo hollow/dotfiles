@@ -170,6 +170,11 @@ autoload -Uz asdf
 zinit as'null' \
     for @asdf-vm/asdf
 
+# act: run github actions locally
+# https://github.com/nektos/act
+zinit wait from'gh-r' lbin \
+    for nektos/act
+
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
@@ -272,11 +277,24 @@ zinit wait \
 zstyle ':fzf-tab:*' switch-group ',' '.'
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -ghH -al $realpath'
 
+# gcloud: Google Cloud SDK
+# https://cloud.google.com/sdk
+zinit wait \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
+    for gcloud
+
 # gh: GitHubs official command line tool
 # https://github.com/cli/cli
 zinit wait from'gh-r' lbin \
     id-as'gh' \
     for cli/cli
+
+# export GitHub token for other applications
+if [[ -r "${XDG_CONFIG_HOME}/gh/hosts.yml" ]]; then
+    export GITHUB_TOKEN=$(yq -r '."github.com".oauth_token' < ${XDG_CONFIG_HOME}/gh/hosts.yml)
+fi
 
 # git: distributed version control system
 # https://github.com/git/git
@@ -310,6 +328,16 @@ zinit wait from'gh-r' lbin \
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GNUPGHOME="${XDG_CONFIG_HOME}"/gnupg
+
+# go: programming language
+# https://www.golang.org
+export GOPATH="${XDG_CACHE_HOME}/go"
+
+zinit wait \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]} go/bin' \
+    for golang
 
 # grex: generate regular expressions from user-provided test cases
 # https://github.com/pemistahl/grex
@@ -417,6 +445,14 @@ zinit wait \
 # https://github.com/chmln/sd
 zinit wait from'gh-r' lbin'sd-* -> sd' \
     for chmln/sd
+
+# terraform:
+zinit wait \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
+    atload'alias tf=terraform' \
+    for terraform
 
 # xh: friendly and fast tool for sending HTTP requests
 # https://github.com/ducaale/xh
