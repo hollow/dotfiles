@@ -165,20 +165,93 @@ export ASDF_DIR="${ZINIT[PLUGINS_DIR]}/asdf"
 export ASDF_BIN="${ASDF_DIR}/bin"
 export ASDF_HASHICORP_OVERWRITE_ARCH="amd64"
 
-autoload -Uz asdf
-
-zinit as'null' \
+autoload -Uz asdf && zinit as'null' \
     for @asdf-vm/asdf
+
+# direnv: change environment based on the current directory
+# https://github.com/direnv/direnv
+zinit \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
+    atload'eval "$(asdf exec ${ICE[id-as]} hook zsh)"' \
+    atload'alias da="direnv allow"' \
+    for direnv
+
+# go: programming language
+# https://www.golang.org
+export GOPATH="${XDG_CACHE_HOME}/go"
+
+zinit wait \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]} go/bin' \
+    atload'mkdir -p "${GOPATH}/bin"' \
+    atload'path-add path "${GOPATH}/bin"' \
+    for golang
+
+# python: programming language
+# https://docs.python.org/3/
+export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+
+# https://github.com/pyenv/pyenv/issues/1768#issuecomment-871602950
+@is-macos && export PYTHON_CONFIGURE_OPTS="--build=aarch64-apple-darwin20.5.0"
+
+zinit wait \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
+    for python
+
+# poetry: python dependency management
+# https://github.com/python-poetry/poetry
+export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
+
+zinit wait \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atclone'asdf exec poetry completions zsh > _poetry' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atpull'asdf exec poetry completions zsh > _poetry' \
+    atload'asdf add-path ${ICE[id-as]}' \
+    atload'alias pa="poetry add"' \
+    atload'alias pi="poetry install"' \
+    for poetry
+
+# ruby: programming language
+# https://www.ruby-lang.org
+export GEM_HOME="${XDG_DATA_HOME}"/gem
+export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
+export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
+export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
+export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
+
+zinit wait \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
+    for ruby
 
 # act: run github actions locally
 # https://github.com/nektos/act
 zinit wait from'gh-r' lbin \
     for nektos/act
 
+# aws: Amazon Web Services CLI
+# https://aws.amazon.com/cli/
+export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"
+export AWS_CONFIG_FILE="${XDG_CONFIG_HOME}/aws/config"
+
+zinit wait \
+    atclone'asdf install-fast ${ICE[id-as]} current' \
+    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
+    atload'asdf add-path ${ICE[id-as]}' \
+    for awscli
+
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'" MANROFFOPT="-c"
+export PAGER="bat"
 
 zinit wait from'gh-r' lbin \
     mv'**/bat.zsh _bat' \
@@ -202,16 +275,6 @@ zinit wait \
     atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
     id-as'dircolors' \
     for trapd00r/LS_COLORS
-
-# direnv: change environment based on the current directory
-# https://github.com/direnv/direnv
-zinit wait \
-    atclone'asdf install-fast ${ICE[id-as]} current' \
-    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
-    atload'asdf add-path ${ICE[id-as]}' \
-    atload'eval "$(asdf exec ${ICE[id-as]} hook zsh)"' \
-    atload'alias da="direnv allow"' \
-    for direnv
 
 # dnscontrol: synchronize DNS
 # https://github.com/StackExchange/dnscontrol
@@ -279,6 +342,8 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -ghH -al $realpath'
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
+export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
+
 zinit wait \
     atclone'asdf install-fast ${ICE[id-as]} current' \
     atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
@@ -290,11 +355,6 @@ zinit wait \
 zinit wait from'gh-r' lbin \
     id-as'gh' \
     for cli/cli
-
-# export GitHub token for other applications
-if [[ -r "${XDG_CONFIG_HOME}/gh/hosts.yml" ]]; then
-    export GITHUB_TOKEN=$(yq -r '."github.com".oauth_token' < ${XDG_CONFIG_HOME}/gh/hosts.yml)
-fi
 
 # git: distributed version control system
 # https://github.com/git/git
@@ -328,16 +388,6 @@ zinit wait from'gh-r' lbin \
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GNUPGHOME="${XDG_CONFIG_HOME}"/gnupg
-
-# go: programming language
-# https://www.golang.org
-export GOPATH="${XDG_CACHE_HOME}/go"
-
-zinit wait \
-    atclone'asdf install-fast ${ICE[id-as]} current' \
-    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
-    atload'asdf add-path ${ICE[id-as]} go/bin' \
-    for golang
 
 # grex: generate regular expressions from user-provided test cases
 # https://github.com/pemistahl/grex
@@ -386,30 +436,6 @@ zinit wait make lbin \
 zinit wait from'gh-r' lbin \
     for @sharkdp/pastel
 
-# python: programming language
-# https://docs.python.org/3/
-export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-
-# TODO: use asdf when python plugin support arm64
-zinit if'@is-macos' \
-    atclone'brew upstall ${ICE[id-as]}' \
-    atpull'%atclone' run-atpull \
-    for python@3.9
-
-# poetry: python dependency management
-# https://github.com/python-poetry/poetry
-export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
-
-zinit wait \
-    atclone'asdf install-fast ${ICE[id-as]} current' \
-    atclone'asdf exec poetry completions zsh > _poetry' \
-    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
-    atpull'asdf exec poetry completions zsh > _poetry' \
-    atload'asdf add-path ${ICE[id-as]}' \
-    atload'alias pa="poetry add"' \
-    atload'alias pi="poetry install"' \
-    for poetry
-
 # procs: A modern replacement for ps
 # https://github.com/dalance/procs
 zinit wait from'gh-r' lbin \
@@ -426,20 +452,6 @@ autoload -Uz @genpass && pw() {
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
 zinit wait from'gh-r' lbin'**/rg' \
     for BurntSushi/ripgrep
-
-# ruby: programming language
-# https://www.ruby-lang.org
-export GEM_HOME="${XDG_DATA_HOME}"/gem
-export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
-export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
-export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
-export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
-
-zinit wait \
-    atclone'asdf install-fast ${ICE[id-as]} current' \
-    atpull'asdf install-fast ${ICE[id-as]} latest' run-atpull \
-    atload'asdf add-path ${ICE[id-as]}' \
-    for ruby
 
 # sd: intuitive find & replace
 # https://github.com/chmln/sd

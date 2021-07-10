@@ -5,3 +5,6 @@
 # Specify desired highlighting theme (e.g. "TwoDark"). Run `bat --list-themes`
 # for a list of all available themes
 --theme="Solarized (dark)"
+
+# Use plain style by default
+--plain
