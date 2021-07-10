@@ -67,7 +67,7 @@ zstyle ':completion:*:*:*:*:processes' command "ps -u ${USERNAME} -o pid,user,co
 # Pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 export PAGER="less"
-export LESS="-iMRSW -x4"
+export LESS="-FiMRSW -x4"
 export LESSHISTFILE=$(path-mkdirname "${XDG_DATA_HOME}/less/history")
 sl() { sort -u | less }
 
@@ -250,8 +250,7 @@ zinit wait \
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
-export MANPAGER="sh -c 'col -bx | bat -l man -p'" MANROFFOPT="-c"
-export PAGER="bat"
+export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 
 zinit wait from'gh-r' lbin \
     mv'**/bat.zsh _bat' \
@@ -323,7 +322,6 @@ zinit wait \
 typeset -TUx FZF_DEFAULT_OPTS fzf_default_opts ' '
 fzf_default_opts=(
     "--ansi"
-    "--cycle"
     "--preview-window='right:60%'"
     "--bind='?:toggle-preview'"
     "--prompt='❯ '"

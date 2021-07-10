@@ -8,3 +8,6 @@
 
 # Use plain style by default
 --plain
+
+# Always use the pager
+--paging=always
