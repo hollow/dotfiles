@@ -1,10 +1,8 @@
 #!zsh
 
-autoload -Uz @is-macos
-
 # Override ZSH MACHTYPE detection to make zinit
 # download amd64 binaries that work with rosetta
-@is-macos && MACHTYPE="x86_64"
+[[ $OSTYPE == darwin* ]] && MACHTYPE="x86_64"
 
 # xdg compatible paths
 declare -gH -A ZINIT
@@ -16,6 +14,9 @@ declare -gH ZPFX="${XDG_CACHE_HOME}"/zpfx
 mkdir -p "${ZPFX}"/{bin,man/man{1..9}}
 path=("${ZPFX}/bin" ${path})
 manpath=("${ZPFX}/man" ${manpath})
+
+# prevent compaudit from complaining
+ZINIT[COMPINIT_OPTS]="-C -u"
 
 # install zinit if missing
 if [[ ! -e "${ZINIT[BIN_DIR]}/zinit.zsh" ]]; then

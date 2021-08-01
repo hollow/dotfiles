@@ -1,3 +1,0 @@
-HashKnownHosts no
-
-Include ~/.config/ssh/config.*

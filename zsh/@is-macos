@@ -1,5 +1,0 @@
-#!zsh
-
-@is-macos() {
-    [[ $OSTYPE == darwin* ]]
-}

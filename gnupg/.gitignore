@@ -1,10 +1,2 @@
-.#lk*
-*.gpg
-*.gpg~
-gpg-agent.conf
-openpgp-revocs.d
-private-keys-v1.d
-pubring.kbx*
-random_seed
-sshcontrol
-tofu.db
+*
+!.gitignore

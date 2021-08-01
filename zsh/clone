@@ -1,6 +1,6 @@
 #!zsh
 
-autoload -Uz @uri-parse
+autoload -Uz uri-parse
 
 local repo_url="$1"
 
@@ -13,7 +13,7 @@ if [[ "${repo_url}" != *':'* ]]; then
     repo_url="https://github.com/${repo_url}"
 fi
 
-@uri-parse rpath ${repo_url} || return
+uri-parse rpath ${repo_url} || return
 local repo_rpath="${REPLY}"
 local repo_apath="${HOME}/src/${repo_rpath}"
 
