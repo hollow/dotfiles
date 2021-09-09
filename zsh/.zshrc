@@ -238,6 +238,9 @@ export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
 # sqlite:
 export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 
+# ssh-agent
+zinit wait for OMZP::ssh-agent
+
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
 export CHECKPOINT_DISABLE=true
