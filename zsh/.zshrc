@@ -250,3 +250,6 @@ alias tf=terraform
 # https://github.com/vim/vim
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[vim]}"
+
+# youtube download audio
+alias yta="youtube-dl -x --audio-format mp3"
