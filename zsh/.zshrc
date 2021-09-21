@@ -238,8 +238,9 @@ export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
 # sqlite:
 export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 
-# ssh-agent
+# ssh:
 zinit wait for OMZP::ssh-agent
+ssu() { ssh -t "$1" sudo -Hi }
 
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
@@ -251,5 +252,5 @@ alias tf=terraform
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[vim]}"
 
-# youtube download audio
+# youtube: download audio
 alias yta="youtube-dl -x --audio-format mp3"
