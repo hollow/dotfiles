@@ -154,6 +154,8 @@ export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
 export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
 export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
 export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
+path=("${HOMEBREW_PREFIX}/opt/ruby/bin" ${path})
+path=("${HOMEBREW_PREFIX}/lib/ruby/gems/3.0.0/bin" ${path})
 
 # android: development kit
 # https://developer.android.com/studio/command-line/variables
@@ -182,6 +184,9 @@ alias df=duf
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
+export CLOUDSDK_PATH="${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk"
+path=("${CLOUDSDK_PATH}/bin" ${path})
+zinit id-as'google-cloud-sdk' for "${CLOUDSDK_PATH}/completion.zsh.inc"
 
 # git: distributed version control system
 # https://github.com/git/git
