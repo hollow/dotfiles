@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Trello Tweaks
 // @namespace    https://github.com/hollow
-// @version      0.2
+// @version      0.3
 // @description  Hide card badges, button texts and other display enhancements.
 // @author       Benedikt Böhm
 // @match        https://trello.com/b/*
@@ -14,7 +14,12 @@
 
     $(`
     <style>
-    .board-header-btns.mod-right .board-header-btn-text {
+    body {
+        zoom: 80%;
+    }
+
+    .board-header-btns.mod-right .board-header-btn-text,
+    .board-header-btns.mod-right .js-butler-header-btns {
         display: none;
     }
 
@@ -22,21 +27,24 @@
         display: none;
     }
 
+    .list-card-members {
+        float: none;
+    }
+
     span.custom-field-front-badges > span > div {
         display: block;
     }
+
+    .badges .badge[title="Attachments"],
+    .badges .badge[title="Checklist items"],
+    .badges .badge[title="Comments"],
+    .badges .badge[title="This card has a description."],
+    .badges .badge[title="Trello attachments"],
+    .badges .badge[title="You are subscribed to this card."],
+    .badges .badge[title="You are watching this card."],
+    .badges .js-plugin-badges > span > div {
+        display: none;
+    }
     </style>
     `).appendTo('head');
-
-    setInterval(function () {
-        $('.badges .badge[title="Attachments"]').parent().remove();
-        $('.badges .badge[title="Checklist items"]').parent().remove();
-        $('.badges .badge[title="Comments"]').parent().remove();
-        $('.badges .badge[title="This card has a description."]').parent().remove();
-        $('.badges .badge[title="Trello attachments"]').parent().remove();
-        $('.badges .badge[title="You are subscribed to this card."]').parent().remove();
-        $('.badges .badge[title="You are watching this card."]').parent().remove();
-        // $('.badges .badge span[style*="github"]').parent().css("display", "none");
-        $('.badges .badge span[style*="confluence.trello.services"]').parent().css("display", "none");
-    }, 500);
 })(window.jQuery);
