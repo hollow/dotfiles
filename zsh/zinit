@@ -20,7 +20,7 @@ ZINIT[COMPINIT_OPTS]="-C -u"
 
 # install zinit if missing
 if [[ ! -e "${ZINIT[BIN_DIR]}/zinit.zsh" ]]; then
-    git clone https://github.com/zdharma/zinit "${ZINIT[BIN_DIR]}" || return
+    git clone https://github.com/zdharma-continuum/zinit "${ZINIT[BIN_DIR]}" || return
 fi
 
 # load zinit into shell environment
@@ -59,13 +59,9 @@ source "${ZINIT[BIN_DIR]}"/zinit.zsh
     :za-local-help-null-handler
 
 # z-a-default-ice: set default ices
-# https://github.com/zinit-zsh/z-a-default-ice
-zinit for zinit-zsh/z-a-default-ice
+# https://github.com/zdharma-continuum/zinit-annex-default-ice
+zinit for zdharma-continuum/zinit-annex-default-ice
 zinit default-ice --quiet lucid light-mode
-
-# z-a-patch-dl: downloads files and applies patches
-# https://github.com/zinit-zsh/z-a-patch-dl
-zinit for zinit-zsh/z-a-patch-dl
 
 # z-a-linkbin: install symlinks into PATH
 # https://github.com/NICHOLAS85/z-a-linkbin

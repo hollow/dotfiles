@@ -26,7 +26,7 @@ typeset -TUx MANPATH manpath=(${(s[:])$(env -u MANPATH manpath)})
 typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
 
 # Zsh plugin manager
-# https://github.com/zdharma/zinit
+# https://github.com/zdharma-continuum/zinit
 autoload -Uz zinit
 alias zre="exec zsh"
 alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
@@ -53,7 +53,7 @@ if [[ -e "${HOMEBREW_PREFIX}" ]]; then
         atclone'brew autoremove' \
         atclone'brew cleanup -s' \
         atpull'%atclone' run-atpull \
-        for zdharma/null
+        for zdharma-continuum/null
 
     # ensure proper GNU based environment
     for formula in coreutils findutils gnu-{sed,tar,time}; do
@@ -98,10 +98,10 @@ zinit wait'!' nocd depth'1' \
     for romkatv/powerlevel10k
 
 # Fast Zsh syntax highlighting
-# https://github.com/zdharma/fast-syntax-highlighting
+# https://github.com/zdharma-continuum/fast-syntax-highlighting
 zinit wait \
     atinit'zicompinit && zicdreplay' \
-    for zdharma/fast-syntax-highlighting
+    for zdharma-continuum/fast-syntax-highlighting
 
 # Colors for ls and completions
 # https://github.com/trapd00r/LS_COLORS
