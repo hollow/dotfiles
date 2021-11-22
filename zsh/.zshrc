@@ -181,6 +181,10 @@ export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 # https://github.com/muesli/duf
 alias df=duf
 
+# gam: Google Apps Manager
+# https://github.com/jay0lee/GAM
+function gam() { "/Users/bene/bin/gam/gam" "$@"; }
+
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
