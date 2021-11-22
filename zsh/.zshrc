@@ -84,6 +84,17 @@ zinit wait for \
 autoload -Uz select-word-style
 select-word-style shell
 
+# Use approximate completion with error correction
+# zstyle ':completion:*' completer _complete _correct _approximate
+
+# Improve completion output format
+# zstyle ':completion:*' verbose yes
+# zstyle ':completion:*' group-name ''
+# zstyle ':completion:*:descriptions' format '%d'
+# zstyle ':completion:*:messages' format '%d'
+# zstyle ':completion:*:warnings' format 'No matches for: %d'
+# zstyle ':completion:*:corrections' format '%d (errors: %e)'
+
 # History configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
 HISTFILE="${XDG_DATA_HOME}/zsh/history"
@@ -181,6 +192,25 @@ export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 # https://github.com/muesli/duf
 alias df=duf
 
+# fzf: command-line fuzzy finder
+# https://github.com/junegunn/fzf
+# typeset -TUx FZF_DEFAULT_OPTS fzf_default_opts ' '
+# fzf_default_opts=(
+#     "--ansi"
+#     "--preview-window='right:60%'"
+#     "--bind='?:toggle-preview'"
+#     "--prompt='❯ '"
+#     "--color='bg+:#073642,bg:#002b36,spinner:#719e07,hl:#586e75'"
+#     "--color='fg:#839496,header:#586e75,info:#cb4b16,pointer:#719e07'"
+#     "--color='marker:#719e07,fg+:#839496,prompt:#719e07,hl+:#719e07'"
+# )
+
+# fzf-tab: tab completion on steriods
+# https://github.com/Aloxaf/fzf-tab
+# zinit wait for Aloxaf/fzf-tab
+# zstyle ':fzf-tab:*' switch-group ',' '.'
+# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -ghH -al $realpath'
+
 # gam: Google Apps Manager
 # https://github.com/jay0lee/GAM
 function gam() { "/Users/bene/bin/gam/gam" "$@"; }
@@ -220,17 +250,15 @@ alias s="git st ."
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 
-# insect: high precision scientific calculator
-# https://github.com/sharkdp/insect
-zinit wait from'gh-r' \
-    lbin'insect-* -> insect' \
-    for @sharkdp/insect
-
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 export PAGER="less" LESS="-FiMRSW -x4"
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 sl() { sort -u | less }
+
+# mcrcon: Rcon client for Minecraft
+# https://github.com/Tiiffi/mcrcon
+zinit wait make lbin for Tiiffi/mcrcon
 
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
