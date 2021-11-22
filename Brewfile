@@ -126,6 +126,7 @@ cask "threema"
 cask "utm"
 cask "visual-studio-code"
 cask "vivaldi"
+cask "vnc-viewer"
 cask "zoom"
 mas "MoneyMoney", id: 872698314
 mas "Telefon", id: 406825478
