@@ -250,6 +250,15 @@ alias s="git st ."
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 
+# home-assistant
+ha() {
+    if [[ $# -eq 0 ]]; then
+        hass-cli --help
+    else
+        hass-cli --sort-by area_id,entity_id,name,description "$@"
+    fi
+}
+
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 export PAGER="less" LESS="-FiMRSW -x4"
@@ -282,7 +291,9 @@ ssu() { ssh -t "$1" sudo -Hi }
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
 export CHECKPOINT_DISABLE=true
-alias tf=terraform
+alias tf="terraform"
+alias tfa="tf apply"
+alias tfp="tf plan"
 
 # vim: the editor
 # https://github.com/vim/vim
@@ -290,4 +301,4 @@ export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[vim]}"
 
 # youtube: download audio
-alias yta="youtube-dl -x --audio-format mp3"
+alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
