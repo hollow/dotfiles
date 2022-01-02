@@ -15,8 +15,9 @@ export XDG_STATE_HOME="${HOME}/.local/state"
 
 # Shell paths
 # https://zsh.sourceforge.io/Intro/intro_3.html
-export ZDOTDIR=${${(%):-%x}:A:h} ZSH=${ZDOTDIR}
-export ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
+ZDOTDIR=${${(%):-%x}:A:h}
+ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
+ZSH_COMPDUMP="${ZSH_CACHE_DIR}/zcompdump"
 mkdir -p "${XDG_CACHE_HOME}/zsh"
 mkdir -p "${XDG_DATA_HOME}/zsh"
 
@@ -24,149 +25,127 @@ mkdir -p "${XDG_DATA_HOME}/zsh"
 typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
 typeset -TUx MANPATH manpath=(${(s[:])$(env -u MANPATH manpath)})
 typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
+autoload -Uz has
 
-# Zsh plugin manager
-# https://github.com/zdharma-continuum/zinit
-autoload -Uz zinit
-alias zre="exec zsh"
-alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
-
-# The missing package manager
-# https://github.com/Homebrew/brew
-export HOMEBREW_PREFIX="/opt/homebrew"
-
-if [[ -e "${HOMEBREW_PREFIX}" ]]; then
-    export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
-    export HOMEBREW_BUNDLE_NO_LOCK=1
-    export HOMEBREW_AUTO_UPDATE_SECS=86400
-    export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
-    export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
-    export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
-
-    export HOMEBREW_SHELLENV_PREFIX= # reset
-    eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
-
-    zinit id-as'brew' as'null' \
-        atclone'brew update' \
-        atclone'brew upgrade' \
-        atclone'brew bundle install' \
-        atclone'brew autoremove' \
-        atclone'brew cleanup -s' \
-        atpull'%atclone' run-atpull \
-        for zdharma-continuum/null
-
-    # ensure proper GNU based environment
-    for formula in coreutils findutils gnu-{sed,tar,time}; do
-        path=("${HOMEBREW_PREFIX}/opt/${formula}/libexec/gnubin" ${path})
-        manpath=("${HOMEBREW_PREFIX}/opt/${formula}/libexec/gnuman" ${manpath})
-    done
-
-    alias bbd="brew bundle dump -f"
-    alias bz="brew uninstall --zap"
+# Enable Powerlevel10k instant prompt
+if [[ -r "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Load basics from Oh My Zsh
-# https://github.com/ohmyzsh/ohmyzsh
-zinit wait for \
-    OMZL::clipboard.zsh \
-    OMZL::compfix.zsh \
-    OMZL::completion.zsh \
-    OMZL::directories.zsh \
-    OMZL::functions.zsh \
-    OMZL::git.zsh \
-    OMZL::grep.zsh \
-    OMZL::history.zsh \
-    OMZL::key-bindings.zsh \
-    OMZL::spectrum.zsh \
-    OMZL::termsupport.zsh
+# Install zgenom
+if [[ ! -d "${XDG_CACHE_HOME}/zgenom" ]]; then
+    git clone https://github.com/jandamm/zgenom.git ${XDG_CACHE_HOME}/zgenom
+fi
+
+# Load zgenom
+ZGEN_CUSTOM_COMPDUMP="${ZSH_COMPDUMP}"
+source "${XDG_CACHE_HOME}/zgenom/zgenom.zsh"
+
+# Reload zgenom
+alias zre="zgenom reset && exec zsh"
+alias zx="sudo rm -rf ${XDG_CACHE_HOME} && exec zsh"
+
+# Check for plugin and zgenom updates every 7 days
+# This does not increase the startup time.
+zgenom autoupdate
+
+# if the init script doesn't exist
+if ! zgenom saved; then
+    # https://github.com/jandamm/zgenom-ext-eval
+    zgenom load jandamm/zgenom-ext-eval
+
+    # Ohmyzsh base library
+    zgenom ohmyzsh
+
+    # enhance the terminal environment with 256 colors
+    # https://github.com/chrissicool/zsh-256color
+    zgenom load chrissicool/zsh-256color
+
+    # build and load ls colors
+    # https://github.com/trapd00r/LS_COLORS
+    zgenom eval --name LS_COLORS \
+        $(dircolors -b LS_COLORS)
+
+    # https://github.com/romkatv/powerlevel10k
+    zgenom load romkatv/powerlevel10k powerlevel10k
+
+    # Feature-rich syntax highlighting for ZSH
+    # https://github.com/zdharma-continuum/fast-syntax-highlighting
+    zgenom load zdharma-continuum/fast-syntax-highlighting
+
+    # Fish-like autosuggestions for zsh
+    # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
+    zgenom load zsh-users/zsh-autosuggestions
+
+    # Automatically close quotes, brackets and other delimiters
+    # https://github.com/hlissner/zsh-autopair
+    zgenom load hlissner/zsh-autopair
+
+    # help remembering those aliases you defined once
+    # https://github.com/djui/alias-tips
+    zgenom load djui/alias-tips
+
+    # Load zsh history search and create bindings for it
+    zgenom load zsh-users/zsh-history-substring-search
+    zgenom eval "bindkey '^[[A' history-substring-search-up"
+    zgenom eval "bindkey '^[[B' history-substring-search-down"
+
+    # Additional completion definitions for Zsh.
+    # https://github.com/zsh-users/zsh-completions
+    zgenom load zsh-users/zsh-completions
+
+    # docker completions
+    zgenom ohmyzsh --completion plugins/docker
+    zgenom ohmyzsh --completion plugins/docker-compose
+
+    # ohmyzsh plugins
+    zgenom ohmyzsh plugins/colored-man-pages
+    zgenom ohmyzsh plugins/pip
+    zgenom ohmyzsh plugins/python
+    zgenom ohmyzsh plugins/rsync
+
+    # keychain
+    zstyle :omz:plugins:ssh-agent agent-forwarding yes
+    zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
+    zgenom ohmyzsh plugins/ssh-agent
+
+    # save all to init script
+    zgenom save
+
+    # Compile your zsh files
+    zgenom compile "${${(%):-%x}:A}"
+    zgenom compile "${ZDOTDIR}"
+fi
 
 # Words are complete shell command arguments
 autoload -Uz select-word-style
 select-word-style shell
 
-# Use approximate completion with error correction
-# zstyle ':completion:*' completer _complete _correct _approximate
+# Speed up slow completions with a cache
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ${ZSH_CACHE_DIR}
 
-# Improve completion output format
-# zstyle ':completion:*' verbose yes
-# zstyle ':completion:*' group-name ''
-# zstyle ':completion:*:descriptions' format '%d'
-# zstyle ':completion:*:messages' format '%d'
-# zstyle ':completion:*:warnings' format 'No matches for: %d'
-# zstyle ':completion:*:corrections' format '%d (errors: %e)'
+# Use approximate completion with error correction
+zstyle ':completion:*' completer _complete _correct _approximate
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%d'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*:corrections' format '%d (errors: %e)'
+
+# Ignore completion functions for commands we don’t have
+zstyle ':completion:*:functions' ignored-patterns '_*'
+
+# Complete process IDs with menu selection
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*' force-list always
 
 # History configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
 HISTFILE="${XDG_DATA_HOME}/zsh/history"
 HISTSIZE=1000000000 SAVEHIST=1000000000
 unsetopt share_history # OMZ enables shared history
-
-# Fast, clean and configurable Zsh theme
-# https://github.com/romkatv/powerlevel10k
-zinit wait'!' nocd depth'1' \
-    atload'source "${ZDOTDIR}/.p10k.zsh"' \
-    atload'_p9k_precmd' \
-    for romkatv/powerlevel10k
-
-# Fast Zsh syntax highlighting
-# https://github.com/zdharma-continuum/fast-syntax-highlighting
-zinit wait \
-    atinit'zicompinit && zicdreplay' \
-    for zdharma-continuum/fast-syntax-highlighting
-
-# Colors for ls and completions
-# https://github.com/trapd00r/LS_COLORS
-zinit wait \
-    pick'dircolors.zsh' nocompile'!' \
-    atclone'dircolors -b LS_COLORS > dircolors.zsh' \
-    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
-    atload'alias ls="ls --color=tty"' \
-    atload'alias l="exa --all --long --group"' \
-    for trapd00r/LS_COLORS
-
-# Additional completions from the community
-# https://github.com/zsh-users/zsh-completions
-zinit wait blockf \
-    atpull'zinit creinstall -q .' \
-    for zsh-users/zsh-completions
-
-# Automatically close quotes, brackets and other delimiters
-# https://github.com/hlissner/zsh-autopair
-zinit wait for hlissner/zsh-autopair
-
-# direnv: change environment based on the current directory
-# https://github.com/direnv/direnv
-if [[ ${EUID} -ne 0 ]]; then
-    eval "$(direnv hook zsh)"
-    alias da="direnv allow"
-fi
-
-# go: programming language
-# https://www.golang.org
-export GOPATH="${XDG_CACHE_HOME}/go"
-path=("${GOPATH}/bin" ${path})
-
-# npm: node package manager
-# https://github.com/npm/cli
-export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
-
-# python: programming language
-# https://docs.python.org/3/
-export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-
-# poetry: python dependency management
-# https://github.com/python-poetry/poetry
-export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
-
-# ruby: programming language
-# https://www.ruby-lang.org
-export GEM_HOME="${XDG_DATA_HOME}"/gem
-export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
-export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
-export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
-export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
-path=("${HOMEBREW_PREFIX}/opt/ruby/bin" ${path})
-path=("${HOMEBREW_PREFIX}/lib/ruby/gems/3.0.0/bin" ${path})
 
 # android: development kit
 # https://developer.android.com/studio/command-line/variables
@@ -185,42 +164,73 @@ export AWS_CONFIG_FILE="${XDG_CONFIG_HOME}/aws/config"
 
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
-export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
-export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
+if has bat; then
+    export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
+    export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
+fi
+
+# brew: the missing package manager
+# https://github.com/Homebrew/brew
+export HOMEBREW_PREFIX="/opt/homebrew"
+
+if [[ -e "${HOMEBREW_PREFIX}" ]]; then
+    export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
+    export HOMEBREW_BUNDLE_NO_LOCK=1
+    export HOMEBREW_AUTO_UPDATE_SECS=86400
+    export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
+    export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
+    export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
+
+    export HOMEBREW_SHELLENV_PREFIX= # reset
+    eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
+
+    # ensure proper GNU based environment
+    for formula in coreutils findutils gnu-{sed,tar,time}; do
+        path=("${HOMEBREW_PREFIX}/opt/${formula}/libexec/gnubin" ${path})
+        manpath=("${HOMEBREW_PREFIX}/opt/${formula}/libexec/gnuman" ${manpath})
+    done
+
+    alias bbd="brew bundle dump -f"
+    alias bz="brew uninstall --zap"
+
+    bup() {
+        brew update && \
+        brew upgrade && \
+        brew bundle install && \
+        brew autoremove && \
+        brew cleanup -s
+    }
+fi
+
+# direnv: change environment based on the current directory
+# https://github.com/direnv/direnv
+if has direnv && [[ ${EUID} -ne 0 ]]; then
+    eval "$(direnv hook zsh)"
+    alias da="direnv allow"
+fi
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
-alias df=duf
+if has duf; then
+    alias df=duf
+elif has pydf; then
+    alias df=pydf
+fi
 
-# fzf: command-line fuzzy finder
-# https://github.com/junegunn/fzf
-# typeset -TUx FZF_DEFAULT_OPTS fzf_default_opts ' '
-# fzf_default_opts=(
-#     "--ansi"
-#     "--preview-window='right:60%'"
-#     "--bind='?:toggle-preview'"
-#     "--prompt='❯ '"
-#     "--color='bg+:#073642,bg:#002b36,spinner:#719e07,hl:#586e75'"
-#     "--color='fg:#839496,header:#586e75,info:#cb4b16,pointer:#719e07'"
-#     "--color='marker:#719e07,fg+:#839496,prompt:#719e07,hl+:#719e07'"
-# )
-
-# fzf-tab: tab completion on steriods
-# https://github.com/Aloxaf/fzf-tab
-# zinit wait for Aloxaf/fzf-tab
-# zstyle ':fzf-tab:*' switch-group ',' '.'
-# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -ghH -al $realpath'
-
-# gam: Google Apps Manager
-# https://github.com/jay0lee/GAM
-function gam() { "/Users/bene/bin/gam/gam" "$@"; }
+# exa: a modern replacement for ‘ls’.
+# https://github.com/ogham/exa
+if has exa; then
+    alias l="exa --all --long --group"
+fi
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
-export CLOUDSDK_PATH="${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk"
-path=("${CLOUDSDK_PATH}/bin" ${path})
-zinit id-as'google-cloud-sdk' for "${CLOUDSDK_PATH}/completion.zsh.inc"
+if [[ -e "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc" ]]; then
+    source "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
+elif [[ -e /usr/share/google-cloud-sdk/completion.zsh.inc ]]; then
+    source /usr/share/google-cloud-sdk/completion.zsh.inc
+fi
 
 # git: distributed version control system
 # https://github.com/git/git
@@ -250,43 +260,58 @@ alias s="git st ."
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 
-# home-assistant
-ha() {
-    if [[ $# -eq 0 ]]; then
-        hass-cli --help
-    else
-        hass-cli --sort-by area_id,entity_id,name,description "$@"
-    fi
-}
+# go: programming language
+# https://www.golang.org
+export GOPATH="${XDG_CACHE_HOME}/go"
+path=("${GOPATH}/bin" ${path})
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 export PAGER="less" LESS="-FiMRSW -x4"
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
+mkdir -p "${XDG_DATA_HOME}/less"
 sl() { sort -u | less }
 
-# mcrcon: Rcon client for Minecraft
-# https://github.com/Tiiffi/mcrcon
-zinit wait make lbin for Tiiffi/mcrcon
+# npm: node package manager
+# https://github.com/npm/cli
+export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
 
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
+# poetry: python dependency management
+# https://github.com/python-poetry/poetry
+export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
+
 # pw: a simple pwgen replacement
 autoload -Uz pw
+
+# python: programming language
+# https://docs.python.org/3/
+export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
 
-# sqlite:
-export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
+# ruby: programming language
+# https://www.ruby-lang.org
+export GEM_HOME="${XDG_DATA_HOME}"/gem
+export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
+export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
+export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
+export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
 
-# ssh:
-zinit wait for OMZP::ssh-agent
-ssu() { ssh -t "$1" sudo -Hi }
+if [[ -e "${HOMEBREW_PREFIX}" ]]; then
+    path=("${HOMEBREW_PREFIX}/opt/ruby/bin" ${path})
+    path=("${HOMEBREW_PREFIX}/lib/ruby/gems/3.0.0/bin" ${path})
+fi
+
+# sqlite: database engine
+# https://sqlite.org
+export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
@@ -302,3 +327,6 @@ export EDITOR="${commands[vim]}"
 
 # youtube: download audio
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
+
+# Load p10k prompt last
+source "${${(%):-%x}:A:h}/.p10k.zsh"

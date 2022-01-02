@@ -1,10 +1,10 @@
 # dotfiles
 
 This repository uses
-[zinit](https://github.com/zdharma/zinit)
+[zgenom](https://github.com/jandamm/zgenom)
 as a plugin and load manager for zsh.
 
-Zinit will initialize
+Zgenom will initialize
 [Homebrew](https://github.com/Homebrew/brew)
 for package management.
 
