@@ -20,7 +20,7 @@ done
 alias bbd="brew bundle dump -f"
 alias bz="brew uninstall --zap"
 
-brew-update() {
+__brew_update() {
     brew update && \
     brew upgrade && \
     brew bundle install && \

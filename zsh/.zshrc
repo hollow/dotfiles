@@ -54,10 +54,6 @@ source "${XDG_CACHE_HOME}/zgenom/zgenom.zsh"
 alias zre="zgenom reset && exec zsh"
 alias zx="sudo rm -rf ${XDG_CACHE_HOME} && exec zsh"
 
-# Check for plugin and zgenom updates every 7 days
-# This does not increase the startup time.
-zgenom autoupdate
-
 # if the init script doesn't exist
 if ! zgenom saved; then
     # https://github.com/jandamm/zgenom-ext-eval
@@ -303,6 +299,16 @@ export EDITOR="${commands[vim]}"
 
 # youtube: download audio
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
+
+# Update system and shell
+up() {
+    if has __brew_update; then
+        __brew_update
+    fi
+
+    zgenom selfupdate
+    zgenom update
+}
 
 # Load p10k prompt last
 source "${${(%):-%x}:A:h}/.p10k.zsh"
