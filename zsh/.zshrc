@@ -29,9 +29,8 @@ autoload -Uz has
 
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
-export HOMEBREW_PREFIX="/opt/homebrew"
-
-if [[ -e "${HOMEBREW_PREFIX}" ]]; then
+if [[ -e /opt/homebrew ]]; then
+    export HOMEBREW_PREFIX="/opt/homebrew"
     export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
     export HOMEBREW_BUNDLE_NO_LOCK=1
     export HOMEBREW_AUTO_UPDATE_SECS=86400
@@ -67,7 +66,7 @@ fi
 
 # Install zgenom
 if [[ ! -d "${XDG_CACHE_HOME}/zgenom" ]]; then
-    git clone https://github.com/jandamm/zgenom.git ${XDG_CACHE_HOME}/zgenom
+    git clone https://github.com/jandamm/zgenom.git "${XDG_CACHE_HOME}/zgenom"
 fi
 
 # Load zgenom
@@ -204,7 +203,7 @@ fi
 
 # direnv: change environment based on the current directory
 # https://github.com/direnv/direnv
-if has direnv && [[ ${EUID} -ne 0 ]]; then
+if has direnv; then
     eval "$(direnv hook zsh)"
     alias da="direnv allow"
 fi
