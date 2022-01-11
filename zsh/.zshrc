@@ -13,24 +13,27 @@ export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 
+# System paths
+typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
+typeset -TUx MANPATH manpath=(${(s[:])$(env -u MANPATH manpath)})
+
 # Shell paths
 # https://zsh.sourceforge.io/Intro/intro_3.html
 ZDOTDIR=${${(%):-%x}:A:h}
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
+mkdir -p "${ZSH_CACHE_DIR}"
+ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
+mkdir -p "${ZSH_DATA_DIR}"
 ZSH_COMPDUMP="${ZSH_CACHE_DIR}/zcompdump"
-mkdir -p "${XDG_CACHE_HOME}/zsh"
-mkdir -p "${XDG_DATA_HOME}/zsh"
 
-# System paths
-typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
-typeset -TUx MANPATH manpath=(${(s[:])$(env -u MANPATH manpath)})
+# Shell functions
 typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
 autoload -Uz has
 
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
 if [[ -e /opt/homebrew ]]; then
-    autoload -Uz brew
+    source "${ZDOTDIR}/brew"
 fi
 
 # Enable Powerlevel10k instant prompt
@@ -149,7 +152,7 @@ zstyle ':completion:*:kill:*' force-list always
 
 # History configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
-HISTFILE="${XDG_DATA_HOME}/zsh/history"
+HISTFILE="${ZSH_DATA_DIR}/history"
 HISTSIZE=1000000000 SAVEHIST=1000000000
 unsetopt share_history # OMZ enables shared history
 
