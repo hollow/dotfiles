@@ -30,33 +30,7 @@ autoload -Uz has
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
 if [[ -e /opt/homebrew ]]; then
-    export HOMEBREW_PREFIX="/opt/homebrew"
-    export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
-    export HOMEBREW_BUNDLE_NO_LOCK=1
-    export HOMEBREW_AUTO_UPDATE_SECS=86400
-    export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
-    export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
-    export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
-
-    export HOMEBREW_SHELLENV_PREFIX= # reset
-    eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
-
-    # ensure proper GNU based environment
-    for formula in coreutils findutils gnu-{sed,tar,time}; do
-        path=("${HOMEBREW_PREFIX}/opt/${formula}/libexec/gnubin" ${path})
-        manpath=("${HOMEBREW_PREFIX}/opt/${formula}/libexec/gnuman" ${manpath})
-    done
-
-    alias bbd="brew bundle dump -f"
-    alias bz="brew uninstall --zap"
-
-    bup() {
-        brew update && \
-        brew upgrade && \
-        brew bundle install && \
-        brew autoremove && \
-        brew cleanup -s
-    }
+    autoload -Uz brew
 fi
 
 # Enable Powerlevel10k instant prompt
