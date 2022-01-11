@@ -95,8 +95,8 @@ if ! zgenom saved; then
 
     # build and load ls colors
     # https://github.com/trapd00r/LS_COLORS
-    zgenom eval --name LS_COLORS \
-        $(dircolors -b ${${(%):-%x}:A:h:h}/LS_COLORS)
+    zgenom clone trapd00r/LS_COLORS
+    zgenom eval $(dircolors -b $(zgenom api clone_dir trapd00r/LS_COLORS)/LS_COLORS)
 
     # https://github.com/romkatv/powerlevel10k
     zgenom load romkatv/powerlevel10k powerlevel10k
