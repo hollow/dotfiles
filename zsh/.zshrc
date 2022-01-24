@@ -194,6 +194,9 @@ export GIT_AUTHOR_EMAIL="${USER_EMAIL}"
 export GIT_COMMITTER_NAME="${USER_NAME}"
 export GIT_COMMITTER_EMAIL="${USER_EMAIL}"
 
+# https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete
+zstyle ':completion:*:*' ignored-patterns '*ORIG_HEAD'
+
 autoload -Uz clone
 
 alias c="git changes"
