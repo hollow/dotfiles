@@ -126,6 +126,10 @@ HISTFILE="${ZSH_DATA_DIR}/history"
 HISTSIZE=1000000000 SAVEHIST=1000000000
 unsetopt share_history # OMZ enables shared history
 
+# act: run your GitHub Actions locally
+# https://github.com/nektos/act
+alias act="act --container-architecture=linux/amd64"
+
 # android: development kit
 # https://developer.android.com/studio/command-line/variables
 export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
