@@ -1,0 +1,3 @@
+ENTRY "videos" URL "/volume1/video"
+ENTRY "downloads" URL "/volume1/downloads"
+ENTRY "nutz" URL "/sh://nutz/mnt/bigspace"

@@ -1,34 +1,34 @@
-# User information (for git, gpg, etc)
+# user information (for git, gpg, etc)
 export USER_NAME="Benedikt Böhm"
 export USER_EMAIL="bb@xnull.de"
 
-# Force locale to english
+# force locale to english
 export LANG="en_US.UTF-8"
 export LC_CTYPE=${LANG}
 
-# User paths
+# user paths
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 
-# System paths
-typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
-typeset -TUx MANPATH manpath=(${(s[:])$(env -u MANPATH manpath)})
-
-# Shell paths
+# shell paths
 # https://zsh.sourceforge.io/Intro/intro_3.html
-ZDOTDIR=${${(%):-%x}:A:h}
-ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
-mkdir -p "${ZSH_CACHE_DIR}"
-ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
-mkdir -p "${ZSH_DATA_DIR}"
+ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
+ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh" && mkdir -p "${ZSH_CACHE_DIR}"
+ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh" && mkdir -p "${ZSH_DATA_DIR}"
 ZSH_COMPDUMP="${ZSH_CACHE_DIR}/zcompdump"
 
-# Shell functions
+# shell functions
 typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
 autoload -Uz has
+
+# system path
+typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
+
+# enforce truecolor support
+export COLORTERM="truecolor"
 
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
@@ -36,23 +36,19 @@ if [[ -e /opt/homebrew ]]; then
     source "${ZDOTDIR}/brew"
 fi
 
-# Enable Powerlevel10k instant prompt
+# enable Powerlevel10k instant prompt
 if [[ -r "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Install zgenom
+# install zgenom
 if [[ ! -d "${XDG_CACHE_HOME}/zgenom" ]]; then
     git clone https://github.com/jandamm/zgenom.git "${XDG_CACHE_HOME}/zgenom"
 fi
 
-# Load zgenom
+# load zgenom
 ZGEN_CUSTOM_COMPDUMP="${ZSH_COMPDUMP}"
 source "${XDG_CACHE_HOME}/zgenom/zgenom.zsh"
-
-# Reload zgenom
-alias zre="zgenom reset && exec zsh"
-alias zx="sudo rm -rf ${XDG_CACHE_HOME} && exec zsh"
 
 # if the init script doesn't exist
 if ! zgenom saved; then
@@ -62,10 +58,6 @@ if ! zgenom saved; then
     # Ohmyzsh base library
     zgenom ohmyzsh
 
-    # enhance the terminal environment with 256 colors
-    # https://github.com/chrissicool/zsh-256color
-    zgenom load chrissicool/zsh-256color
-
     # build and load ls colors
     # https://github.com/trapd00r/LS_COLORS
     zgenom clone trapd00r/LS_COLORS
@@ -74,15 +66,15 @@ if ! zgenom saved; then
     # https://github.com/romkatv/powerlevel10k
     zgenom load romkatv/powerlevel10k powerlevel10k
 
-    # Feature-rich syntax highlighting for ZSH
+    # feature-rich syntax highlighting for ZSH
     # https://github.com/zdharma-continuum/fast-syntax-highlighting
     zgenom load zdharma-continuum/fast-syntax-highlighting
 
-    # Fish-like autosuggestions for zsh
+    # fish-like autosuggestions for zsh
     # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
     zgenom load zsh-users/zsh-autosuggestions
 
-    # Automatically close quotes, brackets and other delimiters
+    # automatically close quotes, brackets and other delimiters
     # https://github.com/hlissner/zsh-autopair
     zgenom load hlissner/zsh-autopair
 
@@ -90,47 +82,29 @@ if ! zgenom saved; then
     # https://github.com/djui/alias-tips
     zgenom load djui/alias-tips
 
-    # Load zsh history search and create bindings for it
+    # load zsh history search and create bindings for it
+    # https://github.com/zsh-users/zsh-history-substring-search
     zgenom load zsh-users/zsh-history-substring-search
     zgenom eval "bindkey '^[[A' history-substring-search-up"
     zgenom eval "bindkey '^[[B' history-substring-search-down"
 
-    # Additional completion definitions for Zsh.
+    # additional completion definitions for Zsh.
     # https://github.com/zsh-users/zsh-completions
     zgenom load zsh-users/zsh-completions
 
-    # docker completions
-    zgenom ohmyzsh --completion plugins/docker
-    zgenom ohmyzsh --completion plugins/docker-compose
-
-    # ohmyzsh plugins
-    zgenom ohmyzsh plugins/colored-man-pages
-    zgenom ohmyzsh plugins/pip
-    zgenom ohmyzsh plugins/python
-    zgenom ohmyzsh plugins/rsync
-
-    # keychain
-    zstyle :omz:plugins:ssh-agent agent-forwarding yes
-    zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
-    zgenom ohmyzsh plugins/ssh-agent
-
     # save all to init script
     zgenom save
-
-    # Compile your zsh files
-    zgenom compile "${${(%):-%x}:A}"
-    zgenom compile "${ZDOTDIR}"
 fi
 
-# Words are complete shell command arguments
+# words are complete shell command arguments
 autoload -Uz select-word-style
 select-word-style shell
 
-# Speed up slow completions with a cache
+# speed up slow completions with a cache
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ${ZSH_CACHE_DIR}
 
-# Use approximate completion with error correction
+# use approximate completion with error correction
 zstyle ':completion:*' completer _complete _correct _approximate
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*' group-name ''
@@ -139,14 +113,14 @@ zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*:corrections' format '%d (errors: %e)'
 
-# Ignore completion functions for commands we don’t have
+# ignore completion functions for commands we don’t have
 zstyle ':completion:*:functions' ignored-patterns '_*'
 
-# Complete process IDs with menu selection
+# complete process IDs with menu selection
 zstyle ':completion:*:*:kill:*' menu yes select
 zstyle ':completion:*:kill:*' force-list always
 
-# History configuration
+# history configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
 HISTFILE="${ZSH_DATA_DIR}/history"
 HISTSIZE=1000000000 SAVEHIST=1000000000
@@ -180,6 +154,11 @@ if has direnv; then
     eval "$(direnv hook zsh)"
     alias da="direnv allow"
 fi
+
+# docker: container runtime
+# https://www.docker.com
+zgenom ohmyzsh --completion plugins/docker
+zgenom ohmyzsh --completion plugins/docker-compose
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
@@ -244,6 +223,18 @@ export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 mkdir -p "${XDG_DATA_HOME}/less"
 sl() { sort -u | less }
 
+# man: unix documentation system
+# https://www.nongnu.org/man-db/
+zgenom ohmyzsh plugins/colored-man-pages
+if has manpath; then
+  typeset -TUx MANPATH manpath=(${(s[:])$(env -u MANPATH manpath)})
+fi
+
+# mc: midnight commander
+# https://midnight-commander.org
+export MC_SKIN="${XDG_CONFIG_HOME}/mc/solarized-dark-truecolor.ini"
+alias mc="mc --nosubshell"
+
 # npm: node package manager
 # https://github.com/npm/cli
 export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
@@ -257,16 +248,23 @@ mkdir -p ${PARALLEL_HOME}
 # https://github.com/python-poetry/poetry
 export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
 
-# pw: a simple pwgen replacement
-autoload -Uz pw
+# genpass: a simple pwgen replacement
+zgenom ohmyzsh plugins/genpass
+pw() { genpass-monkey | clipcopy }
 
 # python: programming language
 # https://docs.python.org/3/
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+zgenom ohmyzsh plugins/pip
+zgenom ohmyzsh plugins/python
 
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
+
+# rsync: fast incremental file transfer
+# https://rsync.samba.org
+zgenom ohmyzsh plugins/rsync
 
 # ruby: programming language
 # https://www.ruby-lang.org
@@ -285,6 +283,12 @@ fi
 # https://sqlite.org
 export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 
+# ssh: secure shell
+# https://www.openssh.com
+zstyle :omz:plugins:ssh-agent agent-forwarding yes
+zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
+zgenom ohmyzsh plugins/ssh-agent
+
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
 export CHECKPOINT_DISABLE=true
@@ -292,15 +296,36 @@ alias tf="terraform"
 alias tfa="tf apply"
 alias tfp="tf plan"
 
-# vim: the editor
+# tmux: a terminal multiplexer
+# https://github.com/tmux/tmux
+export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
+export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
+export ZSH_TMUX_FIXTERM="false"
+if [[ -n "${SSH_CONNECTION}" && -z "${VSCODE_IPC_HOOK_CLI}" ]]; then
+    export ZSH_TMUX_AUTOSTART="true"
+fi
+zgenom ohmyzsh plugins/tmux
+alias T=tmux
+
+# tpm: tmux plugin manager
+# https://github.com/tmux-plugins/tpm
+export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
+if [[ ! -d "${TMUX_PLUGIN_MANAGER_PATH}/tpm" ]]; then
+    mkdir -p "${TMUX_PLUGIN_MANAGER_PATH}"
+    git clone https://github.com/tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
+    ${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
+fi
+
+# vi improved
 # https://github.com/vim/vim
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[vim]}"
 
 # youtube: download audio
+# https://github.com/yt-dlp/yt-dlp
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
-# Update system and shell
+# update system and shell
 up() {
     if has __brew_update; then
         __brew_update
@@ -310,5 +335,11 @@ up() {
     zgenom update
 }
 
-# Load p10k prompt last
-source "${${(%):-%x}:A:h}/.p10k.zsh"
+# reload shell
+alias zre="zgenom reset && exec zsh"
+
+# reset cache and start from scratch
+alias zx="sudo rm -rf ${XDG_CACHE_HOME} && exec zsh"
+
+# load p10k prompt last
+source "${ZDOTDIR}/.p10k.zsh"
