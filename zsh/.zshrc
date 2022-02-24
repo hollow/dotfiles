@@ -292,15 +292,18 @@ export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 
 # ssh: secure shell
 # https://www.openssh.com
+mkdir -p "${XDG_CACHE_HOME}"/ssh
 zstyle :omz:plugins:ssh-agent agent-forwarding yes
 zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
 zgenom ohmyzsh plugins/ssh-agent
+alias ssu="ssh -o RequestTTY=force -o RemoteCommand='sudo -i'"
 
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
 export CHECKPOINT_DISABLE=true
 alias tf="terraform"
 alias tfa="tf apply"
+alias tfd="tf destroy"
 alias tfp="tf plan"
 
 # tmux: a terminal multiplexer
