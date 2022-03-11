@@ -187,6 +187,10 @@ elif [[ -e /usr/share/google-cloud-sdk/completion.zsh.inc ]]; then
     source /usr/share/google-cloud-sdk/completion.zsh.inc
 fi
 
+__gcloud_update() {
+    gcloud components update
+}
+
 # git: distributed version control system
 # https://github.com/git/git
 export GIT_AUTHOR_NAME="${USER_NAME}"
@@ -207,7 +211,8 @@ alias gcu="git co upstream"
 alias gd="git df"
 alias gdc="git dc"
 alias gdm="git df \$(git main-branch)"
-alias gdu="git df upstream"
+alias gdu="git df upstream/\$(git main-branch)"
+alias gf="git fetch --prune"
 alias gl="git lg"
 alias gp="git pull"
 alias gpr="git pull --rebase --autostash"
@@ -261,13 +266,20 @@ pw() { genpass-monkey | clipcopy }
 
 # python: programming language
 # https://docs.python.org/3/
+path=("${HOMEBREW_PREFIX}/opt/python/libexec/bin" ${path})
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 zgenom ohmyzsh plugins/pip
 zgenom ohmyzsh plugins/python
 
+__python_update() {
+    # update all globally installed python modules
+    pip3 install --upgrade -r <(pip3 freeze)
+}
+
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
+alias rg="rg --color=always"
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
@@ -337,10 +349,15 @@ alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
 # update system and shell
 up() {
+    # update brew packages on macOS
     if has __brew_update; then
         __brew_update
     fi
 
+    __gcloud_update
+    __python_update
+
+    # upudate oh-my-zsh and plugins
     zgenom selfupdate
     zgenom update
 }
