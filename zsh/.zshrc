@@ -367,6 +367,11 @@ fi
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[vim]}"
 
+# wget: retrieve files using HTTP, HTTPS, FTP and FTPS
+# https://www.gnu.org/software/wget/
+export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
+alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
+
 # youtube: download audio
 # https://github.com/yt-dlp/yt-dlp
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
