@@ -21,6 +21,9 @@
 [color]
 	ui = true
 
+[commit]
+	gpgsign = true
+
 [diff]
 	renames = copies
 
@@ -35,3 +38,6 @@
 
 [url "ssh://git@github.com/"]
 	insteadOf = https://github.com/
+
+[user]
+	signingkey = bb@xnull.de

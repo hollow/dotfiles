@@ -222,6 +222,8 @@ alias s="git st ."
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
+export GPG_TTY=$(tty)
+zgenom ohmyzsh plugins/gpg-agent
 
 # go: programming language
 # https://www.golang.org
