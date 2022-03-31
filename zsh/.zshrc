@@ -186,7 +186,11 @@ fi
 # https://github.com/ogham/exa
 if has exa; then
     alias l="exa --all --long --group"
+else
+    alias l="ls -lah"
 fi
+
+alias lR="l -R"
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
