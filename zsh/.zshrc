@@ -152,6 +152,16 @@ if has bat; then
     export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 fi
 
+# chef
+_chef_dirs=(cookbooks data_bags environments roles)
+kd() { knife diff "$@" | cdl }
+alias kcu="knife cookbook upload"
+alias kda="kd ${_chef_dirs}"
+alias ks="knife diff ${_chef_dirs} --name-status"
+
+# colordiff
+cdl() { colordiff | less -R }
+
 # direnv: change environment based on the current directory
 # https://github.com/direnv/direnv
 if has direnv; then
