@@ -152,6 +152,14 @@ if has bat; then
     export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 fi
 
+# boto: AWS SDK for Python
+# https://github.com/boto/boto3
+export BOTO_CONFIG="${XDG_DATA_HOME}/boto"
+cat > "${BOTO_CONFIG}" <<EOF
+[GSUtil]
+state_dir = ${XDG_DATA_HOME}/gsutil
+EOF
+
 # chef
 _chef_dirs=(cookbooks data_bags environments roles)
 kd() { knife diff "$@" | cdl }
