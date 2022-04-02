@@ -12,6 +12,7 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
+export XDG_RUNTIME_DIR="${HOME}/.local/run"
 
 # shell paths
 # https://zsh.sourceforge.io/Intro/intro_3.html
@@ -144,6 +145,7 @@ alias ap="ansible-playbook"
 # https://aws.amazon.com/cli/
 export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"
 export AWS_CONFIG_FILE="${XDG_CONFIG_HOME}/aws/config"
+zgenom ohmyzsh plugins/aws
 
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
@@ -371,6 +373,9 @@ export EDITOR="${commands[vim]}"
 # https://www.gnu.org/software/wget/
 export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
 alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
+
+# yarn:
+alias yarn="yarn --use-yarnrc \"${XDG_CONFIG_HOME}/yarn/config\""
 
 # youtube: download audio
 # https://github.com/yt-dlp/yt-dlp
