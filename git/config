@@ -1,3 +1,8 @@
+[user]
+	name = Benedikt Böhm
+	email = bb@xnull.de
+	signingkey = bb@xnull.de
+
 [alias]
 	aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
 	amend = ci --amend --reuse-message=HEAD
@@ -38,6 +43,3 @@
 
 [url "ssh://git@github.com/"]
 	insteadOf = https://github.com/
-
-[user]
-	signingkey = bb@xnull.de

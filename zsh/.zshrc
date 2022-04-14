@@ -217,10 +217,8 @@ __gcloud_update() {
 
 # git: distributed version control system
 # https://github.com/git/git
-export GIT_AUTHOR_NAME="${USER_NAME}"
-export GIT_AUTHOR_EMAIL="${USER_EMAIL}"
-export GIT_COMMITTER_NAME="${USER_NAME}"
-export GIT_COMMITTER_EMAIL="${USER_EMAIL}"
+git config --global user.name "${USER_NAME}"
+git config --global user.email "${USER_EMAIL}"
 
 # https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete
 zstyle ':completion:*:*' ignored-patterns '*ORIG_HEAD'
