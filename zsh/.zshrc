@@ -12,7 +12,10 @@ export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
+
 export XDG_RUNTIME_DIR="${HOME}/.local/run"
+mkdir -p "${XDG_RUNTIME_DIR}"
+chmod 0700 "${XDG_RUNTIME_DIR}"
 
 # shell paths
 # https://zsh.sourceforge.io/Intro/intro_3.html
@@ -337,6 +340,8 @@ alias ssu="ssh -o RequestTTY=force -o RemoteCommand='sudo -i'"
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
 export CHECKPOINT_DISABLE=true
+export TF_CLI_CONFIG_FILE="${XDG_CONFIG_HOME}/terraform.tfrc"
+
 alias tf="terraform"
 alias tfa="tf apply"
 alias tfd="tf destroy"
