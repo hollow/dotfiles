@@ -2,10 +2,12 @@
 
 set -e
 
-gh repo list --archived --limit 99999 "$@" |
-awk '{ print $1 }' |
-parallel -a - \
+gh repo list \
+    --archived \
+    --limit 1000 \
+    --json nameWithOwner "$@" |
+jq -r '.[].nameWithOwner' |
+parallel \
     --bar \
-    --keep-order \
     --tagstring "[{}]" \
     rm -rf "${HOME}/src/{}"

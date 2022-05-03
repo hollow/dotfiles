@@ -2,10 +2,13 @@
 
 set -e
 
-gh repo list --no-archived --limit 99999 "$@" |
-awk '{ print $1 }' |
-parallel -a - \
+gh repo list \
+    --no-archived \
+    --limit 1000 \
+    --json nameWithOwner "$@" |
+jq -r '.[].nameWithOwner' |
+parallel \
     --bar \
-    --keep-order \
+    --jobs 5 \
     --tagstring "[{}]" \
     git-clone-clean-main https://github.com/{} "${HOME}/src/{}"
