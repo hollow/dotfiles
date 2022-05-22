@@ -345,6 +345,7 @@ export TF_CLI_CONFIG_FILE="${XDG_CONFIG_HOME}/terraform.tfrc"
 alias tf="terraform"
 alias tfa="tf apply"
 alias tfd="tf destroy"
+alias tfi="tf import"
 alias tfp="tf plan"
 
 # tmux: a terminal multiplexer
