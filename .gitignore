@@ -1,5 +1,6 @@
 **/*.zwc
-gam/
+gam
+grammarly-languageserver
 gtk-2.0
 iterm2
 op

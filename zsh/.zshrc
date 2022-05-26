@@ -6,6 +6,9 @@ export USER_EMAIL="bb@xnull.de"
 export LANG="en_US.UTF-8"
 export LC_CTYPE=${LANG}
 
+# system path
+typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
+
 # user paths
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 export XDG_CONFIG_HOME="${HOME}/.config"
@@ -26,27 +29,57 @@ ZSH_COMPDUMP="${ZSH_CACHE_DIR}/zcompdump"
 
 # shell functions
 typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
-autoload -Uz has
-
-# system path
-typeset -TUx PATH path=("${XDG_CONFIG_HOME}/bin" /{usr/,}{local/,}{s,}bin)
+autoload -Uz add has
 
 # enforce truecolor support
 export COLORTERM="truecolor"
 
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
-if [[ -e /opt/homebrew ]]; then
-    source "${ZDOTDIR}/brew"
+if has /opt/homebrew/bin/brew; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
+export HOMEBREW_BUNDLE_NO_LOCK=1
+export HOMEBREW_AUTO_UPDATE_SECS=86400
+export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
+export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
+export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
+
+alias bbd="brew bundle dump -f"
+alias bz="brew uninstall --zap"
+
+__brew_update() {
+    brew update && \
+    brew upgrade && \
+    brew bundle install && \
+    brew autoremove && \
+    brew cleanup -s --prune=all
+}
+
+# ensure proper GNU based environment
+GNUBIN_FORMULAS=(
+    coreutils
+    findutils
+    gawk
+    gnu-sed
+    gnu-tar
+    gnu-time
+    make
+)
+
+for formula in ${GNUBIN_FORMULAS}; do
+    add path "${HOMEBREW_PREFIX}/opt/${formula}/libexec/gnubin"
+done
+
 # enable Powerlevel10k instant prompt
-if [[ -r "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+if has "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"; then
     source "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 # install zgenom
-if [[ ! -d "${XDG_CACHE_HOME}/zgenom" ]]; then
+if ! has "${XDG_CACHE_HOME}/zgenom"; then
     git clone https://github.com/jandamm/zgenom.git "${XDG_CACHE_HOME}/zgenom"
 fi
 
@@ -208,9 +241,9 @@ alias lR="l -R"
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
-if [[ -e "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc" ]]; then
+if has "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"; then
     source "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
-elif [[ -e /usr/share/google-cloud-sdk/completion.zsh.inc ]]; then
+elif has /usr/share/google-cloud-sdk/completion.zsh.inc; then
     source /usr/share/google-cloud-sdk/completion.zsh.inc
 fi
 
@@ -253,7 +286,7 @@ zgenom ohmyzsh plugins/gpg-agent
 # go: programming language
 # https://www.golang.org
 export GOPATH="${XDG_CACHE_HOME}/go"
-path=("${GOPATH}/bin" ${path})
+add path "${GOPATH}/bin"
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
@@ -265,9 +298,6 @@ sl() { sort -u | less }
 # man: unix documentation system
 # https://www.nongnu.org/man-db/
 zgenom ohmyzsh plugins/colored-man-pages
-if has manpath; then
-  typeset -TUx MANPATH manpath=(${(s[:])$(env -u MANPATH manpath)})
-fi
 
 # mc: midnight commander
 # https://midnight-commander.org
@@ -293,14 +323,14 @@ pw() { genpass-monkey | clipcopy }
 
 # python: programming language
 # https://docs.python.org/3/
-path=("${HOMEBREW_PREFIX}/opt/python/libexec/bin" ${path})
+add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 zgenom ohmyzsh plugins/pip
 zgenom ohmyzsh plugins/python
 
 __python_update() {
     # update all globally installed python modules
-    pip3 install --upgrade -r <(pip3 freeze)
+    pip install --upgrade -r <(pip freeze)
 }
 
 # ripgrep: fast grep replacement
@@ -314,16 +344,13 @@ zgenom ohmyzsh plugins/rsync
 
 # ruby: programming language
 # https://www.ruby-lang.org
+add path "${HOMEBREW_PREFIX}"/opt/ruby/bin
+add path "${HOMEBREW_PREFIX}"/lib/ruby/gems/*/bin
 export GEM_HOME="${XDG_DATA_HOME}"/gem
 export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
 export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
 export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
 export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
-
-if [[ -e "${HOMEBREW_PREFIX}" ]]; then
-    path=("${HOMEBREW_PREFIX}/opt/ruby/bin" ${path})
-    path=("${HOMEBREW_PREFIX}/lib/ruby/gems/3.0.0/bin" ${path})
-fi
 
 # sqlite: database engine
 # https://sqlite.org
@@ -385,10 +412,13 @@ alias yarn="yarn --use-yarnrc \"${XDG_CONFIG_HOME}/yarn/config\""
 # https://github.com/yt-dlp/yt-dlp
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
+# add local path last so it takes precendence
+add path "${XDG_CONFIG_HOME}/bin"
+
 # update system and shell
 up() {
     # update brew packages on macOS
-    if has __brew_update; then
+    if has brew; then
         __brew_update
     fi
 
