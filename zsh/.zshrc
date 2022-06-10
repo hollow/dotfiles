@@ -45,7 +45,6 @@ export HOMEBREW_BUNDLE_NO_LOCK=1
 export HOMEBREW_AUTO_UPDATE_SECS=86400
 export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
 export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
-export HOMEBREW_UPDATE_REPORT_ONLY_INSTALLED=1
 
 alias bbd="brew bundle dump -f"
 alias bz="brew uninstall --zap"
