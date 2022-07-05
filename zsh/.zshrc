@@ -38,6 +38,8 @@ export COLORTERM="truecolor"
 # https://github.com/Homebrew/brew
 if has /opt/homebrew/bin/brew; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
+    add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+    chmod go-w "${HOMEBREW_PREFIX}/share"
 fi
 
 export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
@@ -203,6 +205,7 @@ kd() { knife diff "$@" | cdl }
 alias kcu="knife cookbook upload"
 alias kda="kd ${_chef_dirs}"
 alias ks="knife diff ${_chef_dirs} --name-status"
+alias kssh="easyssh -e='(ssh-exec-parallel)' -d='(knife)' -f='(coalesce host)'"
 
 # colordiff
 cdl() { colordiff | less -R }
@@ -213,11 +216,6 @@ if has direnv; then
     eval "$(direnv hook zsh)"
     alias da="direnv allow"
 fi
-
-# docker: container runtime
-# https://www.docker.com
-zgenom ohmyzsh --completion plugins/docker
-zgenom ohmyzsh --completion plugins/docker-compose
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
@@ -312,25 +310,52 @@ export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
-# poetry: python dependency management
-# https://github.com/python-poetry/poetry
-export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
-
 # genpass: a simple pwgen replacement
 zgenom ohmyzsh plugins/genpass
 pw() { genpass-monkey | clipcopy }
 
 # python: programming language
 # https://docs.python.org/3/
-add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
+add path "${HOMEBREW_PREFIX}/opt/python@3.10/bin"
+add path "${HOMEBREW_PREFIX}/opt/python@3.10/libexec/bin"
+typeset -TUx PYTHONPATH pythonpath=()
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-zgenom ohmyzsh plugins/pip
-zgenom ohmyzsh plugins/python
 
 __python_update() {
-    # update all globally installed python modules
-    pip install --upgrade -r <(pip freeze)
+    __python_pip_update 3.10
+    __python_pip_update 3.9
+    __python_pipx_update
 }
+
+__python_pip_update() {
+    PIP_REQUIRE_VIRTUALENV=false \
+    "${HOMEBREW_PREFIX}/opt/python@${1}/bin/pip3" \
+        install --upgrade setuptools pip
+}
+
+# python/pdm: a modern Python package and dependency manager
+# https://pdm.fming.dev/
+add pythonpath "${HOMEBREW_PREFIX}/opt/pdm/libexec/lib/python3.10/site-packages/pdm/pep582"
+export PDM_CONFIG_FILE="${XDG_CONFIG_HOME}/pdm/config.toml"
+cat > "${PDM_CONFIG_FILE}" <<EOF
+cache_dir = "${XDG_CACHE_HOME}/pdm"
+global_project.path = "${XDG_DATA_HOME}/pdm/global"
+EOF
+
+# python/pipx: install python applications in isolated environments
+# https://pypa.github.io/pipx/
+export PIPX_HOME="${XDG_DATA_HOME}/pipx"
+export PIPX_BIN_DIR="${PIPX_HOME}/bin"
+add path "${PIPX_BIN_DIR}"
+eval "$(register-python-argcomplete pipx)"
+
+__python_pipx_update() {
+    pipx upgrade-all
+}
+
+# python/poetry: python dependency management
+# https://github.com/python-poetry/poetry
+poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
 
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
@@ -358,9 +383,6 @@ export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 # ssh: secure shell
 # https://www.openssh.com
 mkdir -p "${XDG_CACHE_HOME}"/ssh
-zstyle :omz:plugins:ssh-agent agent-forwarding yes
-zstyle :omz:plugins:ssh-agent identities id_rsa id_ed25519
-zgenom ohmyzsh plugins/ssh-agent
 alias ssu="ssh -o RequestTTY=force -o RemoteCommand='sudo -i'"
 
 # terraform: manage cloud infrastructure
@@ -398,6 +420,10 @@ fi
 # https://github.com/vim/vim
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[vim]}"
+
+# vscode
+# https://code.visualstudio.com
+alias code="env -u XDG_RUNTIME_DIR code"
 
 # wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/
