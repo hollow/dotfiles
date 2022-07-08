@@ -177,6 +177,15 @@ export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
 alias ad="ansible-doc"
 alias ai="ansible-inventory"
 alias ap="ansible-playbook"
+eval $(register-python-argcomplete ansible)
+eval $(register-python-argcomplete ansible-config)
+eval $(register-python-argcomplete ansible-console)
+eval $(register-python-argcomplete ansible-doc)
+eval $(register-python-argcomplete ansible-galaxy)
+eval $(register-python-argcomplete ansible-inventory)
+eval $(register-python-argcomplete ansible-playbook)
+eval $(register-python-argcomplete ansible-pull)
+eval $(register-python-argcomplete ansible-vault)
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
