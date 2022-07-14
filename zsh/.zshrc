@@ -88,51 +88,45 @@ fi
 ZGEN_CUSTOM_COMPDUMP="${ZSH_COMPDUMP}"
 source "${XDG_CACHE_HOME}/zgenom/zgenom.zsh"
 
-# if the init script doesn't exist
-if ! zgenom saved; then
-    # https://github.com/jandamm/zgenom-ext-eval
-    zgenom load jandamm/zgenom-ext-eval
+# https://github.com/jandamm/zgenom-ext-eval
+zgenom load jandamm/zgenom-ext-eval
 
-    # Ohmyzsh base library
-    zgenom ohmyzsh
+# Ohmyzsh base library
+zgenom ohmyzsh
 
-    # build and load ls colors
-    # https://github.com/trapd00r/LS_COLORS
-    zgenom clone trapd00r/LS_COLORS
-    zgenom eval $(dircolors -b $(zgenom api clone_dir trapd00r/LS_COLORS)/LS_COLORS)
+# build and load ls colors
+# https://github.com/trapd00r/LS_COLORS
+zgenom clone trapd00r/LS_COLORS
+zgenom eval $(dircolors -b $(zgenom api clone_dir trapd00r/LS_COLORS)/LS_COLORS)
 
-    # https://github.com/romkatv/powerlevel10k
-    zgenom load romkatv/powerlevel10k powerlevel10k
+# https://github.com/romkatv/powerlevel10k
+zgenom load romkatv/powerlevel10k powerlevel10k
 
-    # feature-rich syntax highlighting for ZSH
-    # https://github.com/zdharma-continuum/fast-syntax-highlighting
-    zgenom load zdharma-continuum/fast-syntax-highlighting
+# feature-rich syntax highlighting for ZSH
+# https://github.com/zdharma-continuum/fast-syntax-highlighting
+zgenom load zdharma-continuum/fast-syntax-highlighting
 
-    # fish-like autosuggestions for zsh
-    # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
-    zgenom load zsh-users/zsh-autosuggestions
+# fish-like autosuggestions for zsh
+# https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
+zgenom load zsh-users/zsh-autosuggestions
 
-    # automatically close quotes, brackets and other delimiters
-    # https://github.com/hlissner/zsh-autopair
-    zgenom load hlissner/zsh-autopair
+# automatically close quotes, brackets and other delimiters
+# https://github.com/hlissner/zsh-autopair
+zgenom load hlissner/zsh-autopair
 
-    # help remembering those aliases you defined once
-    # https://github.com/djui/alias-tips
-    zgenom load djui/alias-tips
+# help remembering those aliases you defined once
+# https://github.com/djui/alias-tips
+zgenom load djui/alias-tips
 
-    # load zsh history search and create bindings for it
-    # https://github.com/zsh-users/zsh-history-substring-search
-    zgenom load zsh-users/zsh-history-substring-search
-    zgenom eval "bindkey '^[[A' history-substring-search-up"
-    zgenom eval "bindkey '^[[B' history-substring-search-down"
+# load zsh history search and create bindings for it
+# https://github.com/zsh-users/zsh-history-substring-search
+zgenom load zsh-users/zsh-history-substring-search
+zgenom eval "bindkey '^[[A' history-substring-search-up"
+zgenom eval "bindkey '^[[B' history-substring-search-down"
 
-    # additional completion definitions for Zsh.
-    # https://github.com/zsh-users/zsh-completions
-    zgenom load zsh-users/zsh-completions
-
-    # save all to init script
-    zgenom save
-fi
+# additional completion definitions for Zsh.
+# https://github.com/zsh-users/zsh-completions
+zgenom load zsh-users/zsh-completions
 
 # words are complete shell command arguments
 autoload -Uz select-word-style
