@@ -342,15 +342,6 @@ __python_pip_update() {
         install --upgrade setuptools pip
 }
 
-# python/pdm: a modern Python package and dependency manager
-# https://pdm.fming.dev/
-add pythonpath "${HOMEBREW_PREFIX}/opt/pdm/libexec/lib/python3.10/site-packages/pdm/pep582"
-export PDM_CONFIG_FILE="${XDG_CONFIG_HOME}/pdm/config.toml"
-cat > "${PDM_CONFIG_FILE}" <<EOF
-cache_dir = "${XDG_CACHE_HOME}/pdm"
-global_project.path = "${XDG_DATA_HOME}/pdm/global"
-EOF
-
 # python/pipx: install python applications in isolated environments
 # https://pypa.github.io/pipx/
 export PIPX_HOME="${XDG_DATA_HOME}/pipx"
