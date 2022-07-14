@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+[[ $TRACE -eq 1 ]] && set -x
 
 git describe --abbrev=0 --tags 2>/dev/null || \
 git main-branch

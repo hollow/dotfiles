@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+[[ $TRACE -eq 1 ]] && set -x
 
 main="$(git main-branch)"
 
@@ -10,14 +11,13 @@ else
     latest="$(git latest)"
 fi
 
+git checkout --quiet "${latest}"
+
 if [[ "${latest}" == "${main}" ]]; then
-    [[ $TRACE -eq 1 ]] && set -x
-    git checkout --quiet "${latest}"
     git branch --quiet --set-upstream-to="origin/${latest}"
     git pull --quiet --rebase --autostash
-else
-    [[ $TRACE -eq 1 ]] && set -x
-    git checkout --quiet "${latest}"
 fi
+
+git-cleanup
 
 git submodule update --no-fetch --checkout --recursive

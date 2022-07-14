@@ -23,5 +23,3 @@ git submodule --quiet foreach \
 
 git submodule --quiet foreach \
     git gc --quiet
-
-git remote prune origin

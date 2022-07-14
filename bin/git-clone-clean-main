@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+[[ $TRACE -eq 1 ]] && set -x
 
 repo="$1"
 repo_path="$2"

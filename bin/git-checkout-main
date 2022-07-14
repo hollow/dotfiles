@@ -3,4 +3,4 @@
 set -e
 [[ $TRACE -eq 1 ]] && set -x
 
-git submodule foreach git-checkout-latest
+git-checkout-latest main
