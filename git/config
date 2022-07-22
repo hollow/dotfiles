@@ -10,7 +10,7 @@
 	ci = commit
 	co = checkout
 	dc = df --cached
-	df = diff --ignore-space-change
+	df = diff
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	ls = ls-tree -r HEAD
 	new = !sh -c 'git lg $1@{1}..$1@{0} "$@"'

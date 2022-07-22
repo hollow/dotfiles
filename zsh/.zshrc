@@ -1,5 +1,3 @@
-# zmodload zsh/zprof
-
 # user information (for git, gpg, etc)
 export USER_NAME="Benedikt Böhm"
 export USER_EMAIL="bb@xnull.de"
@@ -35,7 +33,6 @@ ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
 ZSH_COMPDUMP="${ZSH_CACHE_DIR}/zcompdump"
-ZGEN_CUSTOM_COMPDUMP="${ZSH_COMPDUMP}"
 
 mkdir -p "${ZSH_CACHE_DIR}"
 mkdir -p "${ZSH_DATA_DIR}"
@@ -51,28 +48,96 @@ if ! has "${XDG_CACHE_HOME}/zgenom"; then
 fi
 
 # load zgenom
+ZGEN_AUTOLOAD_COMPINIT=0
+ZGEN_CUSTOM_COMPDUMP="${ZSH_COMPDUMP}"
+COMPLETION_WAITING_DOTS="true"
 source "${XDG_CACHE_HOME}/zgenom/zgenom.zsh"
-
-# check for updates
-zgenom autoupdate
-
-# check if init script exists
-has-zgenom-init() { has "${ZGEN_INIT}" }
 
 # load instant prompt early except during update
 P10K_INIT="${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"
-if has-zgenom-init && has "${P10K_INIT}"; then
+if has "${ZGEN_INIT}" && has "${P10K_INIT}"; then
     source "${P10K_INIT}"
 fi
 
-# initialize zgenom once
-zgenom init
+# load zsh plugins
+if ! zgenom saved; then
+    # ohmyzsh: community driven zsh framework
+    # https://github.com/ohmyzsh/ohmyzsh
+    zgenom ohmyzsh
 
-# zgenom/eval: generate plugins from a command
-# https://github.com/jandamm/zgenom-ext-eval
-if ! has-zgenom-init; then
+    # https://github.com/jandamm/zgenom-ext-eval
     zgenom load jandamm/zgenom-ext-eval
+
+    # replace completion selection menu with fzf
+    # https://github.com/Aloxaf/fzf-tab
+    zgenom load Aloxaf/fzf-tab
+
+    # https://github.com/romkatv/powerlevel10k
+    zgenom load romkatv/powerlevel10k powerlevel10k
+
+    # feature-rich syntax highlighting for ZSH
+    # https://github.com/zdharma-continuum/fast-syntax-highlighting
+    zgenom load zdharma-continuum/fast-syntax-highlighting
+
+    # fish-like autosuggestions for zsh
+    # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
+    zgenom load zsh-users/zsh-autosuggestions
+
+    # automatically close quotes, brackets and other delimiters
+    # https://github.com/hlissner/zsh-autopair
+    zgenom load hlissner/zsh-autopair
+
+    # help remembering those aliases you defined once
+    # https://github.com/djui/alias-tips
+    zgenom load djui/alias-tips
+
+    # load zsh history search and create bindings for it
+    # https://github.com/zsh-users/zsh-history-substring-search
+    zgenom load zsh-users/zsh-history-substring-search
+    zgenom eval "bindkey '^[[A' history-substring-search-up"
+    zgenom eval "bindkey '^[[B' history-substring-search-down"
+
+    # additional completion definitions for Zsh.
+    # https://github.com/zsh-users/zsh-completions
+    zgenom load zsh-users/zsh-completions
 fi
+
+# use approximate completion with error correction
+# https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Control-Functions
+zstyle ':completion:*' completer _complete _correct _approximate
+
+# set descriptions format to enable group support
+zstyle ':completion:*:descriptions' format '%d'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*:corrections' format '%d (errors: %e)'
+
+# set list-colors to enable filename colorizing
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# improve make autocompletion
+# https://unix.stackexchange.com/questions/657256/autocompletion-of-makefile-with-makro-in-zsh-not-correct-works-in-bash
+zstyle ':completion::complete:make:*:targets' call-command true
+
+# ignore completion functions for commands we don’t have
+zstyle ':completion:*:functions' ignored-patterns '_*'
+
+# ignore completion for git ORIG_HEAD
+# https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete#comment99936479_14325591
+zstyle ':completion:*:*:git*:*' ignored-patterns '*ORIG_HEAD'
+
+# preview directory content with exa when completing cd
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa --all --long --group $realpath'
+
+# words are complete shell command arguments
+autoload -Uz select-word-style
+select-word-style shell
+
+# history configuration
+# https://zsh.sourceforge.io/Doc/Release/Options.html#History
+HISTFILE="${ZSH_DATA_DIR}/history"
+HISTSIZE=1000000000 SAVEHIST=1000000000
+unsetopt share_history # OMZ enables shared history
 
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
@@ -85,9 +150,8 @@ export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
 alias bbd="brew bundle dump -f"
 alias bz="brew uninstall --zap"
 
-if ! has-zgenom-init && has /opt/homebrew/bin/brew; then
+if ! zgenom saved && has /opt/homebrew/bin/brew; then
     zgenom eval --name brew "$(/opt/homebrew/bin/brew shellenv)"
-
     echo "-- zgenom: Updating Homebrew packages"
     brew update && \
     brew upgrade && \
@@ -107,12 +171,6 @@ add path "${HOMEBREW_PREFIX}/opt/gnu-time/libexec/gnubin"
 add path "${HOMEBREW_PREFIX}/opt/make/libexec/gnubin"
 add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
 
-# ohmyzsh: community driven zsh framework
-# https://github.com/ohmyzsh/ohmyzsh
-if ! has-zgenom-init; then
-    zgenom ohmyzsh
-fi
-
 # python: programming language
 # https://docs.python.org/3/
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
@@ -125,7 +183,7 @@ zgenom-python-argcomplete() {
     zgenom eval --name $1 "$(register-python-argcomplete $1)"
 }
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     for __python_version in 3.9 3.10; do
         echo "-- zgenom: Updating Python ${__python_version}"
         PIP_REQUIRE_VIRTUALENV=false \
@@ -140,9 +198,10 @@ export PIPX_HOME="${XDG_DATA_HOME}/pipx"
 export PIPX_BIN_DIR="${PIPX_HOME}/bin"
 add path "${PIPX_BIN_DIR}"
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     echo "-- zgenom: Updating pipx packages"
     pipx upgrade-all --include-injected
+    pipx inject copier "MarkupSafe<2.1.0"
     zgenom-python-argcomplete pipx
 fi
 
@@ -160,7 +219,7 @@ alias ad="ansible-doc"
 alias ai="ansible-inventory"
 alias ap="ansible-playbook"
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom-python-argcomplete ansible
     zgenom-python-argcomplete ansible-config
     zgenom-python-argcomplete ansible-console
@@ -177,7 +236,7 @@ fi
 export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"
 export AWS_CONFIG_FILE="${XDG_CONFIG_HOME}/aws/config"
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom ohmyzsh plugins/aws
 fi
 
@@ -209,7 +268,7 @@ cdl() { colordiff | less -R }
 
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom clone trapd00r/LS_COLORS
     zgenom eval --name dircolors "$(dircolors -b $(zgenom api clone_dir trapd00r/LS_COLORS)/LS_COLORS)"
 fi
@@ -218,7 +277,7 @@ fi
 # https://github.com/direnv/direnv
 alias da="direnv allow"
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom eval --name direnv "$(direnv hook zsh)"
 fi
 
@@ -244,7 +303,7 @@ alias lR="l -R"
 # https://cloud.google.com/sdk
 export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom ohmyzsh plugins/gcloud
     echo "-- zgenom: Updating gcloud components"
     gcloud components update
@@ -270,7 +329,7 @@ alias s="git st ."
 
 autoload -Uz clone
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     git config --global user.name "${USER_NAME}"
     git config --global user.email "${USER_EMAIL}"
 fi
@@ -279,7 +338,9 @@ fi
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 export GPG_TTY=$(tty)
-zgenom ohmyzsh plugins/gpg-agent
+if ! zgenom saved; then
+    zgenom ohmyzsh plugins/gpg-agent
+fi
 
 # go: programming language
 # https://www.golang.org
@@ -292,13 +353,13 @@ export PAGER="less" LESS="-FiMRSW -x4"
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 sl() { sort -u | less }
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     mkdir -p "${XDG_DATA_HOME}/less"
 fi
 
 # man: unix documentation system
 # https://www.nongnu.org/man-db/
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom ohmyzsh plugins/colored-man-pages
 fi
 
@@ -315,12 +376,12 @@ export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
 # https://www.gnu.org/software/parallel/
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     mkdir -p ${PARALLEL_HOME}
 fi
 
 # genpass: a simple pwgen replacement
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom ohmyzsh plugins/genpass
 fi
 
@@ -328,7 +389,7 @@ pw() { genpass-monkey | clipcopy }
 
 # poetry: python dependency management
 # https://github.com/python-poetry/poetry
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
 fi
 
@@ -339,7 +400,7 @@ alias rg="rg --color=always"
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom ohmyzsh plugins/rsync
 fi
 
@@ -361,7 +422,7 @@ export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 # https://www.openssh.com
 alias ssu="ssh -o RequestTTY=force -o RemoteCommand='sudo -i'"
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     mkdir -p "${XDG_CACHE_HOME}"/ssh
 fi
 
@@ -376,6 +437,9 @@ alias tfd="tf destroy"
 alias tfi="tf import"
 alias tfp="tf plan"
 
+# terraform/checkov
+#source <(register-python-argcomplete checkov)
+
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
 export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
@@ -388,7 +452,7 @@ fi
 
 alias T=tmux
 
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom ohmyzsh plugins/tmux
 fi
 
@@ -396,7 +460,7 @@ fi
 # https://github.com/tmux-plugins/tpm
 export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
 
-if ! has-zgenom-init && ! has "${TMUX_PLUGIN_MANAGER_PATH}/tpm"; then
+if ! zgenom saved && ! has "${TMUX_PLUGIN_MANAGER_PATH}/tpm"; then
     mkdir -p "${TMUX_PLUGIN_MANAGER_PATH}" && \
     git clone https://github.com/tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm" && \
     ${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
@@ -426,88 +490,15 @@ alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 # add local path last so it takes precendence
 add path "${XDG_CONFIG_HOME}/bin"
 
-# load zsh plugins
-if ! has-zgenom-init; then
-    # https://github.com/romkatv/powerlevel10k
-    zgenom load romkatv/powerlevel10k powerlevel10k
-
-    # feature-rich syntax highlighting for ZSH
-    # https://github.com/zdharma-continuum/fast-syntax-highlighting
-    zgenom load zdharma-continuum/fast-syntax-highlighting
-
-    # fish-like autosuggestions for zsh
-    # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
-    zgenom load zsh-users/zsh-autosuggestions
-
-    # automatically close quotes, brackets and other delimiters
-    # https://github.com/hlissner/zsh-autopair
-    zgenom load hlissner/zsh-autopair
-
-    # help remembering those aliases you defined once
-    # https://github.com/djui/alias-tips
-    zgenom load djui/alias-tips
-
-    # load zsh history search and create bindings for it
-    # https://github.com/zsh-users/zsh-history-substring-search
-    zgenom load zsh-users/zsh-history-substring-search
-    zgenom eval "bindkey '^[[A' history-substring-search-up"
-    zgenom eval "bindkey '^[[B' history-substring-search-down"
-
-    # additional completion definitions for Zsh.
-    # https://github.com/zsh-users/zsh-completions
-    zgenom load zsh-users/zsh-completions
-fi
-
 # save zgenom init script
-if ! has-zgenom-init; then
+if ! zgenom saved; then
     zgenom save
-    zgenom compile ${ZDOTDIR}
 fi
 
 # zgenom update and reset
-alias zre="zgenom reset && exec zsh"
-alias zup="zgenom selfupdate && zgenom update && exec zsh"
-alias zx="sudo rm -rf ${XDG_CACHE_HOME} && exec zsh"
-
-# words are complete shell command arguments
-autoload -Uz select-word-style
-select-word-style shell
-
-# speed up slow completions with a cache
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ${ZSH_CACHE_DIR}
-
-# use approximate completion with error correction
-zstyle ':completion:*' completer _complete _correct _approximate
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*:descriptions' format '%d'
-zstyle ':completion:*:messages' format '%d'
-zstyle ':completion:*:warnings' format 'No matches for: %d'
-zstyle ':completion:*:corrections' format '%d (errors: %e)'
-
-# ignore completion functions for commands we don’t have
-zstyle ':completion:*:functions' ignored-patterns '_*'
-
-# ignore completion for git ORIG_HEAD
-# https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete
-zstyle ':completion:*:*' ignored-patterns '*ORIG_HEAD'
-
-# complete process IDs with menu selection
-zstyle ':completion:*:*:kill:*' menu yes select
-zstyle ':completion:*:kill:*' force-list always
-
-# history configuration
-# https://zsh.sourceforge.io/Doc/Release/Options.html#History
-HISTFILE="${ZSH_DATA_DIR}/history"
-HISTSIZE=1000000000 SAVEHIST=1000000000
-unsetopt share_history # OMZ enables shared history
+alias zre="exec zsh"
+alias zup="zgenom selfupdate && zgenom update && zre"
+alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 
 # load p10k prompt last
 source "${ZDOTDIR}/.p10k.zsh"
-
-# output zsh startup profile
-# zprof
-
-# done
-return 0
