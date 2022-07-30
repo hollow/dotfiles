@@ -420,7 +420,7 @@ export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 
 # ssh: secure shell
 # https://www.openssh.com
-alias ssu="ssh -o RequestTTY=force -o RemoteCommand='sudo -i'"
+alias ssu="sshlive -o RequestTTY=force -o RemoteCommand='sudo -i'"
 
 if ! zgenom saved; then
     mkdir -p "${XDG_CACHE_HOME}"/ssh
