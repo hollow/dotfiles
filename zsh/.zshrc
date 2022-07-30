@@ -337,7 +337,7 @@ fi
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
-export GPG_TTY=$(tty)
+export GPG_TTY="${TTY}"
 if ! zgenom saved; then
     zgenom ohmyzsh plugins/gpg-agent
 fi
