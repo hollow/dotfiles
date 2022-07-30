@@ -94,8 +94,8 @@ if ! zgenom saved; then
     # load zsh history search and create bindings for it
     # https://github.com/zsh-users/zsh-history-substring-search
     zgenom load zsh-users/zsh-history-substring-search
-    zgenom eval "bindkey '^[[A' history-substring-search-up"
-    zgenom eval "bindkey '^[[B' history-substring-search-down"
+    zgenom eval --name history-search-up "bindkey '^[[A' history-substring-search-up"
+    zgenom eval --name history-search-down "bindkey '^[[B' history-substring-search-down"
 
     # additional completion definitions for Zsh.
     # https://github.com/zsh-users/zsh-completions
