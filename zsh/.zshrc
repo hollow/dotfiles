@@ -135,7 +135,7 @@ select-word-style shell
 
 # history configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
-HISTFILE="${ZSH_DATA_DIR}/history"
+export HISTFILE="${ZSH_DATA_DIR}/history"
 HISTSIZE=1000000000 SAVEHIST=1000000000
 unsetopt share_history # OMZ enables shared history
 
@@ -180,10 +180,12 @@ add path "${HOMEBREW_PREFIX}/opt/python@3.10/bin"
 add path "${HOMEBREW_PREFIX}/opt/python@3.10/libexec/bin"
 
 zgenom-python-argcomplete() {
-    zgenom eval --name $1 "$(register-python-argcomplete $1)"
+    if has register-python-argcomplete; then
+        zgenom eval --name $1 "$(register-python-argcomplete $1)"
+    fi
 }
 
-if ! zgenom saved; then
+if ! zgenom saved && has brew; then
     for __python_version in 3.9 3.10; do
         echo "-- zgenom: Updating Python ${__python_version}"
         PIP_REQUIRE_VIRTUALENV=false \
@@ -198,7 +200,7 @@ export PIPX_HOME="${XDG_DATA_HOME}/pipx"
 export PIPX_BIN_DIR="${PIPX_HOME}/bin"
 add path "${PIPX_BIN_DIR}"
 
-if ! zgenom saved; then
+if ! zgenom saved && has pipx; then
     echo "-- zgenom: Updating pipx packages"
     pipx upgrade-all --include-injected
     pipx inject copier "MarkupSafe<2.1.0"
@@ -236,7 +238,7 @@ fi
 export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"
 export AWS_CONFIG_FILE="${XDG_CONFIG_HOME}/aws/config"
 
-if ! zgenom saved; then
+if ! zgenom saved && has aws; then
     zgenom ohmyzsh plugins/aws
 fi
 
@@ -277,7 +279,7 @@ fi
 # https://github.com/direnv/direnv
 alias da="direnv allow"
 
-if ! zgenom saved; then
+if ! zgenom saved && has direnv; then
     zgenom eval --name direnv "$(direnv hook zsh)"
 fi
 
@@ -303,7 +305,7 @@ alias lR="l -R"
 # https://cloud.google.com/sdk
 export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
 
-if ! zgenom saved; then
+if ! zgenom saved && has gcloud; then
     zgenom ohmyzsh plugins/gcloud
     echo "-- zgenom: Updating gcloud components"
     gcloud components update
@@ -338,7 +340,7 @@ fi
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 export GPG_TTY="${TTY}"
-if ! zgenom saved; then
+if ! zgenom saved && has "${GNUPGHOME}"; then
     zgenom ohmyzsh plugins/gpg-agent
 fi
 
@@ -389,7 +391,7 @@ pw() { genpass-monkey | clipcopy }
 
 # poetry: python dependency management
 # https://github.com/python-poetry/poetry
-if ! zgenom saved; then
+if ! zgenom saved && has poetry; then
     poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
 fi
 
@@ -411,8 +413,11 @@ export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
 export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
 export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
 export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
-add path "${HOMEBREW_PREFIX}"/opt/ruby/bin
-add path "${HOMEBREW_PREFIX}"/lib/ruby/gems/*/bin
+
+if has brew; then
+    add path "${HOMEBREW_PREFIX}"/opt/ruby/bin
+    add path "${HOMEBREW_PREFIX}"/lib/ruby/gems/*/bin
+fi
 
 # sqlite: database engine
 # https://sqlite.org
