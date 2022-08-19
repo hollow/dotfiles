@@ -1,2 +1,2 @@
 #!zsh
-type "$1" &>/dev/null || test -e "$1"
+type "$1" &>/dev/null || test -e "/$1"
