@@ -453,10 +453,6 @@ export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
 export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
 export ZSH_TMUX_FIXTERM="false"
 
-if [[ -n "${SSH_CONNECTION}" && -z "${VSCODE_IPC_HOOK_CLI}" ]]; then
-    export ZSH_TMUX_AUTOSTART="true"
-fi
-
 alias T=tmux
 
 if ! zgenom saved; then
