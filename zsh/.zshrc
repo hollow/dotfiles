@@ -70,7 +70,7 @@ if ! zgenom saved; then
 
     # replace completion selection menu with fzf
     # https://github.com/Aloxaf/fzf-tab
-    if has fzf; then
+    if ! has /.syno; then
         zgenom load Aloxaf/fzf-tab
     fi
 
