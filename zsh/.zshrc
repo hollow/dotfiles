@@ -70,7 +70,9 @@ if ! zgenom saved; then
 
     # replace completion selection menu with fzf
     # https://github.com/Aloxaf/fzf-tab
-    zgenom load Aloxaf/fzf-tab
+    if has fzf; then
+        zgenom load Aloxaf/fzf-tab
+    fi
 
     # https://github.com/romkatv/powerlevel10k
     zgenom load romkatv/powerlevel10k powerlevel10k
