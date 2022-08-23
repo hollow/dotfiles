@@ -137,9 +137,13 @@ select-word-style shell
 
 # history configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
-export HISTFILE="${ZSH_DATA_DIR}/history"
-HISTSIZE=1000000000 SAVEHIST=1000000000
-unsetopt share_history # OMZ enables shared history
+HISTSIZE=2000000000 SAVEHIST=1000000000
+HISTFILE="${ZSH_DATA_DIR}/history"
+ln -nfs "${HISTFILE}" "${HOME}/.zsh_history"
+
+# disable Apples history sharing sessions
+# https://apple.stackexchange.com/a/427568
+echo 'SHELL_SESSIONS_DISABLE=1' > "${HOME}/.zshenv"
 
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
@@ -191,7 +195,7 @@ if ! zgenom saved && has brew; then
     for __python_version in 3.9 3.10; do
         echo "-- zgenom: Updating Python ${__python_version}"
         PIP_REQUIRE_VIRTUALENV=false \
-        "${HOMEBREW_PREFIX}/opt/python@${__python_version}/bin/pip3" \
+        "${HOMEBREW_PREFIX}/opt/python@${__python_version}/bin/pip${__python_version}" \
             install --upgrade setuptools pip
     done
 fi
@@ -205,7 +209,6 @@ add path "${PIPX_BIN_DIR}"
 if ! zgenom saved && has pipx; then
     echo "-- zgenom: Updating pipx packages"
     pipx upgrade-all --include-injected
-    pipx inject copier "MarkupSafe<2.1.0"
     zgenom-python-argcomplete pipx
 fi
 
@@ -219,9 +222,21 @@ export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
 
 # ansible: simple IT automation
 # https://github.com/ansible/ansible
+export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible"
+export ANSIBLE_GALAXY_TOKEN_PATH="${XDG_DATA_HOME}/ansible/galaxy_token"
+export ANSIBLE_LOCAL_TEMP="${XDG_RUNTIME_DIR}/ansible/tmp"
+export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
+
 alias ad="ansible-doc"
 alias ai="ansible-inventory"
 alias ap="ansible-playbook"
+
+if ! zgenom saved && has pipx; then
+    echo "-- zgenom: Installing ansible"
+    pipx install --include-deps ansible
+    pipx inject --include-apps ansible ansible-lint
+    pipx inject ansible google-auth requests
+fi
 
 if ! zgenom saved; then
     zgenom-python-argcomplete ansible
@@ -338,6 +353,11 @@ if ! zgenom saved; then
     git config --global user.email "${USER_EMAIL}"
 fi
 
+if ! zgenom saved && has pipx; then
+    echo "-- zgenom: Installing git-delete-merged-branches"
+    pipx install git-delete-merged-branches
+fi
+
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
@@ -350,6 +370,12 @@ fi
 # https://www.golang.org
 export GOPATH="${XDG_CACHE_HOME}/go"
 add path "${GOPATH}/bin"
+
+# ip: helper to get public ip
+# http://4.ifconfig.pro
+IP() {
+    curl -s http://4.ifconfig.pro/ip.host | awk '{print $1}'
+}
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
