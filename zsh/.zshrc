@@ -407,6 +407,9 @@ fi
 export MC_SKIN="${XDG_CONFIG_HOME}/mc/solarized-dark-truecolor.ini"
 alias mc="mc --nosubshell"
 
+# nomad
+complete -o nospace -C nomad nomad
+
 # npm: node package manager
 # https://github.com/npm/cli
 export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
