@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+
+usage() {
+    log "Usage: tfe <command>"
+    log
+    log "Commands:"
+    log "  local <organization> <workspace> (set workspace execution mode to local)"
+    log "  remote <organization> <workspace> (set workspace execution mode to remote)"
+    exit 1
+}
+
+log() {
+    echo "$@" >&2
+}
+
+is-debug() {
+    [[ "${DEBUG}" = "1" ]]
+}
+
+log-debug() {
+    is-debug && log "$@"
+}
+
+jq-debug() {
+    is-debug && jq "$@"
+}
+
+tfe-token() {
+    hcl2json <"${TF_CLI_CONFIG_FILE}" | jq -r '.credentials["app.terraform.io"][0].token'
+}
+
+call() {
+    [[ "$1" == "" ]] && usage
+    log-debug "-- Calling Terraform Cloud API: $*"
+
+    local method="GET"
+    if ! [[ "${1}" =~ ^/.* ]]; then
+        method="$1" && shift
+    fi
+
+    local path="$1" && shift
+
+    curl -s "$@" \
+        --request "${method}" \
+        --header "Authorization: Bearer $(tfe-token)" \
+        --header "Content-Type: application/vnd.api+json" \
+        "https://app.terraform.io/api/v2${path}"
+}
+
+get-workspace-attribute() {
+    local key="${1:?Missing key}" && shift
+    local organization="${1:?Missing organization}" && shift
+    local workspace="${1:?Missing workspace}" && shift
+
+    log-debug "-- Getting ${key} for workspace ${organization}/${workspace}"
+
+    call GET "/organizations/${organization}/workspaces/${workspace}" |
+        jq -r ".data.attributes[\"${key}\"]"
+
+}
+
+update-workspace-attribute() {
+    local key="${1:?Missing key}" && shift
+    local value="${1:?Missing value}" && shift
+    local organization="${1:?Missing organization}" && shift
+    local workspace="${1:?Missing workspace}" && shift
+
+    log-debug "-- Setting ${key} for workspace ${organization}/${workspace} to ${value}"
+
+    jq -n "{ data: { attributes: { \"${key}\": \"${value}\" } } }" |
+        call PATCH "/organizations/${organization}/workspaces/${workspace}" --data "@-" |
+        jq-debug "."
+}
+
+main() {
+    [[ "$1" == "" ]] && usage
+
+    local command="${1}" && shift
+    case "${command}" in
+    call)
+        call "$@"
+        ;;
+    local)
+        update-workspace-attribute execution-mode local "$@"
+        get-workspace-attribute execution-mode "$@"
+        ;;
+    remote)
+        update-workspace-attribute execution-mode remote "$@"
+        get-workspace-attribute execution-mode "$@"
+        ;;
+    *)
+        usage
+        ;;
+    esac
+}
+
+main "$@"
