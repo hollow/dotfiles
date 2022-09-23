@@ -231,6 +231,11 @@ alias ad="ansible-doc"
 alias ai="ansible-inventory"
 alias ap="ansible-playbook"
 
+asu() {
+    local pattern="$1" && shift
+    ansible "${pattern}" -b -m shell -a "$@"
+}
+
 if ! zgenom saved && has pipx; then
     echo "-- zgenom: Installing ansible"
     pipx install --include-deps ansible
