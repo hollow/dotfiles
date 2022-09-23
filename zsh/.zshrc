@@ -363,6 +363,10 @@ if ! zgenom saved && has pipx; then
     pipx install git-delete-merged-branches
 fi
 
+github-export-token() {
+    export GITHUB_TOKEN=$(cat ~/.config/gh/hosts.yml | yq '.["github.com"].oauth_token')
+}
+
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
