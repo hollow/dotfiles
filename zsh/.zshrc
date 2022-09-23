@@ -290,6 +290,9 @@ alias kssh="easyssh -e='(ssh-exec-parallel)' -d='(knife)' -f='(coalesce host)'"
 # https://www.colordiff.org
 cdl() { colordiff | less -R }
 
+# consul
+complete -o nospace -C consul consul
+
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
 if ! zgenom saved; then
