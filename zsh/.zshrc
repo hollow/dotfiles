@@ -41,6 +41,11 @@ mkdir -p "${ZSH_DATA_DIR}"
 typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
 autoload -Uz add has
 
+# homebrew path as early as possible
+if has /opt/homebrew/bin/brew; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 # install zgenom
 if ! has "${XDG_CACHE_HOME}/zgenom"; then
     mkdir -p "${XDG_CACHE_HOME}" && \
@@ -156,8 +161,7 @@ export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
 alias bbd="brew bundle dump -f"
 alias bz="brew uninstall --zap"
 
-if ! zgenom saved && has /opt/homebrew/bin/brew; then
-    zgenom eval --name brew "$(/opt/homebrew/bin/brew shellenv)"
+if ! zgenom saved && has brew; then
     echo "-- zgenom: Updating Homebrew packages"
     brew update && \
     brew upgrade && \
