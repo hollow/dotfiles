@@ -26,7 +26,8 @@ jq-debug() {
 }
 
 tfe-token() {
-    hcl2json <"${TF_CLI_CONFIG_FILE}" | jq -r '.credentials["app.terraform.io"][0].token'
+    grep -A2 credentials "${TF_CLI_CONFIG_FILE}" | hcl2json |
+        jq -r '.credentials["app.terraform.io"][0].token'
 }
 
 call() {
