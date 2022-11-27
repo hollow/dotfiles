@@ -446,7 +446,7 @@ IP() {
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
-export PAGER="less" LESS="-FiMRSW -x4"
+export PAGER="less" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --tabs=4"
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 mkdir -p "$(dirname "${LESSHISTFILE}")"
 sl() { sort -u | less }
