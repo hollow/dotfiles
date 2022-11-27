@@ -336,6 +336,16 @@ cdl() { colordiff | less -R }
 # https://github.com/hashicorp/consul
 complete -o nospace -C consul consul
 
+# copier
+copier-each() {
+    for i in */.copier-answers.yml; do
+        pushd ${i/\/.copier-answers.yml} &>/dev/null
+        echo && pwd
+        eval "$@"
+        popd &>/dev/null
+    done
+}
+
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
 zi eval"dircolors -b LS_COLORS" \
