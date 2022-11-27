@@ -162,6 +162,7 @@ select-word-style shell
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
 HISTSIZE=2000000000 SAVEHIST=1000000000
 HISTFILE="${ZSH_DATA_DIR}/history"
+ln -nfs "${ZSH_DATA_DIR}/history" "${HOME}/.zsh_history"
 
 # disable Apples history sharing sessions
 # https://apple.stackexchange.com/a/427568
