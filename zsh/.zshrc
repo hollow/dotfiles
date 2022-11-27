@@ -83,6 +83,12 @@ zi snippet OMZL::key-bindings.zsh
 zi snippet OMZL::spectrum.zsh
 zi snippet OMZL::termsupport.zsh
 
+# add missing dotdot from ohmyzsh
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
 # additional completion definitions for Zsh.
 # https://github.com/zsh-users/zsh-completions
 zi blockf atpull'zinit creinstall -q .' \
