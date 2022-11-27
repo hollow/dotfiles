@@ -114,7 +114,6 @@ zi load hlissner/zsh-autopair
 # https://github.com/MichaelAquilina/zsh-you-should-use
 zi load MichaelAquilina/zsh-you-should-use
 YSU_MESSAGE_POSITION="after"
-YSU_HARDCORE=1
 
 # load zsh history search and create bindings for it
 # https://github.com/zsh-users/zsh-history-substring-search
