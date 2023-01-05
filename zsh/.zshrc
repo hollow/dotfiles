@@ -39,7 +39,14 @@ mkdir -p "${ZSH_DATA_DIR}"
 
 # shell functions
 typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
-autoload -Uz add has
+
+add() {
+    eval "${1}[1,0]"='("${@[2,-1]}")'
+}
+
+has() {
+    type "$1" &>/dev/null || test -e "/$1"
+}
 
 # homebrew path as early as possible
 if has /opt/homebrew/bin/brew; then
@@ -179,11 +186,6 @@ export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
 alias bbd="brew bundle dump -f"
 alias bz="brew uninstall --zap"
 
-zi id-as"brew" has"brew" as"null" \
-    atclone"brew-update" \
-    atpull"%atclone" run-atpull \
-    for zdharma-continuum/null
-
 brew-update() {
     brew update && \
     brew upgrade && \
@@ -192,6 +194,11 @@ brew-update() {
     brew cleanup -s --prune=all && \
     chmod go-w "${HOMEBREW_PREFIX}/share"
 }
+
+zi id-as"brew" has"brew" as"null" \
+    atclone"brew-update" \
+    atpull"%atclone" run-atpull \
+    for zdharma-continuum/null
 
 # ensure proper environment
 add path "${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin"
@@ -211,11 +218,6 @@ export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 add path "${HOMEBREW_PREFIX}/opt/python@3.10/bin"
 add path "${HOMEBREW_PREFIX}/opt/python@3.10/libexec/bin"
 
-zi id-as"python" has"brew" as"null" \
-    atclone"python-update" \
-    atpull"%atclone" run-atpull \
-    for zdharma-continuum/null
-
 python-update() {
     echo -e "[global]\nrequire-virtualenv = True" \
         > "${XDG_CONFIG_HOME}/pip/pip.conf"
@@ -228,11 +230,20 @@ python-update() {
     done
 }
 
+zi id-as"python" has"brew" as"null" \
+    atclone"python-update" \
+    atpull"%atclone" run-atpull \
+    for zdharma-continuum/null
+
 # python/pipx: install python applications in isolated environments
 # https://pypa.github.io/pipx/
 export PIPX_HOME="${XDG_DATA_HOME}/pipx"
 export PIPX_BIN_DIR="${PIPX_HOME}/bin"
 add path "${PIPX_BIN_DIR}"
+
+pipx-update() {
+    pipx upgrade-all --include-injected
+}
 
 zi id-as"pipx" has"pipx" nocompile \
     atclone"pipx-update" \
@@ -240,26 +251,35 @@ zi id-as"pipx" has"pipx" nocompile \
     eval"register-python-argcomplete pipx" \
     for zdharma-continuum/null
 
-pipx-update() {
-    pipx upgrade-all --include-injected
-}
-
 # python/poetry: python dependency management
 # https://github.com/python-poetry/poetry
-poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
+poetry-update() {
+    pipx install poetry
+    poetry self update
+    poetry self add poetry-plugin-up
+    poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
+}
+
+zi snippet OMZP::poetry
+zi id-as"poetry" has"pipx" as"null" \
+    atclone"poetry-update" \
+    atpull"%atclone" run-atpull \
+    for zdharma-continuum/null
 
 # 1password: remembers all your passwords for you
 # https://1password.com
-zi id-as"1password" has"op" nocompile \
-    atclone"op-update" \
-    atpull"%atclone" run-atpull \
-    eval"op completion zsh; compdef _op op" \
-    for zdharma-continuum/null
-
 op-update() {
     has brew && brew install --cask 1password/tap/1password-cli
     has code && code --force --install-extension 1Password.op-vscode
 }
+
+zi snippet OMZP::1password
+zi id-as"1password" has"op" nocompile \
+    atclone"op-update" \
+    atpull"%atclone" run-atpull \
+    for zdharma-continuum/null
+
+source "${XDG_CONFIG_HOME}/op/plugins.sh"
 
 # android: development kit
 # https://developer.android.com/studio/command-line/variables
@@ -281,14 +301,10 @@ asu() {
     ansible "${pattern}" -b -m shell -a "$@"
 }
 
-zi id-as"ansible" has"ansible" as"null" \
-    atclone"ansible-update" \
-    atpull"%atclone" run-atpull \
-    for zdharma-continuum/null
-
 ansible-update() {
     pipx install --include-deps ansible
     pipx inject --include-apps ansible ansible-lint
+    pipx inject ansible netaddr
     # https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html
     pipx inject ansible google-auth requests
     # https://docs.ansible.com/ansible/latest/collections/netbox/netbox/index.html
@@ -299,7 +315,16 @@ ansible-update() {
     pipx inject ansible python-consul
     # https://docs.ansible.com/ansible/latest/collections/community/general/nomad_job_module.html
     pipx inject ansible python-nomad
+    # https://docs.ansible.com/ansible/latest/collections/community/general/dig_lookup.html
+    pipx inject ansible dnspython
+    # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_filters.html#hashing-and-encrypting-strings-and-passwords
+    pipx inject ansible passlib
 }
+
+zi id-as"ansible" has"ansible" as"null" \
+    atclone"ansible-update" \
+    atpull"%atclone" run-atpull \
+    for zdharma-continuum/null
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
@@ -320,6 +345,7 @@ export BOTO_CONFIG="${XDG_DATA_HOME}/boto"
 cat > "${BOTO_CONFIG}" <<EOF
 [GSUtil]
 state_dir = ${XDG_DATA_HOME}/gsutil
+parallel_composite_upload_threshold = 150M
 EOF
 
 # chef: infrastructure automation
@@ -398,6 +424,7 @@ zi id-as"gcloud" has"gcloud" as"null" \
 alias c="git changes"
 alias ga="git add --all"
 alias gap="git add --patch"
+alias gcl="git cleanup && git checkout-latest main && git dmb -y"
 alias gcm="git co \$(git main-branch)"
 alias gcu="git co upstream"
 alias gd="git diff"
@@ -419,14 +446,40 @@ git-update() {
     pipx install git-delete-merged-branches
 }
 
+hub-repo-list() {
+    gh repo list --limit 1000 --json nameWithOwner "$@" |
+    jq -r '.[].nameWithOwner'
+}
+
+hub-clone-all() {
+    hub-repo-list --no-archived "$@" |
+    parallel --bar --tagstring "[{}]" --jobs 5 \
+        git-clone-clean-main https://github.com/{} "${HOME}/src/{}"
+}
+
+hub-remove-archived() {
+    hub-repo-list --archived "$@" |
+    parallel --bar --tagstring "[{}]" \
+        rm -rf "${HOME}/src/{}"
+}
+
+hub-enforce-admins() {
+    repo=$(git remote get-url origin | perl -pe 's/.*github.com\///')
+    branch=$(git main-branch)
+    gh api -X POST /repos/${repo}/branches/${branch}/protection/enforce_admins | jq
+}
+
+hub-skip-admins() {
+    repo=$(git remote get-url origin | perl -pe 's/.*github.com\///')
+    branch=$(git main-branch)
+    gh api -X DELETE /repos/${repo}/branches/${branch}/protection/enforce_admins | jq
+    gh api /repos/${repo}/branches/${branch}/protection/enforce_admins | jq
+}
+
 zi id-as"git" has"git" as"null" \
     atclone"git-update" \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
-
-github-export-token() {
-    export GITHUB_TOKEN=$(cat ~/.config/gh/hosts.yml | yq '.["github.com"].oauth_token')
-}
 
 # gnupg: GNU privacy guard
 # https://gnupg.org/

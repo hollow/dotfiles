@@ -16,10 +16,10 @@ git submodule sync --quiet --recursive
 
 git submodule --quiet foreach \
     git fetch --quiet \
-        --all \
-        --tags \
-        --prune \
-        --prune-tags
+    --all \
+    --tags \
+    --prune \
+    --prune-tags
 
 git submodule --quiet foreach \
     git gc --quiet
