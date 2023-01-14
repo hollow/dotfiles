@@ -371,8 +371,9 @@ zi eval"dircolors -b LS_COLORS" \
 # direnv: change environment based on the current directory
 # https://github.com/direnv/direnv
 zi from"gh-r" as"program" mv"direnv* -> direnv" \
-    eval"direnv hook zsh" \
     for direnv/direnv
+
+eval "$(direnv hook zsh)"
 
 alias da="direnv allow"
 
