@@ -34,11 +34,15 @@ ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
 ZSH_COMPDUMP="${ZSH_CACHE_DIR}/zcompdump"
 
-mkdir -p "${ZSH_CACHE_DIR}"
+mkdir -p "${ZSH_CACHE_DIR}"{,/completions}
 mkdir -p "${ZSH_DATA_DIR}"
 
 # shell functions
-typeset -TUx FPATH fpath=(${ZDOTDIR} ${fpath[@]})
+typeset -TUx FPATH fpath=(
+    ${ZDOTDIR}
+    ${ZSH_CACHE_DIR}/completions
+    ${fpath[@]}
+)
 
 add() {
     eval "${1}[1,0]"='("${@[2,-1]}")'
@@ -130,7 +134,7 @@ bindkey '^[[B' history-substring-search-down
 
 # replace completion selection menu with fzf
 # https://github.com/Aloxaf/fzf-tab
-if ! has /.syno; then
+if has fzf && ! has /.syno; then
     zi load Aloxaf/fzf-tab
 fi
 
@@ -201,15 +205,17 @@ zi id-as"brew" has"brew" as"null" \
     for zdharma-continuum/null
 
 # ensure proper environment
-add path "${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin"
-add path "${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin"
-add path "${HOMEBREW_PREFIX}/opt/gawk/libexec/gnubin"
-add path "${HOMEBREW_PREFIX}/opt/gnu-sed/libexec/gnubin"
-add path "${HOMEBREW_PREFIX}/opt/gnu-tar/libexec/gnubin"
-add path "${HOMEBREW_PREFIX}/opt/gnu-time/libexec/gnubin"
-add path "${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin"
-add path "${HOMEBREW_PREFIX}/opt/make/libexec/gnubin"
-add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+if has brew; then
+    add path "${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/gawk/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/gnu-sed/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/gnu-tar/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/gnu-time/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/make/libexec/gnubin"
+    add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+fi
 
 # python: programming language
 # https://docs.python.org/3/
@@ -218,19 +224,22 @@ export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 add path "${HOMEBREW_PREFIX}/opt/python@3.10/bin"
 add path "${HOMEBREW_PREFIX}/opt/python@3.10/libexec/bin"
 
-python-update() {
-    echo -e "[global]\nrequire-virtualenv = True" \
-        > "${XDG_CONFIG_HOME}/pip/pip.conf"
+echo -e "[global]\nrequire-virtualenv = True" \
+    > "${XDG_CONFIG_HOME}/pip/pip.conf"
 
-    local v
-    for v in 3.9 3.10; do
-        PIP_REQUIRE_VIRTUALENV=false \
-        "${HOMEBREW_PREFIX}/opt/python@${v}/bin/pip${v}" \
-            install --upgrade setuptools pip
-    done
+python-update() {
+    if has brew; then
+        local v
+        for v in 3.9 3.10; do
+            PIP_REQUIRE_VIRTUALENV=false \
+            "${HOMEBREW_PREFIX}/opt/python@${v}/bin/pip${v}" \
+                install --upgrade setuptools pip
+        done
+    fi
 }
 
-zi id-as"python" has"brew" as"null" \
+zi snippet OMZP::python
+zi id-as"python" as"null" \
     atclone"python-update" \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
@@ -279,7 +288,9 @@ zi id-as"1password" has"op" nocompile \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
 
-source "${XDG_CONFIG_HOME}/op/plugins.sh"
+if has "${XDG_CONFIG_HOME}/op/plugins.sh"; then
+    source "${XDG_CONFIG_HOME}/op/plugins.sh"
+fi
 
 # android: development kit
 # https://developer.android.com/studio/command-line/variables
@@ -300,31 +311,6 @@ asu() {
     local pattern="$1" && shift
     ansible "${pattern}" -b -m shell -a "$@"
 }
-
-ansible-update() {
-    pipx install --include-deps ansible
-    pipx inject --include-apps ansible ansible-lint
-    pipx inject ansible netaddr
-    # https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html
-    pipx inject ansible google-auth requests
-    # https://docs.ansible.com/ansible/latest/collections/netbox/netbox/index.html
-    pipx inject ansible pynetbox pytz
-    # https://docs.ansible.com/ansible/latest/network/user_guide/platform_netconf_enabled.html
-    pipx inject ansible ncclient
-    # https://docs.ansible.com/ansible/latest/collections/community/general/consul_module.html
-    pipx inject ansible python-consul
-    # https://docs.ansible.com/ansible/latest/collections/community/general/nomad_job_module.html
-    pipx inject ansible python-nomad
-    # https://docs.ansible.com/ansible/latest/collections/community/general/dig_lookup.html
-    pipx inject ansible dnspython
-    # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_filters.html#hashing-and-encrypting-strings-and-passwords
-    pipx inject ansible passlib
-}
-
-zi id-as"ansible" has"ansible" as"null" \
-    atclone"ansible-update" \
-    atpull"%atclone" run-atpull \
-    for zdharma-continuum/null
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
@@ -526,7 +512,18 @@ export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
-# genpass: a simple pwgen replacement
+# pre-commit
+# pipx install pre-commit
+pre-commit-update() {
+    pipx install pre-commit
+}
+
+zi id-as"pre-commit" has"pipx" as"null" \
+    atclone"pre-commit-update" \
+    atpull"%atclone" run-atpull \
+    for zdharma-continuum/null
+
+# pw: a simple pwgen replacement
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/genpass
 zi snippet OMZP::genpass
 pw() { genpass-monkey | clipcopy }
@@ -560,7 +557,19 @@ export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 # ssh: secure shell
 # https://www.openssh.com
 alias ssu="sshlive -o RequestTTY=force -o RemoteCommand='sudo -i'"
-mkdir -p "${XDG_CACHE_HOME}"/ssh
+
+mkdir -p "${HOME}/.ssh" "${XDG_CACHE_HOME}"/ssh
+chmod 0700 "${HOME}/.ssh"
+
+if has "${XDG_CONFIG_HOME}/ssh/$(hostname -f).conf"; then
+    ln -nfs "${XDG_CONFIG_HOME}/ssh/$(hostname -f).conf" "${HOME}/.ssh/config"
+elif has "${XDG_CONFIG_HOME}/ssh/$(uname -s).conf"; then
+    ln -nfs "${XDG_CONFIG_HOME}/ssh/$(uname -s).conf" "${HOME}/.ssh/config"
+else
+    ln -nfs "${XDG_CONFIG_HOME}/ssh/default.conf" "${HOME}/.ssh/config"
+fi
+
+chmod 0600 "${HOME}/.ssh/config"
 
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
