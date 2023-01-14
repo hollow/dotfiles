@@ -100,6 +100,9 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 
+# shell options
+setopt extendedglob
+
 # additional completion definitions for Zsh.
 # https://github.com/zsh-users/zsh-completions
 zi blockf atpull'zinit creinstall -q .' \
@@ -561,15 +564,17 @@ alias ssu="sshlive -o RequestTTY=force -o RemoteCommand='sudo -i'"
 mkdir -p "${HOME}/.ssh" "${XDG_CACHE_HOME}"/ssh
 chmod 0700 "${HOME}/.ssh"
 
-if has "${XDG_CONFIG_HOME}/ssh/$(hostname -f).conf"; then
-    ln -nfs "${XDG_CONFIG_HOME}/ssh/$(hostname -f).conf" "${HOME}/.ssh/config"
-elif has "${XDG_CONFIG_HOME}/ssh/$(uname -s).conf"; then
-    ln -nfs "${XDG_CONFIG_HOME}/ssh/$(uname -s).conf" "${HOME}/.ssh/config"
-else
-    ln -nfs "${XDG_CONFIG_HOME}/ssh/default.conf" "${HOME}/.ssh/config"
+ln -nfs "${XDG_CONFIG_HOME}/ssh/$(uname -s).conf" "${HOME}/.ssh/config"
+chmod 0600 "${HOME}/.ssh/config"
+
+# https://1password.community/discussion/comment/660153/#Comment_660153
+if [[ -n "${SSH_TTY}" && ! -S "${HOME}/.ssh/ssh_auth_sock" && -S "${SSH_AUTH_SOCK}" ]]; then
+    ln -nfs "${SSH_AUTH_SOCK}" "${HOME}/.ssh/ssh_auth_sock"
+elif [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
+    ln -nfs "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "${HOME}/.ssh/ssh_auth_sock"
 fi
 
-chmod 0600 "${HOME}/.ssh/config"
+export SSH_AUTH_SOCK="${HOME}/.ssh/ssh_auth_sock"
 
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
