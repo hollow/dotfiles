@@ -9,6 +9,9 @@ export LC_CTYPE=${LANG}
 # enforce truecolor support
 export COLORTERM="truecolor"
 
+# Increase file descriptor limit
+ulimit -n 1048575
+
 # system path
 typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
 
@@ -436,6 +439,15 @@ git-update() {
     pipx install git-delete-merged-branches
 }
 
+git-each () {
+	for i in */.git; do
+		pushd ${i/\/.git} &> /dev/null
+		echo && pwd
+		eval "$@"
+		popd &> /dev/null
+	done
+}
+
 hub-repo-list() {
     gh repo list --limit 1000 --json nameWithOwner "$@" |
     jq -r '.[].nameWithOwner'
@@ -569,10 +581,10 @@ ln -nfs "${XDG_CONFIG_HOME}/ssh/$(uname -s).conf" "${HOME}/.ssh/config"
 chmod 0600 "${HOME}/.ssh/config"
 
 # https://1password.community/discussion/comment/660153/#Comment_660153
-if [[ -n "${SSH_TTY}" && ! -S "${HOME}/.ssh/ssh_auth_sock" && -S "${SSH_AUTH_SOCK}" ]]; then
-    ln -nfs "${SSH_AUTH_SOCK}" "${HOME}/.ssh/ssh_auth_sock"
-elif [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
+if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
     ln -nfs "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" "${HOME}/.ssh/ssh_auth_sock"
+elif [[ -n "${SSH_TTY}" && -S "${SSH_AUTH_SOCK}" && "${SSH_AUTH_SOCK}" != "${HOME}/.ssh/ssh_auth_sock" ]]; then
+    ln -nfs "${SSH_AUTH_SOCK}" "${HOME}/.ssh/ssh_auth_sock"
 fi
 
 export SSH_AUTH_SOCK="${HOME}/.ssh/ssh_auth_sock"
