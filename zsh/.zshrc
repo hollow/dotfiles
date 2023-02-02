@@ -9,9 +9,6 @@ export LC_CTYPE=${LANG}
 # enforce truecolor support
 export COLORTERM="truecolor"
 
-# Increase file descriptor limit
-ulimit -n 1048575
-
 # system path
 typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
 
