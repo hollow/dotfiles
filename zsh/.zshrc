@@ -318,6 +318,10 @@ asu() {
     ansible "${pattern}" -b -m shell -a "$@"
 }
 
+export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
+export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
+export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
+
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
 export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"
@@ -429,6 +433,7 @@ alias gl="git lg"
 alias gp="git pull"
 alias gpr="git pull --rebase --autostash"
 alias grh="git reset HEAD"
+alias gsp="git show -p"
 alias s="git st ."
 
 autoload -Uz clone
@@ -476,6 +481,11 @@ hub-skip-admins() {
     branch=$(git main-branch)
     gh api -X DELETE /repos/${repo}/branches/${branch}/protection/enforce_admins | jq
     gh api /repos/${repo}/branches/${branch}/protection/enforce_admins | jq
+}
+
+pr() {
+    git push && \
+    gh pr create -f "$@"
 }
 
 zi id-as"git" has"git" as"null" \
