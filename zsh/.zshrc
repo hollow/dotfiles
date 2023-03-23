@@ -224,8 +224,9 @@ fi
 # https://docs.python.org/3/
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 
-add path "${HOMEBREW_PREFIX}/opt/python@3.10/bin"
-add path "${HOMEBREW_PREFIX}/opt/python@3.10/libexec/bin"
+PYTHON_VERSION=$(brew ls | sed -n 's/python@//p' | tail -n1)
+add path "${HOMEBREW_PREFIX}/opt/python@${PYTHON_VERSION}/bin"
+add path "${HOMEBREW_PREFIX}/opt/python@${PYTHON_VERSION}/libexec/bin"
 
 echo -e "[global]\nrequire-virtualenv = True" \
     > "${XDG_CONFIG_HOME}/pip/pip.conf"
@@ -233,7 +234,7 @@ echo -e "[global]\nrequire-virtualenv = True" \
 python-update() {
     if has brew; then
         local v
-        for v in 3.9 3.10; do
+        for v in $(brew ls | sed -n 's/python@//p'); do
             PIP_REQUIRE_VIRTUALENV=false \
             "${HOMEBREW_PREFIX}/opt/python@${v}/bin/pip${v}" \
                 install --upgrade setuptools pip
@@ -268,8 +269,14 @@ zi id-as"pipx" has"pipx" nocompile \
 poetry-update() {
     pipx install poetry
     poetry self update
-    poetry self add poetry-plugin-up
     poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
+
+    # https://github.com/python-poetry/poetry/issues/7344#issuecomment-1386841002
+    poetry self lock
+    poetry self install --sync
+
+    # https://github.com/MousaZeidBaker/poetry-plugin-up
+    poetry self add poetry-plugin-up
 }
 
 zi snippet OMZP::poetry
