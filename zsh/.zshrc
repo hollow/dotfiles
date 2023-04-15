@@ -267,7 +267,6 @@ zi id-as"pipx" has"pipx" nocompile \
 # python/poetry: python dependency management
 # https://github.com/python-poetry/poetry
 poetry-update() {
-    pipx install poetry
     poetry self update
     poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
 
@@ -445,7 +444,6 @@ autoload -Uz clone
 git-update() {
     git config --global user.name "${USER_NAME}"
     git config --global user.email "${USER_EMAIL}"
-    pipx install git-delete-merged-branches
 }
 
 git-each () {
@@ -541,17 +539,6 @@ export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
 # https://www.gnu.org/software/parallel/
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
-
-# pre-commit
-# pipx install pre-commit
-pre-commit-update() {
-    pipx install pre-commit
-}
-
-zi id-as"pre-commit" has"pipx" as"null" \
-    atclone"pre-commit-update" \
-    atpull"%atclone" run-atpull \
-    for zdharma-continuum/null
 
 # pw: a simple pwgen replacement
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/genpass
