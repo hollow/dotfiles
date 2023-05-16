@@ -26,8 +26,8 @@ jq-debug() {
 }
 
 tfe-token() {
-    grep -A2 credentials "${TF_CLI_CONFIG_FILE}" | hcl2json |
-        jq -r '.credentials["app.terraform.io"][0].token'
+    jq -r '.credentials["app.terraform.io"].token' \
+        "${TF_CLI_CONFIG_FILE:-${HOME}/.terraform.d/credentials.tfrc.json}"
 }
 
 call() {
@@ -73,6 +73,15 @@ update-workspace-attribute() {
         jq-debug "."
 }
 
+list-active-runs() {
+    statusList="pending,fetching,fetching_completed,pre_plan_running,pre_plan_completed,queuing,plan_queued,planning,planned,cost_estimating,cost_estimated,policy_checking,policy_override,policy_soft_failed,policy_checked,confirmed,post_plan_running,post_plan_completed,apply_queued,applying"
+    for wsId in $(call /organizations/remerge/workspaces | jq -r '.data[].id'); do
+        wsName=$(call "/workspaces/${wsId}" | jq -r '.data.attributes.name')
+        echo ">>> ${wsName}"
+        call "/workspaces/${wsId}/runs?filter%5Bstatus%5D=${statusList}" | jq '.data | map({(.id): .attributes.status}) | add'
+    done
+}
+
 main() {
     [[ "$1" == "" ]] && usage
 
@@ -88,6 +97,9 @@ main() {
     remote)
         update-workspace-attribute execution-mode remote "$@"
         get-workspace-attribute execution-mode "$@"
+        ;;
+    list-active-runs)
+        list-active-runs
         ;;
     *)
         usage
