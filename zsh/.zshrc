@@ -321,6 +321,15 @@ asu() {
     ansible "${pattern}" -b -m shell -a "$@"
 }
 
+ansible-each() {
+    for i in */ansible.cfg; do
+        pushd ${i/\/ansible.cfg} &>/dev/null
+        echo && pwd
+        eval "$@"
+        popd &>/dev/null
+    done
+}
+
 export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
 export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
 export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
@@ -404,6 +413,13 @@ else
 fi
 
 alias lR="l -R"
+
+# fping
+netping() {
+    for i in "$@"; do
+        fping -g "${i}" 2>/dev/null
+    done
+}
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
@@ -513,7 +529,7 @@ IP() {
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
-export PAGER="less" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --quit-if-one-screen --tabs=4"
+export PAGER="less" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --clear-screen --tabs=4"
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 mkdir -p "$(dirname "${LESSHISTFILE}")"
 sl() { sort -u | less }
@@ -548,7 +564,7 @@ pw() { genpass-monkey | clipcopy }
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
-alias rg="rg --color=always"
+rg() { command rg --color=always --sort path "$@" | less }
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org

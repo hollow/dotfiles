@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -e
+[[ $TRACE -eq 1 ]] && set -x
+
+# https://stackoverflow.com/questions/2657935/checking-for-a-dirty-index-or-untracked-files-with-git/2659808#comment28748156_2659808
+git update-index -q --refresh | grep -q 'needs merge' || \
+! git diff-index --quiet --cached HEAD -- || \
+! git diff-files --quiet || \
+test -n "$(git ls-files --exclude-standard --others)"
