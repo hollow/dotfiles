@@ -593,7 +593,9 @@ export SSH_AUTH_SOCK="${HOME}/.ssh/ssh_auth_sock"
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
 export CHECKPOINT_DISABLE=true
-export TF_CLI_CONFIG_FILE="${XDG_CONFIG_HOME}/terraform.tfrc"
+export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/terraform/plugins"
+mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+ln -nfs "${XDG_CONFIG_HOME}/terraform" "${HOME}/.terraform.d"
 
 alias tf="terraform"
 alias tfa="tf apply"
