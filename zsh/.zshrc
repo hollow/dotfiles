@@ -9,6 +9,9 @@ export LC_CTYPE=${LANG}
 # enforce truecolor support
 export COLORTERM="truecolor"
 
+# shell options
+setopt extendedglob
+
 # system path
 typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
 
@@ -79,20 +82,20 @@ alias zup="zi update --all"
 alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 
 # https://github.com/NICHOLAS85/z-a-eval
-zi load NICHOLAS85/z-a-eval
+zi light-mode for NICHOLAS85/z-a-eval
 
 # ohmyzsh: community driven zsh framework
 # https://github.com/ohmyzsh/ohmyzsh
 COMPLETION_WAITING_DOTS="true"
-zi snippet OMZL::clipboard.zsh
-zi snippet OMZL::completion.zsh
-zi snippet OMZL::directories.zsh
-zi snippet OMZL::functions.zsh
-zi snippet OMZL::grep.zsh
-zi snippet OMZL::history.zsh
-zi snippet OMZL::key-bindings.zsh
-zi snippet OMZL::spectrum.zsh
-zi snippet OMZL::termsupport.zsh
+zi light-mode for \
+    OMZL::completion.zsh \
+    OMZL::directories.zsh \
+    OMZL::functions.zsh \
+    OMZL::grep.zsh \
+    OMZL::history.zsh \
+    OMZL::key-bindings.zsh \
+    OMZL::spectrum.zsh \
+    OMZL::termsupport.zsh
 
 # add missing dotdot from ohmyzsh
 alias ..="cd .."
@@ -100,45 +103,55 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 
-# shell options
-setopt extendedglob
-
-# additional completion definitions for Zsh.
-# https://github.com/zsh-users/zsh-completions
-zi blockf atpull'zinit creinstall -q .' \
-    for zsh-users/zsh-completions
-
-# load completion system
-autoload compinit
-compinit -d "${ZSH_COMPDUMP}"
+# directory loop helper
+each() {
+    local dirs=(${argv:1:((${argv[(Ie)do]}-1))})
+    local cmd=(${argv:((${argv[(Ie)do]}+1))})
+    for dir in ${dirs[@]}; do
+        echo -e "\n${dir:P}"
+        pushd "${dir:P}" &>/dev/null
+        eval "${cmd[@]}"
+        popd &>/dev/null
+    done
+}
 
 # feature-rich syntax highlighting for ZSH
 # https://github.com/zdharma-continuum/fast-syntax-highlighting
-zi load zdharma-continuum/fast-syntax-highlighting
+zi wait lucid light-mode \
+    atinit"zicompinit; zicdreplay" \
+    for zdharma-continuum/fast-syntax-highlighting
 
 # fish-like autosuggestions for zsh
 # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
-zi load zsh-users/zsh-autosuggestions
+zi wait lucid light-mode \
+    atload"_zsh_autosuggest_start" \
+    for zsh-users/zsh-autosuggestions
+
+# additional completion definitions for Zsh.
+# https://github.com/zsh-users/zsh-completions
+zi wait lucid light-mode \
+    blockf atpull'zinit creinstall -q .' \
+    for zsh-users/zsh-completions
 
 # automatically close quotes, brackets and other delimiters
 # https://github.com/hlissner/zsh-autopair
-zi load hlissner/zsh-autopair
+zi wait lucid light-mode for hlissner/zsh-autopair
 
 # reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
-zi load MichaelAquilina/zsh-you-should-use
+zi wait lucid light-mode for MichaelAquilina/zsh-you-should-use
 YSU_MESSAGE_POSITION="after"
 
 # load zsh history search and create bindings for it
 # https://github.com/zsh-users/zsh-history-substring-search
-zi load zsh-users/zsh-history-substring-search
+zi light-mode for zsh-users/zsh-history-substring-search
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 # replace completion selection menu with fzf
 # https://github.com/Aloxaf/fzf-tab
 if has fzf && ! has /.syno; then
-    zi load Aloxaf/fzf-tab
+    zi wait lucid light-mode for Aloxaf/fzf-tab
 fi
 
 # use approximate completion with error correction
@@ -203,6 +216,7 @@ brew-update() {
 }
 
 zi id-as"brew" has"brew" as"null" \
+    light-mode \
     atclone"brew-update" \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
@@ -224,9 +238,9 @@ fi
 # https://docs.python.org/3/
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 
-PYTHON_VERSION=$(brew ls | sed -n 's/python@//p' | tail -n1)
-add path "${HOMEBREW_PREFIX}/opt/python@${PYTHON_VERSION}/bin"
-add path "${HOMEBREW_PREFIX}/opt/python@${PYTHON_VERSION}/libexec/bin"
+HOMEBREW_PYTHON_PATH=(${HOMEBREW_PREFIX}/opt/python@*(n,On[1]))
+add path "${HOMEBREW_PYTHON_PATH}/bin"
+add path "${HOMEBREW_PYTHON_PATH}/libexec/bin"
 
 echo -e "[global]\nrequire-virtualenv = True" \
     > "${XDG_CONFIG_HOME}/pip/pip.conf"
@@ -242,8 +256,9 @@ python-update() {
     fi
 }
 
-zi snippet OMZP::python
+zi light-mode for OMZP::python
 zi id-as"python" as"null" \
+    light-mode \
     atclone"python-update" \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
@@ -259,6 +274,7 @@ pipx-update() {
 }
 
 zi id-as"pipx" has"pipx" nocompile \
+    light-mode \
     atclone"pipx-update" \
     atpull"%atclone" run-atpull \
     eval"register-python-argcomplete pipx" \
@@ -269,6 +285,7 @@ zi id-as"pipx" has"pipx" nocompile \
 poetry-update() {
     poetry self update
     poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
+    poetry config virtualenvs.in-project true
 
     # https://github.com/python-poetry/poetry/issues/7344#issuecomment-1386841002
     poetry self lock
@@ -278,8 +295,9 @@ poetry-update() {
     poetry self add poetry-plugin-up
 }
 
-zi snippet OMZP::poetry
+zi light-mode for OMZP::poetry
 zi id-as"poetry" has"pipx" as"null" \
+    light-mode \
     atclone"poetry-update" \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
@@ -291,8 +309,9 @@ op-update() {
     has code && code --force --install-extension 1Password.op-vscode
 }
 
-zi snippet OMZP::1password
+zi wait lucid light-mode for OMZP::1password
 zi id-as"1password" has"op" nocompile \
+    light-mode \
     atclone"op-update" \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
@@ -322,12 +341,7 @@ asu() {
 }
 
 ansible-each() {
-    for i in */ansible.cfg; do
-        pushd ${i/\/ansible.cfg} &>/dev/null
-        echo && pwd
-        eval "$@"
-        popd &>/dev/null
-    done
+    each */ansible.cfg(:h) do "$@"
 }
 
 export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
@@ -338,7 +352,7 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 # https://aws.amazon.com/cli/
 export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"
 export AWS_CONFIG_FILE="${XDG_CONFIG_HOME}/aws/config"
-zi snippet OMZP::aws
+zi light-mode for OMZP::aws
 
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
@@ -369,27 +383,28 @@ cdl() { colordiff | less -R }
 
 # consul: distributed, highly available service discovery
 # https://github.com/hashicorp/consul
-complete -o nospace -C consul consul
+zi id-as"consul" has"consul" as"null" \
+    wait lucid light-mode \
+    atinit"complete -o nospace -C consul consul" \
+    for zdharma-continuum/null
 
 # copier
 copier-each() {
-    for i in */.copier-answers.yml; do
-        pushd ${i/\/.copier-answers.yml} &>/dev/null
-        echo && pwd
-        eval "$@"
-        popd &>/dev/null
-    done
+    each */.copier-answers.yml(:h) do "$@"
 }
 
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
-zi eval"dircolors -b LS_COLORS" \
+zi id-as"dircolors" has"dircolors" \
+    wait lucid light-mode \
+    eval"dircolors -b LS_COLORS" \
     atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
     for trapd00r/LS_COLORS
 
 # direnv: change environment based on the current directory
 # https://github.com/direnv/direnv
 zi from"gh-r" as"program" mv"direnv* -> direnv" \
+    light-mode \
     for direnv/direnv
 
 eval "$(direnv hook zsh)"
@@ -424,13 +439,14 @@ netping() {
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
-zi snippet OMZP::gcloud
+zi wait lucid light-mode for OMZP::gcloud
 
 gcloud-update() {
     gcloud components update
 }
 
 zi id-as"gcloud" has"gcloud" as"null" \
+    light-mode \
     atclone"gcloud-update" \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
@@ -463,12 +479,7 @@ git-update() {
 }
 
 git-each () {
-	for i in */.git; do
-		pushd ${i/\/.git} &> /dev/null
-		echo && pwd
-		eval "$@"
-		popd &> /dev/null
-	done
+    each */.git(:h) do "$@"
 }
 
 hub-repo-list() {
@@ -507,6 +518,7 @@ pr() {
 }
 
 zi id-as"git" has"git" as"null" \
+    light-mode \
     atclone"git-update" \
     atpull"%atclone" run-atpull \
     for zdharma-continuum/null
@@ -536,7 +548,7 @@ sl() { sort -u | less }
 
 # man: unix documentation system
 # https://www.nongnu.org/man-db/
-zi snippet OMZP::colored-man-pages
+zi light-mode for OMZP::colored-man-pages
 
 # mc: midnight commander
 # https://midnight-commander.org
@@ -545,7 +557,10 @@ alias mc="mc --nosubshell"
 
 # nomad: workload orchestrator
 # https://github.com/hashicorp/nomad
-complete -o nospace -C nomad nomad
+zi id-as"nomad" has"nomad" as"null" \
+    wait lucid light-mode \
+    atinit"complete -o nospace -C nomad nomad" \
+    for zdharma-continuum/null
 
 # npm: node package manager
 # https://github.com/npm/cli
@@ -558,7 +573,7 @@ mkdir -p ${PARALLEL_HOME}
 
 # pw: a simple pwgen replacement
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/genpass
-zi snippet OMZP::genpass
+zi light-mode for OMZP::genpass
 pw() { genpass-monkey | clipcopy }
 
 # ripgrep: fast grep replacement
@@ -568,7 +583,7 @@ rg() { command rg --color=always --sort path "$@" | less }
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
-zi snippet OMZP::rsync
+zi light-mode for OMZP::rsync
 
 # ruby: programming language
 # https://www.ruby-lang.org
@@ -622,6 +637,7 @@ alias tfp="tf plan"
 # terraform/checkov: static code analysis tool for Terraform
 # https://github.com/bridgecrewio/checkov
 zi id-as"checkov" has"checkov" as"null" \
+    wait lucid light-mode \
     eval"register-python-argcomplete checkov" \
     for zdharma-continuum/null
 
@@ -630,7 +646,7 @@ zi id-as"checkov" has"checkov" as"null" \
 export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
 export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
 export ZSH_TMUX_FIXTERM="false"
-zi snippet OMZP::tmux
+zi light-mode for OMZP::tmux
 alias T=tmux
 
 # tmux/tpm: tmux plugin manager
@@ -664,13 +680,10 @@ alias yarn="yarn --use-yarnrc \"${XDG_CONFIG_HOME}/yarn/config\""
 # https://github.com/yt-dlp/yt-dlp
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
-# replay all completions
-zi cdreplay -q
-
 # add local path last so it takes precendence
 add path "${XDG_CONFIG_HOME}/bin"
 
 # Powerlevel10k is a theme for Zsh
 # https://github.com/romkatv/powerlevel10k
-zi load romkatv/powerlevel10k
+zi light-mode for romkatv/powerlevel10k
 source "${ZDOTDIR}"/.p10k.zsh
