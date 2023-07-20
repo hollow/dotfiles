@@ -67,13 +67,15 @@ fi
 
 # zinit: Flexible and fast ZSH plugin manager
 # https://github.com/zdharma-continuum/zinit
-if ! has "${ZINIT_HOME:=${XDG_DATA_HOME}/zinit/zinit.git}"; then
+if ! has "${ZINIT_HOME:=${XDG_CACHE_HOME}/zinit/zinit.git}"; then
     mkdir -p "$(dirname ${ZINIT_HOME})"
     git clone https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}"
 fi
 
 declare -A ZINIT
+ZINIT[HOME_DIR]="${XDG_CACHE_HOME}/zinit"
 ZINIT[ZCOMPDUMP_PATH]="${ZSH_COMPDUMP}"
+ZPFX="${XDG_CACHE_HOME}/zinit/polaris"
 source "${ZINIT_HOME}/zinit.zsh"
 
 # zinit update and reset
@@ -541,7 +543,7 @@ IP() {
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
-export PAGER="less" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --clear-screen --tabs=4"
+export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 mkdir -p "$(dirname "${LESSHISTFILE}")"
 sl() { sort -u | less }
@@ -571,10 +573,8 @@ export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
-# pw: a simple pwgen replacement
-# https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/genpass
-zi light-mode for OMZP::genpass
-pw() { genpass-monkey | clipcopy }
+# pwgen: generate random passwords
+pw() { pwgen -s 32 1 | clipcopy }
 
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
@@ -640,6 +640,10 @@ zi id-as"checkov" has"checkov" as"null" \
     wait lucid light-mode \
     eval"register-python-argcomplete checkov" \
     for zdharma-continuum/null
+
+terraform-each() {
+    each */terraform.tf(:h) do "$@"
+}
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
