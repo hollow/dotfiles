@@ -568,6 +568,9 @@ zi id-as"nomad" has"nomad" as"null" \
 # https://github.com/npm/cli
 export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
 
+# orbstack/docker:
+add path "${HOME}"/.orbstack/bin
+
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
