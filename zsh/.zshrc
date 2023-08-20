@@ -287,7 +287,6 @@ zi id-as"pipx" has"pipx" nocompile \
 poetry-update() {
     poetry self update
     poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
-    poetry config virtualenvs.in-project true
 
     # https://github.com/python-poetry/poetry/issues/7344#issuecomment-1386841002
     poetry self lock
@@ -306,6 +305,10 @@ zi id-as"poetry" has"pipx" as"null" \
 
 # 1password: remembers all your passwords for you
 # https://1password.com
+op() {
+    env -u OP_ACCOUNT op "$@"
+}
+
 op-update() {
     has brew && brew install --cask 1password/tap/1password-cli
     has code && code --force --install-extension 1Password.op-vscode
@@ -441,6 +444,8 @@ netping() {
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
+add path "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin"
+
 zi wait lucid light-mode for OMZP::gcloud
 
 gcloud-update() {
@@ -519,6 +524,11 @@ pr() {
     gh pr create -f "$@"
 }
 
+ghm() {
+    gh pr merge --merge "$@" && \
+    gcl
+}
+
 zi id-as"git" has"git" as"null" \
     light-mode \
     atclone"git-update" \
@@ -567,6 +577,7 @@ zi id-as"nomad" has"nomad" as"null" \
 # npm: node package manager
 # https://github.com/npm/cli
 export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
+add path "${XDG_DATA_HOME}"/npm/bin
 
 # orbstack/docker:
 add path "${HOME}"/.orbstack/bin
