@@ -1,4 +1,5 @@
 **/*.zwc
+.tmp.driveupload/
 gam
 grammarly-languageserver
 gtk-2.0

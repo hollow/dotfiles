@@ -180,8 +180,8 @@ zstyle ':completion:*:*:git*:*' ignored-patterns '*ORIG_HEAD'
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
 
-# preview directory content with exa when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa --all --long --group $realpath'
+# preview directory content with eza when completing cd
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
 
 # words are complete shell command arguments
 autoload -Uz select-word-style
@@ -272,6 +272,7 @@ export PIPX_BIN_DIR="${PIPX_HOME}/bin"
 add path "${PIPX_BIN_DIR}"
 
 pipx-update() {
+    pipx reinstall-all
     pipx upgrade-all --include-injected
 }
 
@@ -424,10 +425,10 @@ elif has pydf; then
     alias df=pydf
 fi
 
-# exa: a modern replacement for ‘ls’.
-# https://github.com/ogham/exa
-if has exa; then
-    alias l="exa --all --long --group"
+# eza: a modern replacement for ‘ls’.
+# https://github.com/ogham/eza
+if has eza; then
+    alias l="eza --all --long --group"
 else
     alias l="ls -lah"
 fi
