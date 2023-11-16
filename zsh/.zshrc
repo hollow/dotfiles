@@ -247,23 +247,7 @@ add path "${HOMEBREW_PYTHON_PATH}/libexec/bin"
 echo -e "[global]\nrequire-virtualenv = True" \
     > "${XDG_CONFIG_HOME}/pip/pip.conf"
 
-python-update() {
-    if has brew; then
-        local v
-        for v in $(brew ls | sed -n 's/python@//p'); do
-            PIP_REQUIRE_VIRTUALENV=false \
-            "${HOMEBREW_PREFIX}/opt/python@${v}/bin/pip${v}" \
-                install --upgrade setuptools pip
-        done
-    fi
-}
-
 zi light-mode for OMZP::python
-zi id-as"python" as"null" \
-    light-mode \
-    atclone"python-update" \
-    atpull"%atclone" run-atpull \
-    for zdharma-continuum/null
 
 # python/pipx: install python applications in isolated environments
 # https://pypa.github.io/pipx/
@@ -289,10 +273,6 @@ poetry-update() {
     poetry self update
     poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
 
-    # https://github.com/python-poetry/poetry/issues/7344#issuecomment-1386841002
-    poetry self lock
-    poetry self install --sync
-
     # https://github.com/MousaZeidBaker/poetry-plugin-up
     poetry self add poetry-plugin-up
 }
@@ -306,10 +286,6 @@ zi id-as"poetry" has"pipx" as"null" \
 
 # 1password: remembers all your passwords for you
 # https://1password.com
-op() {
-    env -u OP_ACCOUNT op "$@"
-}
-
 op-update() {
     has brew && brew install --cask 1password/tap/1password-cli
     has code && code --force --install-extension 1Password.op-vscode
@@ -342,7 +318,11 @@ alias ai="ansible-inventory"
 alias ap="ansible-playbook"
 
 asu() {
-    local pattern="$1" && shift
+    local pattern="platform_almalinux"
+    if [[ $# -gt 1 ]]; then
+        pattern="$1" && shift
+    fi
+
     ansible "${pattern}" -b -m shell -a "$@"
 }
 
@@ -490,6 +470,14 @@ git-each () {
     each */.git(:h) do "$@"
 }
 
+# Enforce personal 1Password account for gh
+unalias gh
+
+gh() {
+    env OP_ACCOUNT=my.1password.com OP_SERVICE_ACCOUNT_TOKEN= \
+        op plugin run -- gh "$@"
+}
+
 hub-repo-list() {
     gh repo list --limit 1000 --json nameWithOwner "$@" |
     jq -r '.[].nameWithOwner'
@@ -523,6 +511,7 @@ hub-skip-admins() {
 pr() {
     git push && \
     gh pr create -f "$@"
+    gh pr view --web
 }
 
 ghm() {
@@ -698,6 +687,9 @@ alias yarn="yarn --use-yarnrc \"${XDG_CONFIG_HOME}/yarn/config\""
 # youtube: download audio
 # https://github.com/yt-dlp/yt-dlp
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
+
+# misc other aliases
+alias dev="ssh -t dev01.dev.rmge.net \"zsh -i -c T\""
 
 # add local path last so it takes precendence
 add path "${XDG_CONFIG_HOME}/bin"
