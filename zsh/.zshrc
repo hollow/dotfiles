@@ -111,8 +111,12 @@ each() {
     local cmd=(${argv:((${argv[(Ie)do]}+1))})
     for dir in ${dirs[@]}; do
         echo -e "\n${dir:P}"
-        pushd "${dir:P}" &>/dev/null
-        eval "${cmd[@]}"
+        if [[ "${cmd[@]}" == "" ]]; then
+            pushd "${dir:P}"
+        else
+            pushd "${dir:P}" &>/dev/null
+            eval "${cmd[@]}"
+        fi
         popd &>/dev/null
     done
 }
@@ -269,10 +273,12 @@ zi id-as"pipx" has"pipx" nocompile \
 
 # python/poetry: python dependency management
 # https://github.com/python-poetry/poetry
+export POETRY_CONFIG_DIR="${XDG_CONFIG_HOME}/pypoetry"
+export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
+export POETRY_DATA_DIR="${XDG_DATA_HOME}/pypoetry"
+
 poetry-update() {
     poetry self update
-    poetry config cache-dir "${XDG_CACHE_HOME}/poetry"
-
     # https://github.com/MousaZeidBaker/poetry-plugin-up
     poetry self add poetry-plugin-up
 }
