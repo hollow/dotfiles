@@ -619,7 +619,7 @@ alias ssu="sshlive -o RequestTTY=force -o RemoteCommand='sudo -i'"
 mkdir -p "${HOME}/.ssh" "${XDG_CACHE_HOME}"/ssh
 chmod 0700 "${HOME}/.ssh"
 
-ln -nfs "${XDG_CONFIG_HOME}/ssh/$(uname -s).conf" "${HOME}/.ssh/config"
+ln -nfs "${XDG_CONFIG_HOME}/ssh/config" "${HOME}/.ssh/config"
 chmod 0600 "${HOME}/.ssh/config"
 
 # https://1password.community/discussion/comment/660153/#Comment_660153

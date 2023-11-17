@@ -9,5 +9,9 @@ ServerAliveCountMax 10
 IdentityAgent ~/.ssh/ssh_auth_sock
 ForwardAgent yes
 
-# orbstack/docker integration
-Include ~/.orbstack/ssh/config
+# OrbStack/Docker integration
+Match exec "[[ -e ~/.orbstack/ssh/config ]]"
+    Include ~/.orbstack/ssh/config
+
+# Include custom local config
+Include ~/.ssh/config.local
