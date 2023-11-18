@@ -1,0 +1,10 @@
+python 3.11.6
+pipx 1.2.1
+poetry 1.7.1
+gcloud 455.0.0
+consul 1.17.0
+direnv 2.32.3
+duf 0.8.1
+nomad 1.6.3+ent
+tmux 3.3a
+fzf 0.44.1

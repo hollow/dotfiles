@@ -1,0 +1,25 @@
+#!zsh
+
+autoload -Uz uri-parse
+
+local source="$1"
+local target="$2"
+
+if [[ "${source}" == "" ]]; then
+    print -P "usage: %N <source> [<target>]"
+    return 1
+fi
+
+if [[ "${target}" == "" ]]; then
+    target="${source}"
+fi
+
+if [[ "${source}" != '/'* ]]; then
+    source="${XDG_CONFIG_HOME}/${source}"
+fi
+
+if [[ "${target}" != '/'* ]]; then
+    target="${HOME}/${target}"
+fi
+
+ln -nfs "${source}" "${target}"

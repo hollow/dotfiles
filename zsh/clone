@@ -3,9 +3,10 @@
 autoload -Uz uri-parse
 
 local repo_url="$1"
+local repo_path="$2"
 
 if [[ -z "${repo_url}" ]]; then
-    print -P "usage: %N <url>"
+    print -P "usage: %N <url> [<path>]"
     return 1
 fi
 
@@ -13,12 +14,16 @@ if [[ "${repo_url}" != *':'* ]]; then
     repo_url="https://github.com/${repo_url}"
 fi
 
-uri-parse rpath ${repo_url} || return
-local repo_rpath="${REPLY}"
-local repo_apath="${HOME}/src/${repo_rpath}"
-
-if [[ ! -e "${repo_apath}" ]]; then
-    git clone "${repo_url}" "${repo_apath}" || return
+if [[ "${repo_path}" == "" ]]; then
+    uri-parse rpath ${repo_url} || return
+    repo_path="${HOME}/src/${REPLY}"
 fi
 
-cd "${repo_apath}"
+if [[ ! -e "${repo_path}" ]]; then
+    mkdir -p "$(dirname ${repo_path})"
+    git clone "${repo_url}" "${repo_path}" || return
+fi
+
+if ! (( zsh_eval_context[(I)file] )); then
+    cd "${repo_path}"
+fi
