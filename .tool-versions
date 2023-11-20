@@ -8,3 +8,6 @@ duf 0.8.1
 nomad 1.6.3+ent
 tmux 3.3a
 fzf 0.44.1
+1password-cli 2.23.0
+fd 8.7.1
+ripgrep 13.0.0

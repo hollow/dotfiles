@@ -39,7 +39,6 @@ chmod 0700 "${XDG_RUNTIME_DIR}"
 ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
-ZSH_COMPDUMP="${ZSH_CACHE_DIR}/zcompdump-${HOST}-${ZSH_VERSION}"
 
 mkdir -p "${ZSH_CACHE_DIR}"{,/completions}
 mkdir -p "${ZSH_DATA_DIR}"
@@ -69,8 +68,6 @@ fi
 typeset -Ag ZI
 ZI[HOME_DIR]="${XDG_CACHE_HOME}/zi"
 ZI[BIN_DIR]="${ZI[HOME_DIR]}/bin"
-ZI[ZCOMPDUMP_PATH]="${ZSH_COMPDUMP}"
-ZI[COMPINIT_OPTS]=-C
 source "${ZDOTDIR}/zzinit" && zzinit
 
 alias zre="exec zsh"
@@ -267,6 +264,12 @@ zi auto with"pipx" for OMZP::poetry
 :1password-cli-load() {
     if has "${XDG_CONFIG_HOME}/op/plugins.sh"; then
         source "${XDG_CONFIG_HOME}/op/plugins.sh"
+
+        # Enforce personal 1Password account for gh
+        unalias gh; gh() {
+            env OP_ACCOUNT=my.1password.com OP_SERVICE_ACCOUNT_TOKEN= \
+                op plugin run -- gh "$@"
+        }
     fi
 }
 
@@ -301,7 +304,7 @@ asu() {
 }
 
 ansible-each() {
-    each */ansible.cfg(:h) do "$@"
+    each */ansible.mk(:h) do "$@"
 }
 
 # ansible/ara: ARA Records Ansible
@@ -322,7 +325,7 @@ zi auto wait for OMZP::aws
     export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 }
 
-zi auto with"asdf" for bat
+zi auto with"asdf" wait for bat
 
 # boto: AWS SDK for Python
 # https://github.com/boto/boto3
@@ -346,7 +349,7 @@ alias kssh="easyssh -e='(ssh-exec-parallel)' -d='(knife)' -f='(coalesce host)'"
     register-python-argcomplete checkov
 }
 
-zi auto with"pipx" for checkov
+zi auto with"pipx" wait for checkov
 
 # colordiff: syntax highlighting for diff
 # https://www.colordiff.org
@@ -363,7 +366,7 @@ zi auto with"asdf" wait1 for consul
 
 # copier: repository template framework
 # https://copier.readthedocs.io/en/stable/
-zi auto with"pipx" for copier
+zi auto with"pipx" wait for copier
 
 copier-each() {
     each */.copier-answers.yml(:h) do "$@"
@@ -379,7 +382,7 @@ copier-each() {
     dircolors -b LS_COLORS
 }
 
-zi auto id-as"dircolors" for trapd00r/LS_COLORS
+zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
 
 # direnv: change environment based on the current directory
 # https://github.com/direnv/direnv
@@ -404,7 +407,7 @@ zi auto id-as"docker" as"completion" blockf wait for \
     alias df=duf
 }
 
-zi auto with"asdf" for duf
+zi auto with"asdf" wait for duf
 
 # eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
@@ -413,7 +416,7 @@ zi auto with"asdf" for duf
     alias lR="l -R"
 }
 
-zi auto has"eza" for eza
+zi auto has"eza" wait for eza
 
 # fd:
 zi auto with"asdf" id-as"fd" as"completion" blockf wait for \
@@ -450,7 +453,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
     source "${CLOUDSDK_HOME}/completion.zsh.inc"
 }
 
-zi auto with"asdf" wait for gcloud
+zi auto with"asdf" wait1 for gcloud
 
 # git: distributed version control system
 # https://github.com/git/git
@@ -477,12 +480,6 @@ alias s="git st ."
 
 git-each () {
     each */.git(:h) do "$@"
-}
-
-# Enforce personal 1Password account for gh
-gh() {
-    env OP_ACCOUNT=my.1password.com OP_SERVICE_ACCOUNT_TOKEN= \
-        op plugin run -- gh "$@"
 }
 
 hub-repo-list() {
@@ -536,6 +533,10 @@ export GPG_TTY="${TTY}"
 export GOPATH="${XDG_CACHE_HOME}/go"
 add path "${GOPATH}/bin"
 
+go-each() {
+    each */go.mk(:h) do "$@"
+}
+
 # ip: helper to get public ip
 # http://4.ifconfig.pro
 IP() {
@@ -565,7 +566,7 @@ alias mc="mc --nosubshell"
     complete -o nospace -C nomad nomad
 }
 
-zi auto with"asdf" wait for nomad
+zi auto with"asdf" wait1 for nomad
 
 # npm: node package manager
 # https://github.com/npm/cli
@@ -642,7 +643,7 @@ alias tfi="tf import"
 alias tfp="tf plan"
 
 terraform-each() {
-    each */terraform.tf(:h) do "$@"
+    each */terraform.mk(:h) do "$@"
 }
 
 # tmux: a terminal multiplexer
