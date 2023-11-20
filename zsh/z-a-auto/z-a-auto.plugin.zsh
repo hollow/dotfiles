@@ -5,28 +5,40 @@
 
 :za-auto-null-handler() { :; }
 
-.za-auto-eval() {
-    local ___ehid="${ICE[id-as]}" ___with="${ICE[with]:-custom}"
-    local ___handlers="${ICE[eval]/.za-auto-eval\;(#c0,1)/}"
-    debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} ${${___handlers[1]}:+handlers}{msg2} ${___handlers}"
-}
+:za-auto-init() {
+    (( ${+ICE[with]} )) || return 0
 
-.za-auto-init() {
-    local ___ehid="${ICE[id-as]}" ___with="${ICE[with]:-custom}"
+    local ___ehid="${ICE[id-as]}" ___with="${ICE[with]}"
     local ___handlers="${ICE[atinit]/.za-auto-init\;(#c0,1)/}"
-    debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} ${${___handlers[1]}:+handlers}{msg2} ${___handlers}"
+    debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} handlers {msg2}${___handlers}"
+
+    if (( ${+functions[:${___ehid}-init]} )) {
+        :${___ehid}-init "$@"
+    }
+
+    return 0
 }
 
-.za-auto-load() {
-    local ___ehid="${ICE[id-as]}" ___with="${ICE[with]:-custom}"
+:za-auto-load() {
+    (( ${+ICE[with]} )) || return 0
+
+    local ___ehid="${ICE[id-as]}" ___with="${ICE[with]}"
     local ___handlers="${ICE[atload]/.za-auto-load\;(#c0,1)/}"
-    debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} ${${___handlers[1]}:+handlers}{msg2} ${___handlers}"
+    debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} handlers {msg2}${___handlers}"
+
+    if (( ${+functions[:${___ehid}-load]} )) {
+        :${___ehid}-load "$@"
+    }
+
+    return 0
 }
 
-.za-auto-update() {
-    local ___ehid="${ICE[id-as]}" ___with="${ICE[with]:-custom}"
+:za-auto-update() {
+    (( ${+ICE[with]} )) || return 0
+
+    local ___ehid="${ICE[id-as]}" ___with="${ICE[with]}"
     local ___handlers="${ICE[atclone]/.za-auto-update\;(#c0,1)/}"
-    debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} ${${___handlers[1]}:+handlers}{msg2} ${___handlers}"
+    debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} handlers {msg2}${___handlers}"
 
     case ${___with} in
         (asdf)
@@ -38,6 +50,12 @@
             pipx install ${___ehid}
             ;;
     esac
+
+    if (( ${+functions[:${___ehid}-update]} )) {
+        :${___ehid}-update "$@"
+    }
+
+    return 0
 }
 
 :za-auto-command() {
@@ -83,32 +101,17 @@
         ___ices+=(as"null")
     }
 
-    # add hook functions if they exist
-    ___ices+=(eval=.za-auto-eval)
+    # add eval hook function if they exist
     if (( ${+functions[:${___ehid}-eval]} )) {
         ___ices+=(eval=:${___ehid}-eval)
     }
 
-    ___ices+=(atload=.za-auto-load)
-    if (( ${+functions[:${___ehid}-load]} )) {
-        ___ices+=(atload=:${___ehid}-load)
-    }
-
-    ___ices+=(atinit=.za-auto-init)
-    if (( ${+functions[:${___ehid}-init]} )) {
-        ___ices+=(atinit=:${___ehid}-init)
-    }
-
-    ___ices+=(atclone=.za-auto-update)
-    if (( ${+functions[:${___ehid}-update]} )) {
-        ___ices+=(atclone=:${___ehid}-update)
-    }
-
-    # pull and clone should be the same thing
-    ___ices+=(atpull"%atclone" run-atpull)
-
     if ! (( ${+ZI_ICES[id-as]} )) {
         ___ices+=(id-as"${___ehid}")
+    }
+
+    if ! (( ${+ZI_ICES[with]} )) {
+        ___ices+=(with"custom")
     }
 
     debug "{func}[${___ehid}]{rst}" "{msg}${___argv[*]}{rst}"
@@ -120,3 +123,23 @@
     :za-auto-command \
     :za-auto-null-handler \
     "with''"
+
+@zi-register-annex "z-a-auto" \
+    hook:atclone-50 \
+    :za-auto-update \
+    :za-auto-null-handler
+
+@zi-register-annex "z-a-auto" \
+    hook:atpull-50 \
+    :za-auto-update \
+    :za-auto-null-handler
+
+@zi-register-annex "z-a-auto" \
+    hook:atload-50 \
+    :za-auto-load \
+    :za-auto-null-handler
+
+@zi-register-annex "z-a-auto" \
+    hook:atinit-50 \
+    :za-auto-init \
+    :za-auto-null-handler

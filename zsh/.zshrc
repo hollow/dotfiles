@@ -1,3 +1,6 @@
+# enable debug mode
+# DOT_DEBUG=1
+
 # user information (for git, gpg, etc)
 export USER_NAME="Benedikt Böhm"
 export USER_EMAIL="bb@xnull.de"
@@ -58,11 +61,6 @@ if has /opt/homebrew/bin/brew; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# powerlevel10k instant prompt
-if has "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"; then
-    source "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # zi: Flexible and fast ZSH plugin manager
 # https://github.com/z-shell/zi
 typeset -Ag ZI
@@ -78,22 +76,22 @@ zup() {
     zi update --all
 }
 
-# zi/auto: load plugins with conventions
-zi light "${ZDOTDIR}/z-a-auto"
-
 # zinit/default: set global default ice
 # https://github.com/z-shell/z-a-default-ice
-zi light z-shell/z-a-default-ice
+zi id-as for z-shell/z-a-default-ice
 zi default-ice -q lucid light-mode
 
 # zinit/eval: creates a cache containing the output of a command
 # https://github.com/z-shell/z-a-eval
-zi light z-shell/z-a-eval
+zi id-as for z-shell/z-a-eval
+
+# zi/auto: load plugins with conventions
+zi id-as for "${ZDOTDIR}/z-a-auto"
 
 # ohmyzsh: community driven zsh framework
 # https://github.com/ohmyzsh/ohmyzsh
 COMPLETION_WAITING_DOTS="true"
-zi light-mode for \
+zi for \
     OMZL::completion.zsh \
     OMZL::directories.zsh \
     OMZL::functions.zsh \
@@ -185,11 +183,8 @@ export ASDF_DIR="${XDG_CACHE_HOME}/asdf"
 export ASDF_DATA_DIR="${ASDF_DIR}"
 export ASDF_COMPLETIONS="${ASDF_DIR}/completions"
 
-:asdf-init() {
-    clone asdf-vm/asdf "${ASDF_DIR}"
-}
-
 :asdf-update() {
+    clone asdf-vm/asdf "${ASDF_DIR}"
     source "${ASDF_DIR}/asdf.sh"
     asdf update
     asdf plugin update --all
@@ -210,7 +205,7 @@ zi auto with"asdf" for OMZP::python
 
 # python/pipx: install python applications in isolated environments
 # https://pypa.github.io/pipx/
-export PIPX_HOME="${XDG_DATA_HOME}/pipx"
+export PIPX_HOME="${XDG_CACHE_HOME}/pipx"
 export PIPX_BIN_DIR="${PIPX_HOME}/bin"
 add path "${PIPX_BIN_DIR}"
 
@@ -325,7 +320,7 @@ zi auto wait for OMZP::aws
     export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 }
 
-zi auto with"asdf" wait for bat
+zi auto has"bat" wait for bat
 
 # boto: AWS SDK for Python
 # https://github.com/boto/boto3
@@ -595,7 +590,7 @@ zi auto wait for OMZP::rsync
 
 # ruby: programming language
 # https://www.ruby-lang.org
-export GEM_HOME="${XDG_DATA_HOME}"/gem
+export GEM_HOME="${XDG_CACHE_HOME}"/gem
 export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
 export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
 export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
@@ -661,7 +656,7 @@ terraform-each() {
     alias T=tmux
 }
 
-zi auto with"asdf" silent wait for OMZP::tmux
+zi auto has"tmux" wait for OMZP::tmux
 
 # tmux/xpanes:
 # https://github.com/greymd/tmux-xpanes
@@ -692,12 +687,12 @@ add path "${XDG_CONFIG_HOME}/bin"
 
 # reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
-zi auto silent wait for MichaelAquilina/zsh-you-should-use
+zi auto wait for MichaelAquilina/zsh-you-should-use
 YSU_MESSAGE_POSITION="after"
 
 # load zsh history search and create bindings for it
 # https://github.com/zsh-users/zsh-history-substring-search
-zi auto silent wait for zsh-users/zsh-history-substring-search
+zi auto wait for zsh-users/zsh-history-substring-search
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
@@ -718,7 +713,7 @@ zi auto atload"_zsh_autosuggest_start" \
 
 # zsh/autopair: automatically close quotes, brackets and other delimiters
 # https://github.com/hlissner/zsh-autopair
-zi auto silent wait for hlissner/zsh-autopair
+zi auto wait for hlissner/zsh-autopair
 
 # zsh/completions: initialize completion system
 # https://github.com/zsh-users/zsh-completions
