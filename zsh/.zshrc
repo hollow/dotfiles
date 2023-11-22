@@ -532,6 +532,8 @@ go-each() {
     each */go.mk(:h) do "$@"
 }
 
+zi auto with"asdf" for golang
+
 # ip: helper to get public ip
 # http://4.ifconfig.pro
 IP() {

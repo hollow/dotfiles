@@ -11,3 +11,4 @@ fzf 0.44.1
 1password-cli 2.23.0
 fd 8.7.1
 ripgrep 13.0.0
+golang 1.21.4
