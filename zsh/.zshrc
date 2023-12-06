@@ -208,6 +208,8 @@ zi auto with"asdf" for OMZP::python
 # https://pypa.github.io/pipx/
 export PIPX_HOME="${XDG_CACHE_HOME}/pipx"
 export PIPX_BIN_DIR="${PIPX_HOME}/bin"
+export PIPX_DEFAULT_PYTHON=$(which python)
+
 add path "${PIPX_BIN_DIR}"
 
 :pipx-update() {
@@ -596,9 +598,9 @@ pw() { pwgen -s 32 1 | clipcopy }
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
 rg() { command rg --color=always --sort path "$@" | less }
 
-:ripgrep-eval() {
-    rg --generate complete-zsh
-}
+#:ripgrep-eval() {
+#    rg --generate complete-zsh
+#}
 
 zi auto with"asdf" for ripgrep
 
