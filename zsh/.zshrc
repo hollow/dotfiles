@@ -675,7 +675,7 @@ terraform-parallel() {
     alias T=tmux
 }
 
-zi auto has"tmux" wait for OMZP::tmux
+zi auto has"tmux" silent for OMZP::tmux
 
 # tmux/xpanes:
 # https://github.com/greymd/tmux-xpanes
