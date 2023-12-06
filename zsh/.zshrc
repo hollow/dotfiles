@@ -54,7 +54,8 @@ typeset -TUx FPATH fpath=(
 )
 
 # load standarf functions
-autoload -Uz add clone debug each has link log
+autoload -Uz add clone debug has link log
+autoload -Uz :each :parallel
 
 # add homebrew path as early as possible
 if has /opt/homebrew/bin/brew; then
@@ -299,7 +300,11 @@ asu() {
 }
 
 ansible-each() {
-    each */ansible.mk(:h) do "$@"
+    :each */ansible.mk(:h) do "$@"
+}
+
+ansible-parallel() {
+    :parallel */ansible.mk(:h) do "$@"
 }
 
 # ansible/ara: ARA Records Ansible
@@ -364,7 +369,11 @@ zi auto with"asdf" wait1 for consul
 zi auto with"pipx" wait for copier
 
 copier-each() {
-    each */.copier-answers.yml(:h) do "$@"
+    :each */.copier-answers.yml(:h) do "$@"
+}
+
+copier-parallel() {
+    :parallel */.copier-answers.yml(:h) do "$@"
 }
 
 # dircolors: setup colors for ls and friends
@@ -474,7 +483,7 @@ alias gsp="git show -p"
 alias s="git st ."
 
 git-each () {
-    each */.git(:h) do "$@"
+    :each */.git(:h) do "$@"
 }
 
 hub-repo-list() {
@@ -490,8 +499,8 @@ hub-clone-all() {
 
 hub-remove-archived() {
     hub-repo-list --archived "$@" |
-    parallel --bar --tagstring "[{}]" \
-        rm -rf "${HOME}/src/{}"
+    parallel \
+        rm -rvf "${HOME}/src/{}"
 }
 
 hub-enforce-admins() {
@@ -529,7 +538,11 @@ export GOPATH="${XDG_CACHE_HOME}/go"
 add path "${GOPATH}/bin"
 
 go-each() {
-    each */go.mk(:h) do "$@"
+    :each */go.mk(:h) do "$@"
+}
+
+go-parallel() {
+    :parallel */go.mk(:h:a) do "$@"
 }
 
 zi auto with"asdf" for golang
@@ -598,11 +611,6 @@ export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
 export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
 export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
 
-if has brew; then
-    add path "${HOMEBREW_PREFIX}"/opt/ruby/bin
-    add path "${HOMEBREW_PREFIX}"/lib/ruby/gems/*/bin
-fi
-
 # sqlite: database engine
 # https://sqlite.org
 export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
@@ -640,7 +648,11 @@ alias tfi="tf import"
 alias tfp="tf plan"
 
 terraform-each() {
-    each */terraform.mk(:h) do "$@"
+    :each */terraform.mk(:h) do "$@"
+}
+
+terraform-parallel() {
+    :parallel */terraform.mk(:h) do "$@"
 }
 
 # tmux: a terminal multiplexer

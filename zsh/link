@@ -22,4 +22,6 @@ if [[ "${target}" != '/'* ]]; then
     target="${HOME}/${target}"
 fi
 
-ln -nfs "${source}" "${target}"
+if [[ "$(readlink "${target}")" != "${source}" ]]; then
+    ln -nfs "${source}" "${target}"
+fi

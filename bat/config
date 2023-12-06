@@ -7,7 +7,7 @@
 --theme="Solarized (dark)"
 
 # Use plain style by default
---plain
+--style=plain
 
 # Always use the pager
 --paging=always
