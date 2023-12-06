@@ -596,8 +596,11 @@ pw() { pwgen -s 32 1 | clipcopy }
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
 rg() { command rg --color=always --sort path "$@" | less }
 
-zi auto with"asdf" id-as"ripgrep" as"completion" blockf wait for \
-    https://github.com/BurntSushi/ripgrep/blob/master/complete/_rg
+:ripgrep-eval() {
+    rg --generate complete-zsh
+}
+
+zi auto with"asdf" for ripgrep
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
