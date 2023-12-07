@@ -343,7 +343,6 @@ EOF
 alias kcu="knife cookbook upload"
 alias kda="knife diff cookbooks data_bags environments roles"
 alias ks="kda --name-status"
-alias kssh="easyssh -e='(ssh-exec-parallel)' -d='(knife)' -f='(coalesce host)'"
 
 # checkov: static code analysis tool for Terraform & Co
 # https://github.com/bridgecrewio/checkov
@@ -632,12 +631,10 @@ chmod 0600 "${HOME}/.ssh/config"
 
 # https://1password.community/discussion/comment/660153/#Comment_660153
 if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
-    link "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" .ssh/ssh_auth_sock
-elif [[ -n "${SSH_TTY}" && -S "${SSH_AUTH_SOCK}" && "${SSH_AUTH_SOCK}" != "${HOME}/.ssh/ssh_auth_sock" ]]; then
-    link "${SSH_AUTH_SOCK}" .ssh/ssh_auth_sock
+    export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+else
+    zi auto silent for OMZP::ssh-agent
 fi
-
-export SSH_AUTH_SOCK="${HOME}/.ssh/ssh_auth_sock"
 
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
