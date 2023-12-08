@@ -1,14 +1,7 @@
 [user]
 	name = Benedikt Böhm
 	email = bb@xnull.de
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO2wbcnPz2sPIU1T2FFt88ZHpOXvFqwNxNX+5WFo2A2b
-
-[gpg]
-	format = ssh
-
-[gpg "ssh"]
-	program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-	allowedSignersFile = /Users/bene/.config/git/allowed_signers
+	signingkey = AE74137591CEC5EF551598267650F79B136BDA74
 
 [alias]
 	aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'

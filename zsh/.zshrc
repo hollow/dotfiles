@@ -532,6 +532,7 @@ ghm() {
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 export GPG_TTY="${TTY}"
+zi auto for OMZP::gpg-agent
 
 # go: programming language
 # https://www.golang.org

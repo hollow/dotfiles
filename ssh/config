@@ -5,10 +5,6 @@ StrictHostKeyChecking no
 ServerAliveInterval 60
 ServerAliveCountMax 10
 
-# Use local ssh agent
-IdentityAgent ~/.ssh/ssh_auth_sock
-ForwardAgent yes
-
 # OrbStack/Docker integration
 Match exec "[[ -e ~/.orbstack/ssh/config ]]"
     Include ~/.orbstack/ssh/config
