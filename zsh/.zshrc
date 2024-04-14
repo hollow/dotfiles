@@ -73,7 +73,13 @@ alias zre="exec zsh"
 alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 
 zup() {
-    zi self-update
+    :brew-update && \
+    :asdf-update && \
+    :pipx-update && \
+    :poetry-update && \
+    :tmux-update && \
+    :gcloud-update && \
+    zi self-update && \
     zi update --all
 }
 
@@ -202,7 +208,7 @@ zi auto silent for OMZP::asdf
 # python: programming language
 # https://docs.python.org/3/
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-zi auto with"asdf" for OMZP::python
+zi auto silent with"asdf" for OMZP::python
 
 # python/pipx: install python applications in isolated environments
 # https://pypa.github.io/pipx/
@@ -657,6 +663,8 @@ terraform-each() {
 terraform-parallel() {
     :parallel */terraform.mk(:h) do "$@"
 }
+
+zi auto with"asdf" for terraform
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux

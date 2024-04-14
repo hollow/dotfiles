@@ -5,7 +5,7 @@ StrictHostKeyChecking no
 ServerAliveInterval 60
 ServerAliveCountMax 10
 
-# OrbStack/Docker integration
+# Docker/OrbStack integration
 Match exec "[[ -e ~/.orbstack/ssh/config ]]"
     Include ~/.orbstack/ssh/config
 
