@@ -189,13 +189,22 @@ zi auto has"brew" for brew
 export ASDF_DIR="${XDG_CACHE_HOME}/asdf"
 export ASDF_DATA_DIR="${ASDF_DIR}"
 export ASDF_COMPLETIONS="${ASDF_DIR}/completions"
+export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
+export ASDF_GOLANG_MOD_VERSION_ENABLED=true
 
 :asdf-update() {
     clone asdf-vm/asdf "${ASDF_DIR}"
     source "${ASDF_DIR}/asdf.sh"
+
     asdf update
     asdf plugin update --all
+
     link .tool-versions
+
+    for plugin in $(asdf plugin list); do
+        asdf install ${plugin} latest
+        asdf global ${plugin} latest
+    done
 }
 
 .asdf-install() {
