@@ -706,9 +706,6 @@ export EDITOR="${commands[vim]}"
 export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
 alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
 
-# yarn:
-alias yarn="yarn --use-yarnrc \"${XDG_CONFIG_HOME}/yarn/config\""
-
 # youtube: download audio
 # https://github.com/yt-dlp/yt-dlp
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
