@@ -22,6 +22,9 @@
 [advice]
 	detachedHead = false
 
+[branch]
+	sort = -committerdate
+
 [color]
 	ui = true
 
@@ -34,12 +37,15 @@
 [init]
 	defaultBranch = main
 
+[pull]
+	ff = only
+
 [push]
 	followTags = true
 	autoSetupRemote = true
 
-[pull]
-	ff = only
+[rerere]
+	enabled = true
 
 [url "ssh://git@github.com/"]
 	insteadOf = https://github.com/
