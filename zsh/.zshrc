@@ -474,7 +474,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
     else
         export CLOUDSDK_HOME="/usr/lib64/google-cloud-sdk"
     fi
-    source "${CLOUDSDK_HOME}/path.zsh.inc"
+    add path "${CLOUDSDK_HOME}/bin"
     source "${CLOUDSDK_HOME}/completion.zsh.inc"
     export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
 }
