@@ -73,6 +73,7 @@ alias zre="exec zsh"
 alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 
 zup() {
+    local oldpwd="${PWD}"
     :brew-update && \
     :asdf-update && \
     :pipx-update && \
@@ -81,6 +82,7 @@ zup() {
     :gcloud-update && \
     zi self-update && \
     zi update --all
+    cd "${oldpwd}"
 }
 
 # zinit/default: set global default ice
@@ -477,7 +479,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
     export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
 }
 
-zi auto with"asdf" wait1 for gcloud
+zi auto wait1 for gcloud
 
 # git: distributed version control system
 # https://github.com/git/git
