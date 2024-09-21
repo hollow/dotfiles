@@ -171,6 +171,7 @@ zstyle ':completion:*:git-checkout:*' sort false
 }
 
 :brew-update() {
+    has brew || return 0
     brew update
     brew upgrade
     brew bundle install
@@ -465,7 +466,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 :gcloud-update() {
-    gcloud components update
+    gcloud components update || :
 }
 
 :gcloud-load() {
