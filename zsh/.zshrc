@@ -467,10 +467,14 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
 }
 
 :gcloud-load() {
-    export CLOUDSDK_HOME=(${ASDF_DATA_DIR}/installs/gcloud/*(n,On[1]))
-    export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
+    if has brew; then
+        export CLOUDSDK_HOME="/opt/homebrew/share/google-cloud-sdk"
+    else
+        export CLOUDSDK_HOME="/usr/lib64/google-cloud-sdk"
+    fi
     source "${CLOUDSDK_HOME}/path.zsh.inc"
     source "${CLOUDSDK_HOME}/completion.zsh.inc"
+    export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
 }
 
 zi auto with"asdf" wait1 for gcloud

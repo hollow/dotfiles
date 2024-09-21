@@ -5,9 +5,5 @@ StrictHostKeyChecking no
 ServerAliveInterval 60
 ServerAliveCountMax 10
 
-# Docker/OrbStack integration
-Match exec "[[ -e ~/.orbstack/ssh/config ]]"
-    Include ~/.orbstack/ssh/config
-
 # Include custom local config
 Include ~/.ssh/config.local
