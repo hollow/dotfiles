@@ -294,6 +294,9 @@ zi auto with"pipx" for OMZP::poetry
 # 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-load() {
+    # 1Password CLI plugins only work with 1Password UI on macOS
+    has brew || return
+
     if has "${XDG_CONFIG_HOME}/op/plugins.sh"; then
         source "${XDG_CONFIG_HOME}/op/plugins.sh"
 
@@ -325,6 +328,10 @@ export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
 alias ad="ansible-doc"
 alias ai="ansible-inventory"
 alias ap="ansible-playbook"
+
+ah() {
+    ai --list | jq -r '.platform_almalinux.hosts[]' | sort -V
+}
 
 asu() {
     local pattern="platform_almalinux"
@@ -674,6 +681,10 @@ if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock
 else
     zi auto silent for OMZP::ssh-agent
 fi
+
+# sshp:
+# https://github.com/bahamas10/sshp
+zi make as"program" for bahamas10/sshp
 
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
