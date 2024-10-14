@@ -205,8 +205,16 @@ export ASDF_GOLANG_MOD_VERSION_ENABLED=true
     link .tool-versions
 
     for plugin in $(asdf plugin list); do
-        asdf install ${plugin} latest
-        asdf global ${plugin} latest
+        local version="latest"
+
+        case "${plugin}" in
+            "python")
+                version=$(asdf list all python | grep '^3.12' | tail -n1)
+                ;;
+        esac
+
+        asdf install ${plugin} "${version}"
+        asdf global ${plugin} "${version}"
     done
 }
 
@@ -231,6 +239,7 @@ export PIPX_DEFAULT_PYTHON=$(which python)
 add path "${PIPX_BIN_DIR}"
 
 :pipx-update() {
+    :poetry-update-pre
     .asdf-install pipx
     pipx reinstall-all
     pipx upgrade-all --include-injected
@@ -260,9 +269,16 @@ export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
 export POETRY_DATA_DIR="${XDG_DATA_HOME}/pypoetry"
 
 :poetry-update() {
+    :poetry-update-pre
     poetry self update
     # https://github.com/MousaZeidBaker/poetry-plugin-up
-    poetry self add poetry-plugin-up
+    poetry self add poetry-plugin-up@latest
+}
+
+:poetry-update-pre() {
+    # prevent stale poetry config from breaking upgrades
+    rm -f "${POETRY_CONFIG_DIR}/poetry.lock"
+    rm -f "${POETRY_CONFIG_DIR}/pyproject.toml"
 }
 
 zi auto with"pipx" for OMZP::poetry
