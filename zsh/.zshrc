@@ -208,6 +208,9 @@ export ASDF_GOLANG_MOD_VERSION_ENABLED=true
         local version="latest"
 
         case "${plugin}" in
+            "fzf")
+                version="0.44.1" # newer versions break autocompletion
+                ;;
             "python")
                 version=$(asdf list all python | grep '^3.12' | tail -n1)
                 ;;
