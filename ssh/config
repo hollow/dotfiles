@@ -7,3 +7,6 @@ ServerAliveCountMax 10
 
 # Include custom local config
 Include ~/.ssh/config.local
+
+Host dev
+  HostName dev01.dev.rmge.net
