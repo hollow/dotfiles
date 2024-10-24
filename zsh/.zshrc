@@ -468,8 +468,7 @@ zi auto with"asdf" wait for duf
 zi auto has"eza" wait for eza
 
 # fd:
-zi auto with"asdf" id-as"fd" as"completion" blockf wait for \
-    https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fd/_fd
+zi auto with"asdf" for fd
 
 # fping: send ICMP echo probes to network hosts
 # https://fping.org/
@@ -501,9 +500,12 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
     else
         export CLOUDSDK_HOME="/usr/lib64/google-cloud-sdk"
     fi
-    add path "${CLOUDSDK_HOME}/bin"
-    source "${CLOUDSDK_HOME}/completion.zsh.inc"
-    export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
+
+    if has "${CLOUDSDK_HOME}"; then
+        add path "${CLOUDSDK_HOME}/bin"
+        source "${CLOUDSDK_HOME}/completion.zsh.inc"
+        export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
+    fi
 }
 
 zi auto wait1 for gcloud
@@ -735,8 +737,10 @@ zi auto has"tmux" silent for OMZP::tmux
 
 # vi improved
 # https://github.com/vim/vim
+zi auto with"asdf" for neovim
+alias vim=nvim
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
-export EDITOR="${commands[vim]}"
+export EDITOR="${commands[nvim]}"
 
 # wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/
@@ -755,8 +759,10 @@ add path "${XDG_CONFIG_HOME}/bin"
 
 # reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
-zi auto wait for MichaelAquilina/zsh-you-should-use
-YSU_MESSAGE_POSITION="after"
+if has tput; then
+    zi auto wait for MichaelAquilina/zsh-you-should-use
+    YSU_MESSAGE_POSITION="after"
+fi
 
 # load zsh history search and create bindings for it
 # https://github.com/zsh-users/zsh-history-substring-search
