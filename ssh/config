@@ -5,8 +5,9 @@ StrictHostKeyChecking no
 ServerAliveInterval 60
 ServerAliveCountMax 10
 
-# Include custom local config
-Include ~/.ssh/config.local
-
 Host dev
-  HostName dev01.dev.rmge.net
+	HostName dev01.dev.rmge.net
+
+Host home.xnull.de
+	HostName 10.0.0.11
+	User root

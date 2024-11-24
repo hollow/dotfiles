@@ -68,6 +68,7 @@ brew "kcat"
 brew "less"
 brew "logcli"
 brew "make"
+brew "mas"
 brew "maven"
 brew "midnight-commander"
 brew "mtr"
@@ -160,6 +161,13 @@ cask "vlc"
 cask "whatsapp"
 cask "wireshark"
 cask "zulu@17"
+mas "1Password for Safari", id: 1569813296
+mas "AusweisApp", id: 948660805
+mas "Kindle", id: 302584613
+mas "Live Home 3D", id: 1066144116
+mas "MoneyMoney", id: 872698314
+mas "WISO steuer: 2019", id: 1434027991
+mas "WISO steuer: 2020", id: 1476374877
 vscode "1password.op-vscode"
 vscode "4ops.packer"
 vscode "aaron-bond.better-comments"

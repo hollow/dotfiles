@@ -752,6 +752,7 @@ alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
 # misc other aliases
+alias X="ssh -t xnull.de \"/usr/local/bin/zsh -i -c T\""
 alias dev="ssh -t dev01.dev.rmge.net \"zsh -i -c T\""
 
 # add local path last so it takes precendence
