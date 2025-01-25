@@ -1,6 +1,3 @@
-# enable debug mode
-# DOT_DEBUG=1
-
 # user information (for git, gpg, etc)
 export USER_NAME="Benedikt Böhm"
 export USER_EMAIL="bb@xnull.de"
@@ -53,7 +50,7 @@ typeset -TUx FPATH fpath=(
     ${fpath[@]}
 )
 
-# load standarf functions
+# load standard functions
 autoload -Uz add clone debug has link log
 autoload -Uz :each :parallel
 
@@ -360,8 +357,6 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
-export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME}/aws/credentials"
-export AWS_CONFIG_FILE="${XDG_CONFIG_HOME}/aws/config"
 zi auto wait for OMZP::aws
 
 # bat: cat(1) clone with wings
@@ -445,8 +440,7 @@ zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
 
 zi auto with"asdf" for direnv/direnv
 
-# docker/orbstack:
-add path "${HOME}"/.orbstack/bin
+# docker:
 zi auto id-as"docker" as"completion" blockf wait for \
     https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker
 
@@ -640,6 +634,9 @@ add path "${XDG_DATA_HOME}"/npm/bin
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
+# postgresql:
+add path "${HOMEBREW_PREFIX}/opt/postgresql@17/bin"
+
 # pwgen: generate random passwords
 pw() { pwgen -s 32 1 | clipcopy }
 
@@ -752,7 +749,7 @@ alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
 # misc other aliases
-alias X="ssh -t xnull.de \"/usr/local/bin/zsh -i -c T\""
+alias X="TERM=xterm-256color ssh -t 10.0.0.10 \"/usr/local/bin/zsh -i -c T\""
 alias dev="ssh -t dev01.dev.rmge.net \"zsh -i -c T\""
 
 # add local path last so it takes precendence
@@ -795,6 +792,4 @@ zi auto wait for hlissner/zsh-autopair
 zi auto blockf wait for zsh-users/zsh-completions
 
 # Load .envrc after shell initialization if present
-if [[ -e .envrc ]]; then
-    direnv reload
-fi
+pushd "${HOME}" &>/dev/null && popd

@@ -1,6 +1,6 @@
 provider_installation {
   dev_overrides {
-    #"LeaseWeb/leaseweb" = "/Users/bene/src/hollow/terraform-provider-leaseweb"
+    #"LeaseWeb/leaseweb" = "/Users/bene/src/Leaseweb/terraform-provider-leaseweb"
   }
 
   # For all other providers, install them directly from their origin provider
