@@ -76,6 +76,10 @@ if has /opt/homebrew/bin/brew; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# compiler flags
+typeset -TUx LDFLAGS ldflags ":"
+typeset -TUx CPPFLAGS cppflags ":"
+
 # zi: Flexible and fast ZSH plugin manager
 # https://github.com/z-shell/zi
 typeset -Ag ZI
@@ -652,7 +656,11 @@ export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
 # postgresql:
-add path "${HOMEBREW_PREFIX}/opt/postgresql@17/bin"
+if has "${HOMEBREW_PREFIX}/opt/postgresql@17"; then
+    add path "${HOMEBREW_PREFIX}/opt/postgresql@17/bin"
+    add ldflags "-L/opt/homebrew/opt/postgresql@17/lib"
+    add cppflags "-I/opt/homebrew/opt/postgresql@17/include"
+fi
 
 # pwgen: generate random passwords
 pw() { pwgen -s 32 1 | clipcopy }
