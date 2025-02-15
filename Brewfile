@@ -83,7 +83,7 @@ brew "parallel"
 brew "pastel"
 brew "pinentry-mac"
 brew "pipenv"
-brew "postgresql@14"
+brew "postgresql@17"
 brew "prettier"
 brew "prettyping"
 brew "pstree"
@@ -170,6 +170,8 @@ mas "AusweisApp", id: 948660805
 mas "Kindle", id: 302584613
 mas "Live Home 3D", id: 1066144116
 mas "MoneyMoney", id: 872698314
+mas "Slack", id: 803453959
+mas "Tailscale", id: 1475387142
 mas "WISO steuer: 2019", id: 1434027991
 mas "WISO steuer: 2020", id: 1476374877
 vscode "1password.op-vscode"

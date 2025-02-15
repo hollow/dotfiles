@@ -1,3 +1,20 @@
+# profiling and debugging zsh startup time
+if [[ -n "${ZSH_PROF+1}" ]]; then
+    zmodload zsh/zprof
+fi
+
+if [[ -n "${ZSH_DEBUGRC+1}" ]]; then
+    zmodload zsh/datetime
+    setopt PROMPT_SUBST
+    PS4='+$EPOCHREALTIME %N:%i> '
+
+    logfile=$(mktemp zsh_profile.XXXXXXXX)
+    echo "Logging to $logfile"
+    exec 3>&2 2>$logfile
+
+    setopt XTRACE
+fi
+
 # user information (for git, gpg, etc)
 export USER_NAME="Benedikt Böhm"
 export USER_EMAIL="bb@xnull.de"
@@ -576,7 +593,7 @@ ghm() {
 # https://gnupg.org/
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 export GPG_TTY="${TTY}"
-zi auto for OMZP::gpg-agent
+zi auto wait for OMZP::gpg-agent
 
 # go: programming language
 # https://www.golang.org
@@ -792,4 +809,15 @@ zi auto wait for hlissner/zsh-autopair
 zi auto blockf wait for zsh-users/zsh-completions
 
 # Load .envrc after shell initialization if present
-pushd "${HOME}" &>/dev/null && popd
+if [[ -e .envrc ]]; then
+    pushd "${HOME}" &>/dev/null && popd
+fi
+
+if [[ -n "${ZSH_PROF+1}" ]]; then
+    zprof
+fi
+
+if [[ -n "${ZSH_DEBUGRC+1}" ]]; then
+    unsetopt XTRACE
+    exec 2>&3 3>&-
+fi
