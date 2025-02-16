@@ -213,35 +213,102 @@ export ASDF_COMPLETIONS="${ASDF_DIR}/completions"
 export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
 export ASDF_GOLANG_MOD_VERSION_ENABLED=true
 
-:asdf-update() {
-    clone asdf-vm/asdf "${ASDF_DIR}"
-    source "${ASDF_DIR}/asdf.sh"
+.asdf-plugin-add() {
+    if asdf plugin list | grep -q "^${1}$"; then
+        return
+    fi
+    asdf plugin add ${1}
+}
 
-    asdf update
-    asdf plugin update --all
+.asdf-latest() {
+    local plugin="${1}"
+    .asdf-plugin-add ${plugin}
 
-    link .tool-versions
-
-    for plugin in $(asdf plugin list); do
-        local version="latest"
-
-        case "${plugin}" in
-            "fzf")
-                version="0.44.1" # newer versions break autocompletion
-                ;;
-            "python")
-                version=$(asdf list all python | grep '^3.12' | tail -n1)
-                ;;
-        esac
-
-        asdf install ${plugin} "${version}"
-        asdf global ${plugin} "${version}"
-    done
+    case "${plugin}" in
+        consul|nomad)
+            .asdf-list ${plugin} | grep -v '+ent' | grep -v '-' | tail -n1
+            ;;
+        neovim)
+            .asdf-list ${plugin} | grep -P '^\d' | tail -n1
+            ;;
+        python)
+            .asdf-list ${plugin} | grep -v '-' | grep '^3.12' | tail -n1
+            ;;
+        ruby)
+            .asdf-list ${plugin} | grep -P '^\d' | grep -v '-' | tail -n1
+            ;;
+        *)
+            asdf latest ${plugin}
+            ;;
+    esac
 }
 
 .asdf-install() {
-    asdf plugin add ${1}
-    asdf install ${1} ${2:-latest}
+    local plugin="${1}"
+    .asdf-plugin-add ${plugin}
+
+    local version="${2:-$(.asdf-latest ${plugin})}"
+    echo asdf install ${plugin} "${version}"
+
+    # https://github.com/bartlomiejdanek/asdf-github-cli/issues/9#issuecomment-1948334408
+    case "${plugin}" in
+        github-cli)
+            PATH=/usr/bin:${PATH} asdf install ${plugin} ${version}
+            ;;
+        *)
+            asdf install ${plugin} ${version}
+            ;;
+    esac
+}
+
+.asdf-list() {
+    asdf list all ${1} | grep -Pv '^$'
+}
+
+.asdf-update() {
+    local plugin="${1}"
+    .asdf-plugin-add ${plugin}
+
+    local version="${2:-$(.asdf-latest ${plugin})}"
+    .asdf-install ${plugin} "${version}"
+
+    asdf set --home ${plugin} "${version}"
+}
+
+.asdf-prune() {
+    pushd "${HOME}" &>/dev/null
+    for version in $(asdf list ${1} | grep -Pv "^ \*"); do
+        echo -n "  - ${version} ..."
+        asdf uninstall ${1} ${version}
+        echo
+    done
+    popd &>/dev/null
+}
+
+.asdf-prune-all() {
+    for plugin in $(asdf plugin list); do
+        echo ">>> ${plugin}"
+        .asdf-prune ${plugin}
+    done
+}
+
+:asdf-update() {
+    link .tool-versions
+
+    for plugin in $(asdf plugin list); do
+        echo ">>> ${plugin}"
+
+        case "${plugin}" in
+            nodejs|python)
+                # https://github.com/asdf-vm/asdf-nodejs/issues/416
+                ;;
+            *)
+                asdf plugin update ${plugin}
+                ;;
+        esac
+
+        .asdf-update "${plugin}"
+    done
 }
 
 zi auto silent for OMZP::asdf
