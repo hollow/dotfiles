@@ -29,6 +29,9 @@ export COLORTERM="truecolor"
 # shell options
 setopt extendedglob
 
+# set resource limits
+ulimit -n $((1024*1024))
+
 # words are complete shell command arguments
 autoload -Uz select-word-style
 select-word-style shell
@@ -93,7 +96,6 @@ alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 zup() {
     local oldpwd="${PWD}"
     :brew-update && \
-    :asdf-update && \
     :pipx-update && \
     :poetry-update && \
     :tmux-update && \
@@ -204,142 +206,37 @@ zstyle ':completion:*:git-checkout:*' sort false
 }
 
 zi auto has"brew" for brew
-
-# asdf: multiple runtime version manager
-# https://asdf-vm.com/
-export ASDF_DIR="${XDG_CACHE_HOME}/asdf"
-export ASDF_DATA_DIR="${ASDF_DIR}"
-export ASDF_COMPLETIONS="${ASDF_DIR}/completions"
-export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
-export ASDF_GOLANG_MOD_VERSION_ENABLED=true
-
-.asdf-plugin-add() {
-    if asdf plugin list | grep -q "^${1}$"; then
-        return
-    fi
-    asdf plugin add ${1}
-}
-
-.asdf-latest() {
-    local plugin="${1}"
-    .asdf-plugin-add ${plugin}
-
-    case "${plugin}" in
-        consul|nomad)
-            .asdf-list ${plugin} | grep -v '+ent' | grep -v '-' | tail -n1
-            ;;
-        neovim)
-            .asdf-list ${plugin} | grep -P '^\d' | tail -n1
-            ;;
-        python)
-            .asdf-list ${plugin} | grep -v '-' | grep '^3.12' | tail -n1
-            ;;
-        ruby)
-            .asdf-list ${plugin} | grep -P '^\d' | grep -v '-' | tail -n1
-            ;;
-        *)
-            asdf latest ${plugin}
-            ;;
-    esac
-}
-
-.asdf-install() {
-    local plugin="${1}"
-    .asdf-plugin-add ${plugin}
-
-    local version="${2:-$(.asdf-latest ${plugin})}"
-    echo asdf install ${plugin} "${version}"
-
-    # https://github.com/bartlomiejdanek/asdf-github-cli/issues/9#issuecomment-1948334408
-    case "${plugin}" in
-        github-cli)
-            PATH=/usr/bin:${PATH} asdf install ${plugin} ${version}
-            ;;
-        *)
-            asdf install ${plugin} ${version}
-            ;;
-    esac
-}
-
-.asdf-list() {
-    asdf list all ${1} | grep -Pv '^$'
-}
-
-.asdf-update() {
-    local plugin="${1}"
-    .asdf-plugin-add ${plugin}
-
-    local version="${2:-$(.asdf-latest ${plugin})}"
-    .asdf-install ${plugin} "${version}"
-
-    asdf set --home ${plugin} "${version}"
-}
-
-.asdf-prune() {
-    pushd "${HOME}" &>/dev/null
-    for version in $(asdf list ${1} | grep -Pv "^ \*"); do
-        echo -n "  - ${version} ..."
-        asdf uninstall ${1} ${version}
-        echo
-    done
-    popd &>/dev/null
-}
-
-.asdf-prune-all() {
-    for plugin in $(asdf plugin list); do
-        echo ">>> ${plugin}"
-        .asdf-prune ${plugin}
-    done
-}
-
-:asdf-update() {
-    link .tool-versions
-
-    for plugin in $(asdf plugin list); do
-        echo ">>> ${plugin}"
-
-        case "${plugin}" in
-            nodejs|python)
-                # https://github.com/asdf-vm/asdf-nodejs/issues/416
-                ;;
-            *)
-                asdf plugin update ${plugin}
-                ;;
-        esac
-
-        .asdf-update "${plugin}"
-    done
-}
-
-zi auto silent for OMZP::asdf
+link .tool-versions
 
 # python: programming language
 # https://docs.python.org/3/
+export PYTHONHOME=("${HOMEBREW_PREFIX}"/opt/python@*(n,On[1]))
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-zi auto silent with"asdf" for OMZP::python
+add path "${PYTHONHOME}/libexec/bin"
+zi auto silent for OMZP::python
 
 # python/pipx: install python applications in isolated environments
 # https://pypa.github.io/pipx/
 export PIPX_HOME="${XDG_CACHE_HOME}/pipx"
 export PIPX_BIN_DIR="${PIPX_HOME}/bin"
-export PIPX_DEFAULT_PYTHON=$(which python)
+export PIPX_DEFAULT_PYTHON="${PYTHONHOME}"/libexec/bin/python
 
 add path "${PIPX_BIN_DIR}"
 
 :pipx-update() {
-    :poetry-update-pre
-    .asdf-install pipx
+    has :poetry-update-pre && :poetry-update-pre
     pipx reinstall-all
     pipx upgrade-all --include-injected
 }
 
-zi auto with"asdf" for pipx
+zi auto has"pipx" for pipx
 
 # python/argcomplete: completion for python programs
 # https://github.com/kislyuk/argcomplete#readme
 :argcomplete-load() {
-    local __argcomplete_path=(${PIPX_HOME}/venvs/argcomplete/lib/python*(n,On[1]))
-    add fpath ${__argcomplete_path}/site-packages/argcomplete/bash_completion.d
+    local __argcomplete_brew_dir=("${HOMEBREW_PREFIX}"/Cellar/python-argcomplete/*(n,On[1]))
+    local __argcomplete_python_dir=(${__argcomplete_brew_dir}/libexec/lib/python*(n,On[1]))
+    add fpath ${__argcomplete_python_dir}/site-packages/argcomplete/bash_completion.d
 }
 
 :argcomplete-eval() {
@@ -348,7 +245,7 @@ zi auto with"asdf" for pipx
     register-python-argcomplete pipx
 }
 
-zi auto with"pipx" for argcomplete
+zi auto has"register-python-argcomplete" for argcomplete
 
 # python/poetry: python dependency management
 # https://github.com/python-poetry/poetry
@@ -400,7 +297,7 @@ zi auto with"pipx" for OMZP::poetry
     op completion zsh
 }
 
-zi auto with"asdf" wait for 1password-cli
+zi auto has"op" wait for 1password-cli
 
 # android: development kit
 # https://developer.android.com/studio/command-line/variables
@@ -445,7 +342,7 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
-zi auto wait for OMZP::aws
+zi auto has"aws" wait for OMZP::aws
 
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
@@ -477,7 +374,7 @@ alias ks="kda --name-status"
     register-python-argcomplete checkov
 }
 
-zi auto with"pipx" wait for checkov
+zi auto has"checkov" wait for checkov
 
 # colordiff: syntax highlighting for diff
 # https://www.colordiff.org
@@ -486,15 +383,14 @@ cdl() { colordiff | less -R }
 # consul: distributed, highly available service discovery
 # https://github.com/hashicorp/consul
 :consul-load() {
-    zicompinit
     complete -o nospace -C consul consul
 }
 
-zi auto with"asdf" wait1 for consul
+zi auto has"consul" wait1 for consul
 
 # copier: repository template framework
 # https://copier.readthedocs.io/en/stable/
-zi auto with"pipx" wait for copier
+zi auto has"copier" wait for copier
 
 copier-each() {
     :each */.copier-answers.yml(:h) do "$@"
@@ -526,7 +422,7 @@ zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
     direnv hook zsh
 }
 
-zi auto with"asdf" for direnv/direnv
+zi auto has"direnv" for direnv/direnv
 
 # docker:
 zi auto id-as"docker" as"completion" blockf wait for \
@@ -538,7 +434,7 @@ zi auto id-as"docker" as"completion" blockf wait for \
     alias df=duf
 }
 
-zi auto with"asdf" wait for duf
+zi auto has"duf" wait for duf
 
 # eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
@@ -550,7 +446,7 @@ zi auto with"asdf" wait for duf
 zi auto has"eza" wait for eza
 
 # fd:
-zi auto with"asdf" for fd
+zi auto has"fd" for fd
 
 # fping: send ICMP echo probes to network hosts
 # https://fping.org/
@@ -561,11 +457,11 @@ netping() {
 }
 
 # fzf:
-zi auto with"asdf" wait for fzf
+zi auto has"fzf" wait for fzf
 
 # fzf/tab: replace completion selection menu with fzf
 # https://github.com/Aloxaf/fzf-tab
-zi auto wait for Aloxaf/fzf-tab
+zi auto has"fzf" wait for Aloxaf/fzf-tab
 
 # preview directory content with eza when completing cd
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
@@ -590,7 +486,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
     fi
 }
 
-zi auto wait1 for gcloud
+zi auto has"gcloud" wait1 for gcloud
 
 # git: distributed version control system
 # https://github.com/git/git
@@ -679,7 +575,7 @@ go-parallel() {
     :parallel */go.mk(:h:a) do "$@"
 }
 
-zi auto with"asdf" for golang
+zi auto has"go" for golang
 
 # ip: helper to get public ip
 # http://4.ifconfig.pro
@@ -706,11 +602,10 @@ alias mc="mc --nosubshell"
 # nomad: workload orchestrator
 # https://github.com/hashicorp/nomad
 :nomad-load() {
-    zicompinit
     complete -o nospace -C nomad nomad
 }
 
-zi auto with"asdf" wait1 for nomad
+zi auto has"nomad" wait1 for nomad
 
 # npm: node package manager
 # https://github.com/npm/cli
@@ -741,7 +636,7 @@ rg() { command rg --color=always --sort path "$@" | less }
 #    rg --generate complete-zsh
 #}
 
-zi auto with"asdf" for ripgrep
+zi auto for ripgrep
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
@@ -788,10 +683,24 @@ mkdir -p "${TF_PLUGIN_CACHE_DIR}"
 link terraform .terraform.d
 
 alias tf="terraform"
-alias tfa="tf apply"
 alias tfd="tf destroy"
 alias tfi="tf import"
-alias tfp="tf plan"
+
+tfa() {
+    if [[ $# -eq 0 ]]; then
+        tf apply
+    else
+        tf apply "${@[@]/#/-target=}"
+    fi
+}
+
+tfp() {
+    if [[ $# -eq 0 ]]; then
+        tf plan
+    else
+        tf plan "${@[@]/#/-target=}"
+    fi
+}
 
 terraform-each() {
     :each */terraform.mk(:h) do "$@"
@@ -801,7 +710,7 @@ terraform-parallel() {
     :parallel */terraform.mk(:h) do "$@"
 }
 
-zi auto with"asdf" for terraform
+zi auto has"terraform" for terraform
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
@@ -826,7 +735,7 @@ zi auto has"tmux" silent for OMZP::tmux
 
 # vi improved
 # https://github.com/vim/vim
-zi auto with"asdf" for neovim
+zi auto has"nvim" for neovim
 alias vim=nvim
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[nvim]}"
@@ -842,7 +751,6 @@ alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
 # misc other aliases
 alias X="TERM=xterm-256color ssh -t 10.0.0.10 \"/usr/local/bin/zsh -i -c T\""
-alias dev="ssh -t dev01.dev.rmge.net \"zsh -i -c T\""
 
 # add local path last so it takes precendence
 add path "${XDG_CONFIG_HOME}/bin"
@@ -881,7 +789,8 @@ zi auto wait for hlissner/zsh-autopair
 
 # zsh/completions: initialize completion system
 # https://github.com/zsh-users/zsh-completions
-zi auto blockf wait for zsh-users/zsh-completions
+zi auto blockf atpull'zinit creinstall -q .' \
+    wait for zsh-users/zsh-completions
 
 # Load .envrc after shell initialization if present
 if [[ -e .envrc ]]; then

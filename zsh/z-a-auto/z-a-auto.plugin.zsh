@@ -41,11 +41,6 @@
     debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} handlers {msg2}${___handlers}"
 
     case ${___with} in
-        (asdf)
-            local -A versions=($(<"${HOME}/.tool-versions"))
-            asdf plugin add ${___ehid}
-            asdf install ${___ehid} ${versions[${___ehid}]:-latest}
-            ;;
         (pipx)
             pipx install ${___ehid}
             ;;

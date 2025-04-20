@@ -6,8 +6,7 @@ set -e
 git fetch --quiet \
     --all \
     --tags \
-    --prune \
-    --prune-tags
+    --prune
 
 git gc --quiet
 
