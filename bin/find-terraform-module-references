@@ -1,0 +1,35 @@
+#!zsh
+
+fd -e tf -x sh -c 'echo "=== $1 ===" && grep -A 10 "module\s*\"" "$1"' _ {} | \
+  awk '
+    /^=== .* ===$/ { file = $0 }
+    /module\s*"[^"]*"\s*\{/ {
+      match($0, /"([^"]*)"/, arr)
+      module_name = arr[1]
+      source = ""
+      version = ""
+    }
+    /source\s*=/ {
+      match($0, /=\s*"([^"]*)"/, arr)
+      source = arr[1]
+      if (match(source, /\?ref=([^&"]*)/, ref_arr)) {
+        version = ref_arr[1]
+      }
+    }
+    /version\s*=/ {
+      match($0, /=\s*"([^"]*)"/, arr)
+      if (version == "") {
+        version = arr[1]
+      }
+    }
+    /^\}/ && module_name {
+      if (source !~ /^\.\.?\//) {
+        print file
+        print "Module:", module_name
+        print "Source:", source
+        print "Version:", version
+        print ""
+      }
+      module_name = ""
+    }
+  '

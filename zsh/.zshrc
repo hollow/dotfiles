@@ -192,6 +192,7 @@ zstyle ':completion:*:git-checkout:*' sort false
 
 :brew-update() {
     has brew || return 0
+    brew bundle dump -f
     brew update
     brew upgrade
     brew bundle install
