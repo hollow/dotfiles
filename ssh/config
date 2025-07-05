@@ -5,10 +5,6 @@ StrictHostKeyChecking no
 ServerAliveInterval 60
 ServerAliveCountMax 10
 
-Host home.xnull.de
-	HostName 10.0.0.11
-	User root
-
 # To use ScaleFT proxycommand, add this configuration block to your $HOME/.ssh/config
 #Match exec "/usr/local/bin/sft resolve -q  %h"
 #    ProxyCommand "/usr/local/bin/sft" proxycommand  %h

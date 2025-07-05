@@ -1,11 +1,12 @@
 **/*.zwc
 .tmp.driveupload/
+colima/
+flipperdevices.com
 gam
+go/telemetry
 grammarly-languageserver
 gtk-2.0
 iterm2
 op
 pypoetry/
 terraform.tfrc
-flipperdevices.com
-go/telemetry

@@ -216,6 +216,14 @@ export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 add path "${PYTHONHOME}/libexec/bin"
 zi auto silent for OMZP::python
 
+python-each() {
+    :each */python.mk(:h) do "$@"
+}
+
+python-parallel() {
+    :parallel */python.mk(:h) do "$@"
+}
+
 # python/pipx: install python applications in isolated environments
 # https://pypa.github.io/pipx/
 export PIPX_HOME="${XDG_CACHE_HOME}/pipx"
@@ -426,8 +434,7 @@ zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
 zi auto has"direnv" for direnv/direnv
 
 # docker:
-zi auto id-as"docker" as"completion" blockf wait for \
-    https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker
+add fpath "${HOME}/.docker/completions"
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
@@ -514,6 +521,10 @@ alias s="git st ."
 
 git-each () {
     :each */.git(:h) do "$@"
+}
+
+git-parallel () {
+    :parallel */.git(:h) do "$@"
 }
 
 hub-repo-list() {
@@ -608,6 +619,15 @@ alias mc="mc --nosubshell"
 
 zi auto has"nomad" wait1 for nomad
 
+# node: JavaScript runtime
+node-each() {
+    :each */nodejs.mk(:h) do "$@"
+}
+
+node-parallel() {
+    :parallel */nodejs.mk(:h) do "$@"
+}
+
 # npm: node package manager
 # https://github.com/npm/cli
 export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
@@ -650,6 +670,9 @@ export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
 export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
 export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
 export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
+
+export RUBYHOME=("${HOMEBREW_PREFIX}"/opt/ruby@*(n,On[1]))
+add path "${RUBYHOME}/bin"
 
 # sqlite: database engine
 # https://sqlite.org
