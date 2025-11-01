@@ -97,7 +97,6 @@ zup() {
     local oldpwd="${PWD}"
     :brew-update && \
     :pipx-update && \
-    :poetry-update && \
     :tmux-update && \
     :gcloud-update && \
     zi self-update && \
@@ -233,7 +232,6 @@ export PIPX_DEFAULT_PYTHON="${PYTHONHOME}"/libexec/bin/python
 add path "${PIPX_BIN_DIR}"
 
 :pipx-update() {
-    has :poetry-update-pre && :poetry-update-pre
     pipx reinstall-all
     pipx upgrade-all --include-injected
 }
@@ -255,27 +253,6 @@ zi auto has"pipx" for pipx
 }
 
 zi auto has"register-python-argcomplete" for argcomplete
-
-# python/poetry: python dependency management
-# https://github.com/python-poetry/poetry
-export POETRY_CONFIG_DIR="${XDG_CONFIG_HOME}/pypoetry"
-export POETRY_CACHE_DIR="${XDG_CACHE_HOME}/poetry"
-export POETRY_DATA_DIR="${XDG_DATA_HOME}/pypoetry"
-
-:poetry-update() {
-    :poetry-update-pre
-    poetry self update
-    # https://github.com/MousaZeidBaker/poetry-plugin-up
-    poetry self add poetry-plugin-up@latest
-}
-
-:poetry-update-pre() {
-    # prevent stale poetry config from breaking upgrades
-    rm -f "${POETRY_CONFIG_DIR}/poetry.lock"
-    rm -f "${POETRY_CONFIG_DIR}/pyproject.toml"
-}
-
-zi auto with"pipx" for OMZP::poetry
 
 # vscode
 # https://code.visualstudio.com
@@ -370,12 +347,6 @@ cat > "${BOTO_CONFIG}" <<EOF
 state_dir = ${XDG_DATA_HOME}/gsutil
 parallel_composite_upload_threshold = 150M
 EOF
-
-# chef: infrastructure automation
-# https://www.chef.io/
-alias kcu="knife cookbook upload"
-alias kda="knife diff cookbooks data_bags environments roles"
-alias ks="kda --name-status"
 
 # checkov: static code analysis tool for Terraform & Co
 # https://github.com/bridgecrewio/checkov
@@ -544,19 +515,6 @@ hub-remove-archived() {
         rm -rvf "${HOME}/src/{}"
 }
 
-hub-enforce-admins() {
-    repo=$(git remote get-url origin | perl -pe 's/.*github.com\///')
-    branch=$(git main-branch)
-    gh api -X POST /repos/${repo}/branches/${branch}/protection/enforce_admins | jq
-}
-
-hub-skip-admins() {
-    repo=$(git remote get-url origin | perl -pe 's/.*github.com\///')
-    branch=$(git main-branch)
-    gh api -X DELETE /repos/${repo}/branches/${branch}/protection/enforce_admins | jq
-    gh api /repos/${repo}/branches/${branch}/protection/enforce_admins | jq
-}
-
 pr() {
     git push && \
     gh pr create -f "$@"
@@ -639,11 +597,14 @@ export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
 # postgresql:
-if has "${HOMEBREW_PREFIX}/opt/postgresql@17"; then
-    add path "${HOMEBREW_PREFIX}/opt/postgresql@17/bin"
-    add ldflags "-L/opt/homebrew/opt/postgresql@17/lib"
-    add cppflags "-I/opt/homebrew/opt/postgresql@17/include"
-fi
+:postgresql-load() {
+    local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(n,On[1]))
+    add path "${__postgresql_brew_dir}/bin"
+    add ldflags "-L${__postgresql_brew_dir}/lib"
+    add cppflags "-I${__postgresql_brew_dir}/include"
+}
+
+zi auto has"psql" for postgresql
 
 # pwgen: generate random passwords
 pw() { pwgen -s 32 1 | clipcopy }
@@ -651,13 +612,7 @@ pw() { pwgen -s 32 1 | clipcopy }
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
-rg() { command rg --color=always --sort path "$@" | less }
-
-#:ripgrep-eval() {
-#    rg --generate complete-zsh
-#}
-
-zi auto for ripgrep
+zi auto has"rg" for ripgrep
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
@@ -695,7 +650,7 @@ else
     zi auto silent for OMZP::ssh-agent
 fi
 
-# sshp:
+# sshp: Parallel SSH Executor
 # https://github.com/bahamas10/sshp
 zi make as"program" for bahamas10/sshp
 
@@ -755,7 +710,7 @@ zi auto has"tmux" silent for OMZP::tmux
 
 # tmux/xpanes:
 # https://github.com/greymd/tmux-xpanes
-# TODO: zi auto wait for greymd/tmux-xpanes
+zi auto has"tmux" wait for greymd/tmux-xpanes
 
 # vi improved
 # https://github.com/vim/vim
@@ -774,7 +729,7 @@ alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
 alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
 # misc other aliases
-alias X="TERM=xterm-256color ssh -t 10.0.0.10 \"/usr/local/bin/zsh -i -c T\""
+alias X="TERM=xterm-256color ssh -t 10.0.0.11 \"/usr/local/bin/zsh -i -c T\""
 
 # add local path last so it takes precendence
 add path "${XDG_CONFIG_HOME}/bin"
