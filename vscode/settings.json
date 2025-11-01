@@ -1,0 +1,120 @@
+{
+  "[github-actions-workflow]": {
+    "editor.autoIndent": "keep"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[ignore]": {
+    "editor.formatOnSave": false
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.wordWrap": "off"
+  },
+  "[python]": {
+    "editor.formatOnType": true
+  },
+  "[terraform]": {
+    "editor.tabSize": 2
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "ansible.lightspeed.enabled": false,
+  "ansible.lightspeed.suggestions.enabled": false,
+  "chat.agent.enabled": true,
+  "csv-preview.resizeColumns": "all",
+  "direnv.restart.automatic": true,
+  "docker.extension.enableComposeLanguageServer": false,
+  "editor.accessibilitySupport": "off",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.cursorSurroundingLines": 5,
+  "editor.fontFamily": "'MesloLGS Nerd Font', Menlo, Monaco, 'Courier New', monospace",
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
+  "editor.showFoldingControls": "always",
+  "explorer.autoReveal": false,
+  "explorer.compactFolders": false,
+  "explorer.confirmDragAndDrop": false,
+  "files.associations": {
+    "*.alloy": "grafana-alloy",
+    "*.jinja": "jinja"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "git.autofetch": true,
+  "git.blame.editorDecoration.enabled": false,
+  "git.enableCommitSigning": true,
+  "github.copilot.chat.agent.thinkingTool": true,
+  "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.editor.temporalContext.enabled": true,
+  "github.copilot.chat.edits.temporalContext.enabled": true,
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "githubPullRequests.pullBranch": "never",
+  "githubPullRequests.terminalLinksHandler": "github",
+  "gitlens.advanced.messages": {
+    "suppressIntegrationRequestTimedOutWarning": true
+  },
+  "gitlens.codeLens.enabled": false,
+  "gitlens.statusBar.enabled": false,
+  "gitlens.views.commitDetails.files.layout": "tree",
+  "gitlens.views.commits.files.layout": "tree",
+  "go.toolsManagement.autoUpdate": true,
+  "go.useLanguageServer": true,
+  "makefile.configureOnOpen": false,
+  "parallels-desktop.brew.path": "/opt/homebrew/bin/brew",
+  "parallels-desktop.devops-service.path": "/Users/bene/.parallels-desktop-vscode/tools/prldevops",
+  "parallels-desktop.extension.path": "/Users/bene/.parallels-desktop-vscode",
+  "parallels-desktop.git.path": "/opt/homebrew/bin/git",
+  "parallels-desktop.prlctl.path": "/usr/local/bin/prlctl",
+  "redhat.telemetry.enabled": false,
+  "search.followSymlinks": false,
+  "search.showLineNumbers": true,
+  "shellcheck.exclude": [
+    "SC1071",
+    "SC2239"
+  ],
+  "terminal.integrated.drawBoldTextInBrightColors": false,
+  "terminal.integrated.enablePersistentSessions": false,
+  "terminal.integrated.macOptionIsMeta": true,
+  "terminal.integrated.persistentSessionReviveProcess": "never",
+  "terminal.integrated.scrollback": 100000,
+  "terminal.integrated.tabs.description": "${task}${separator}${local}${separator}${process}",
+  "terminal.integrated.tabs.title": "${workspaceFolder}",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "window.confirmBeforeClose": "keyboardOnly",
+  "window.customTitleBarVisibility": "never",
+  "window.nativeFullScreen": false,
+  "window.newWindowDimensions": "inherit",
+  "window.restoreWindows": "all",
+  "workbench.editor.decorations.badges": true,
+  "workbench.editor.decorations.colors": true,
+  "workbench.editor.empty.hint": "hidden",
+  "workbench.editor.enablePreview": false,
+  "workbench.enableExperiments": false,
+  "workbench.startupEditor": "none",
+  "yaml.customTags": [
+    "!encrypted/pkcs1-oaep scalar",
+    "!vault scalar"
+  ],
+  "yaml.format.singleQuote": true,
+  "chat.mcp.gallery.enabled": true,
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+  "python.analysis.typeCheckingMode": "standard",
+  "chat.agent.maxRequests": 100,
+  "claudeCode.useTerminal": true,
+  "terminal.integrated.tabs.enabled": false
+}

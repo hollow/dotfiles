@@ -254,13 +254,15 @@ zi auto has"pipx" for pipx
 
 zi auto has"register-python-argcomplete" for argcomplete
 
-# vscode
+# vscode: visual studio code editor
 # https://code.visualstudio.com
-# alias code="env -u XDG_RUNTIME_DIR code"
-.code-extension() {
-    has code || return 0
-    code --force --install-extension "$@"
+:vscode-load() {
+    for i in settings keybindings mcp; do
+        link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
+    done
 }
+
+zi auto has"code" wait for vscode
 
 # 1password: remembers all your passwords for you
 # https://1password.com

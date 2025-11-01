@@ -1,5 +1,6 @@
 **/*.zwc
 .tmp.driveupload/
+auth0/
 flipperdevices.com
 gam
 go/telemetry
