@@ -115,6 +115,10 @@
   "gitlens.ai.vscode.model": "copilot:gpt-4.1",
   "python.analysis.typeCheckingMode": "standard",
   "chat.agent.maxRequests": 100,
-  "claudeCode.useTerminal": true,
-  "terminal.integrated.tabs.enabled": false
+  "terminal.integrated.tabs.enabled": false,
+  "editor.wordWrap": "on",
+  "githubPullRequests.codingAgent.promptForConfirmation": false,
+  "git.openRepositoryInParentFolders": "never",
+  "claudeCode.preferredLocation": "sidebar",
+  "ansible.validation.lint.enabled": false
 }

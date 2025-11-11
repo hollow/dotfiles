@@ -303,16 +303,26 @@ alias ai="ansible-inventory"
 alias ap="ansible-playbook"
 
 ah() {
-    ai --list | jq -r '.platform_almalinux.hosts[]' | sort -V
+    ansible "${1:-all}" --list-hosts \
+    | sed '/hosts.*:$/d;s/ //g' \
+    | sort -u
 }
 
-asu() {
-    local pattern="platform_almalinux"
-    if [[ $# -gt 1 ]]; then
+assh() {
+    local pattern="all"
+    if [[ $# -ge 1 ]]; then
         pattern="$1" && shift
     fi
 
-    ansible "${pattern}" -b -m shell -a "$@"
+    if [[ $# -eq 0 ]]; then
+        set -- uptime
+    fi
+
+    if [[ -e "${pattern}" ]]; then
+        sshp -f "${pattern}" "$@"
+    else
+        ah "${pattern}" | sshp "$@"
+    fi
 }
 
 ansible-each() {
@@ -327,6 +337,21 @@ ansible-parallel() {
 export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
 export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
 export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
+
+ara-server() {
+    mkdir -p "${ARA_BASE_DIR}"
+    docker run --name ara-server --detach --tty \
+        --volume ${ARA_BASE_DIR}:/opt/ara -p 8000:8000 \
+        docker.io/recordsansible/ara-api:latest
+}
+
+ara-client() {
+    set -x
+    source <(python3 -m ara.setup.env)
+    export ARA_API_CLIENT="http"
+    export ARA_API_SERVER="http://127.0.0.1:8000"
+    set +x
+}
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
@@ -571,6 +596,14 @@ zi auto wait for OMZP::colored-man-pages
 export MC_SKIN="${XDG_CONFIG_HOME}/mc/solarized-dark-truecolor.ini"
 alias mc="mc --nosubshell"
 
+# mise: dev tools, env vars, task runner
+# https://github.com/jdx/mise
+# :mise-load() {
+#     eval "$(mise activate zsh)"
+# }
+
+# zi auto has"mise" for jdx/mise
+
 # nomad: workload orchestrator
 # https://github.com/hashicorp/nomad
 :nomad-load() {
@@ -606,7 +639,7 @@ mkdir -p ${PARALLEL_HOME}
     add cppflags "-I${__postgresql_brew_dir}/include"
 }
 
-zi auto has"psql" for postgresql
+zi auto has"brew" for postgresql
 
 # pwgen: generate random passwords
 pw() { pwgen -s 32 1 | clipcopy }
