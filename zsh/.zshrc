@@ -266,21 +266,6 @@ zi auto has"code" wait for vscode
 
 # 1password: remembers all your passwords for you
 # https://1password.com
-:1password-cli-load() {
-    # 1Password CLI plugins only work with 1Password UI on macOS
-    has brew || return
-
-    if has "${XDG_CONFIG_HOME}/op/plugins.sh"; then
-        source "${XDG_CONFIG_HOME}/op/plugins.sh"
-
-        # Enforce personal 1Password account for gh
-        unalias gh; gh() {
-            env OP_ACCOUNT=my.1password.com OP_SERVICE_ACCOUNT_TOKEN= \
-                op plugin run -- gh "$@"
-        }
-    fi
-}
-
 :1password-cli-eval() {
     op completion zsh
 }
@@ -340,6 +325,8 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 
 ara-server() {
     mkdir -p "${ARA_BASE_DIR}"
+    docker stop ara-server
+    docker rm ara-server
     docker run --name ara-server --detach --tty \
         --volume ${ARA_BASE_DIR}:/opt/ara -p 8000:8000 \
         docker.io/recordsansible/ara-api:latest
