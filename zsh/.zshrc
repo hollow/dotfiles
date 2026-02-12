@@ -96,7 +96,7 @@ alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 zup() {
     local oldpwd="${PWD}"
     :brew-update && \
-    :pipx-update && \
+    :uv-update && \
     :tmux-update && \
     :gcloud-update && \
     zi self-update && \
@@ -223,20 +223,22 @@ python-parallel() {
     :parallel */python.mk(:h) do "$@"
 }
 
-# python/pipx: install python applications in isolated environments
-# https://pypa.github.io/pipx/
-export PIPX_HOME="${XDG_CACHE_HOME}/pipx"
-export PIPX_BIN_DIR="${PIPX_HOME}/bin"
-export PIPX_DEFAULT_PYTHON="${PYTHONHOME}"/libexec/bin/python
+# python/uv: an extremely fast Python package manager
+# https://github.com/astral-sh/uv
+export UV_TOOL_DIR="${XDG_CACHE_HOME}/uv/tools"
+export UV_TOOL_BIN_DIR="${UV_TOOL_DIR}/bin"
 
-add path "${PIPX_BIN_DIR}"
+add path "${UV_TOOL_BIN_DIR}"
 
-:pipx-update() {
-    pipx reinstall-all
-    pipx upgrade-all --include-injected
+:uv-update() {
+    uv tool upgrade --all
 }
 
-zi auto has"pipx" for pipx
+:uv-eval() {
+    uv generate-shell-completion zsh
+}
+
+zi auto has"uv" for uv
 
 # python/argcomplete: completion for python programs
 # https://github.com/kislyuk/argcomplete#readme
@@ -244,12 +246,6 @@ zi auto has"pipx" for pipx
     local __argcomplete_brew_dir=("${HOMEBREW_PREFIX}"/Cellar/python-argcomplete/*(n,On[1]))
     local __argcomplete_python_dir=(${__argcomplete_brew_dir}/libexec/lib/python*(n,On[1]))
     add fpath ${__argcomplete_python_dir}/site-packages/argcomplete/bash_completion.d
-}
-
-:argcomplete-eval() {
-    # we cannot register pipx completions before we install argcomplete but we
-    # cannot install argcomplete until pipx is installed
-    register-python-argcomplete pipx
 }
 
 zi auto has"register-python-argcomplete" for argcomplete

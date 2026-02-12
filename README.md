@@ -125,7 +125,7 @@ enhancing shell performance and functionality.
   that sequentially updates all major tools and packages in the environment:
 
   - Homebrew packages (via `brew update`, `brew upgrade`, and `brew bundle`)
-  - Python applications installed via pipx
+  - Python tools installed via uv
   - Tmux plugins
   - Google Cloud SDK components
   - Zi plugin manager itself
@@ -476,19 +476,23 @@ system free from ad‑hoc `pip install --user` clutter.
   every REPL session loads personal helper code (history, quality‑of‑life
   tweaks, etc.).
 
-- **Application Isolation via pipx**: `pipx` is configured with
-  `PIPX_HOME` (cached environments) and `PIPX_BIN_DIR` (binaries added to
-  `PATH`). Tools installed through pipx (e.g. linters, formatters, CLIs) run in
-  dedicated virtual environments, avoiding dependency conflicts.
+- **Application Isolation via uv**: Python CLI tools are installed through
+  [uv](https://github.com/astral-sh/uv) (`uv tool install`), which creates
+  isolated virtual environments per tool under `UV_TOOL_DIR`
+  (`~/.cache/uv/tools`). Their entry‑point scripts land in `UV_TOOL_BIN_DIR`
+  (`~/.cache/uv/tools/bin`), which is added to `PATH` so every tool is
+  available without polluting the system Python.
 
-- **Automatic Tool Refresh**: The `:pipx-update` helper (invoked by `zup`)
-  reinstalls and upgrades all pipx‑managed applications, including injected
-  dependencies, ensuring they stay current without manual tracking.
+- **Automatic Tool Refresh**: The `:uv-update` helper (called by `zup`) runs
+  `uv tool upgrade --all` to keep every uv‑managed tool at its latest
+  version. New tools are auto‑installed on first `zi update` via the
+  `z-a-auto` annex's `with"uv"` integration.
 
 - **Tab Completion for Python CLIs**: `argcomplete` integration extends shell
-  completion for Python programs (e.g. `pipx`) by adding its
-  generated completion functions to `fpath` and registering them after the
-  packages are available.
+  completion for Python programs by adding its generated completion functions
+  to `fpath` and registering them after the packages are available. uv's own
+  completions are generated via `uv generate-shell-completion zsh` and cached
+  by the `z-a-eval` annex.
 
 - **Clean Separation of Caches/Data**: All Python‑related config, cache, and
   data locations honor the XDG directory setup, keeping the home directory

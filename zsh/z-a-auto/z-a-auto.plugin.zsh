@@ -41,8 +41,8 @@
     debug "{func}[${___ehid}]{msg} with {msg2}${___with}{msg} handlers {msg2}${___handlers}"
 
     case ${___with} in
-        (pipx)
-            pipx install ${___ehid}
+        (uv)
+            uv tool install ${___ehid}
             ;;
     esac
 
