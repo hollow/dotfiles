@@ -206,7 +206,6 @@ zstyle ':completion:*:git-checkout:*' sort false
 }
 
 zi auto has"brew" for brew
-link .tool-versions
 
 # python: programming language
 # https://docs.python.org/3/
@@ -366,9 +365,15 @@ EOF
 
 zi auto has"checkov" wait for checkov
 
+# claude: AI assistant by Anthropic
+# https://claude.ai
+export CLAUDE_CONFIG_DIR="${XDG_CONFIG_HOME}/claude"
+link claude .claude
+
 # colordiff: syntax highlighting for diff
 # https://www.colordiff.org
 cdl() { colordiff | less -R }
+cdu() { diff -u "$@" | cdl }
 
 # consul: distributed, highly available service discovery
 # https://github.com/hashicorp/consul
@@ -416,6 +421,7 @@ zi auto has"direnv" for direnv/direnv
 
 # docker:
 add fpath "${HOME}/.docker/completions"
+link colima .colima
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
@@ -578,6 +584,10 @@ zi auto wait for OMZP::colored-man-pages
 # https://midnight-commander.org
 export MC_SKIN="${XDG_CONFIG_HOME}/mc/solarized-dark-truecolor.ini"
 alias mc="mc --nosubshell"
+
+# ncdu: disk usage analyzer
+# https://dev.yorhel.nl/ncdu
+link ncduignore .ncduignore
 
 # mise: dev tools, env vars, task runner
 # https://github.com/jdx/mise

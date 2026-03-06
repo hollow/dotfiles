@@ -1,6 +1,7 @@
-**/*.zwc
 .tmp.driveupload/
+**/*.zwc
 auth0/
+colima/
 containers/
 flipperdevices.com
 gam

@@ -8,3 +8,5 @@ ServerAliveCountMax 0
 # Use secure algorithms
 Ciphers aes256-ctr,aes128-ctr,aes192-ctr
 MACs hmac-sha2-512,hmac-sha2-256,hmac-sha1
+
+Include /Users/bene/.colima/ssh_config
