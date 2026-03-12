@@ -16,6 +16,7 @@ NC='\033[0m'
 # Folders to ignore
 IGNORE_FOLDERS=(
     "terraform-google-lb-http"
+    "terraform-modules"
 )
 
 SEARCH_DIR="${1:-.}"
@@ -110,7 +111,7 @@ in_module && /^\}/ {
     next
 }
 
-in_module && /source[[:space:]]*=/ {
+in_module && source == "" && /source[[:space:]]*=/ {
     gsub(/.*source[[:space:]]*=[[:space:]]*"/, "", $0)
     gsub(/".*/, "", $0)
     source = $0

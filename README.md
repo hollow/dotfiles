@@ -400,9 +400,9 @@ sensible defaults, and extensive shell integration for GitHub operations.
   - `pr`: Push current branch and open a pull request creation form, then view
     in browser
   - `ghm`: Merge a PR and clean up local branches
-  - `hub-repo-list`: List all repositories (with filtering options)
-  - `hub-clone-all`: Clone all non-archived repos in parallel
-  - `hub-remove-archived`: Delete local copies of archived repositories
+  - `gh-repo-list`: List all repositories (with filtering options)
+  - `gh-clone-all`: Clone all non-archived repos in parallel
+  - `gh-remove-archived`: Delete local copies of archived repositories
 
 - **Batch Operations**: Apply commands across multiple Git repositories:
 

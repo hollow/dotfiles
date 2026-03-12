@@ -359,6 +359,12 @@ map <leader>x :e ~/buffer.md<cr>
 " Toggle paste mode on and off
 map <leader>pp :setlocal paste!<cr>
 
+" macOS CMD+C/V copy/paste (requires terminal to forward super key)
+vnoremap <D-c> "+y
+nnoremap <D-v> "+p
+inoremap <D-v> <C-r>+
+vnoremap <D-v> "+p
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Helper functions

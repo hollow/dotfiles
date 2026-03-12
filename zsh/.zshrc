@@ -79,6 +79,9 @@ if has /opt/homebrew/bin/brew; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# add local bin to path
+add path "${HOME}/.local/bin"
+
 # compiler flags
 typeset -TUx LDFLAGS ldflags ":"
 typeset -TUx CPPFLAGS cppflags ":"
@@ -225,7 +228,7 @@ python-parallel() {
 # python/uv: an extremely fast Python package manager
 # https://github.com/astral-sh/uv
 export UV_TOOL_DIR="${XDG_CACHE_HOME}/uv/tools"
-export UV_TOOL_BIN_DIR="${UV_TOOL_DIR}/bin"
+export UV_TOOL_BIN_DIR="${XDG_CACHE_HOME}/uv/bin"
 
 add path "${UV_TOOL_BIN_DIR}"
 
@@ -421,7 +424,6 @@ zi auto has"direnv" for direnv/direnv
 
 # docker:
 add fpath "${HOME}/.docker/completions"
-link colima .colima
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
@@ -491,7 +493,7 @@ zi auto id-as"git" as"completion" blockf mv"git->_git" wait for \
 alias c="git changes"
 alias ga="git add --all"
 alias gap="git add --patch"
-alias gcl="git cleanup && git checkout-latest main && git dmb -y"
+alias gcl="git checkout-latest main"
 alias gcm="git co \$(git main-branch)"
 alias gcu="git co upstream"
 alias gd="git diff"
@@ -514,19 +516,19 @@ git-parallel () {
     :parallel */.git(:h) do "$@"
 }
 
-hub-repo-list() {
+gh-repo-list() {
     gh repo list --limit 1000 --json nameWithOwner "$@" |
     jq -r '.[].nameWithOwner'
 }
 
-hub-clone-all() {
-    hub-repo-list --no-archived "$@" |
+gh-clone-all() {
+    gh-repo-list --no-archived "$@" |
     parallel --bar --tagstring "[{}]" --jobs 5 \
         git-clone-clean-main https://github.com/{} "${HOME}/src/{}"
 }
 
-hub-remove-archived() {
-    hub-repo-list --archived "$@" |
+gh-remove-archived() {
+    gh-repo-list --archived "$@" |
     parallel \
         rm -rvf "${HOME}/src/{}"
 }
@@ -537,9 +539,19 @@ pr() {
     gh pr view --web
 }
 
+ghc() {
+    # git fetch --prune
+    # comm -12 \
+    #     <(git branch -r | grep -v HEAD | sed 's|  origin/||' | sed 's/^ *//' | sort) \
+    #     <(gh pr list --limit 1000 --state closed --json headRefName --jq '[.[].headRefName] | sort[]' | sort) |
+    # xargs -r -I{} echo {}
+    git checkout-latest main
+    git dmb -y
+}
+
 ghm() {
     gh pr merge --merge "$@" && \
-    gcl
+    ghc
 }
 
 # gnupg: GNU privacy guard
@@ -591,11 +603,12 @@ link ncduignore .ncduignore
 
 # mise: dev tools, env vars, task runner
 # https://github.com/jdx/mise
-# :mise-load() {
-#     eval "$(mise activate zsh)"
-# }
+:mise-load() {
+    local _mise_cmd_not_found
+    eval "$(mise activate zsh)"
+}
 
-# zi auto has"mise" for jdx/mise
+zi auto has"mise" for jdx/mise
 
 # nomad: workload orchestrator
 # https://github.com/hashicorp/nomad

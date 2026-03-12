@@ -1,0 +1,23 @@
+# typography
+font-family = MesloLGS Nerd Font
+
+# theme
+theme = Dark Modern
+unfocused-split-opacity = 0.6
+unfocused-split-fill = #000000
+
+# macOS
+macos-non-native-fullscreen = visible-menu
+
+# macOS clipboard keybindings
+keybind = super+c=copy_to_clipboard
+keybind = super+v=paste_from_clipboard
+
+# scrollback
+scrollback-limit = 134217728
+
+# always start in home directory
+working-directory = home
+window-inherit-working-directory = false
+tab-inherit-working-directory = false
+
