@@ -31,6 +31,9 @@ echo "--- Appearance"
 # Dark mode
 w NSGlobalDomain AppleInterfaceStyle -string "Dark"
 
+# Disable transparency (windows, menu bar)
+w com.apple.Accessibility reduceTransparency -bool true
+
 # Double-click title bar: Maximize (instead of minimize)
 w NSGlobalDomain AppleActionOnDoubleClick -string "Maximize"
 

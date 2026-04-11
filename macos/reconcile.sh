@@ -131,6 +131,7 @@ is_noise() {
 
 typeset -A TRACKED
 TRACKED[NSGlobalDomain${TAB}AppleInterfaceStyle]="Dark"
+TRACKED[com.apple.Accessibility${TAB}reduceTransparency]="1"
 TRACKED[NSGlobalDomain${TAB}AppleActionOnDoubleClick]="Maximize"
 TRACKED[com.apple.dock${TAB}autohide]="1"
 TRACKED[com.apple.dock${TAB}show-recents]="0"
