@@ -76,7 +76,7 @@ autoload -Uz :each :parallel
 
 # add homebrew path as early as possible
 if has /opt/homebrew/bin/brew; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+    eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 fi
 
 # add local bin to path
@@ -208,14 +208,21 @@ zstyle ':completion:*:git-checkout:*' sort false
     brew install "$@"
 }
 
-zi auto has"brew" for brew
+zi auto has"dscl" for brew
 
 # python: programming language
 # https://docs.python.org/3/
-export PYTHONHOME=("${HOMEBREW_PREFIX}"/opt/python@*(n,On[1]))
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-add path "${PYTHONHOME}/libexec/bin"
-zi auto silent for OMZP::python
+
+:python-load() {
+    local __python_brew_dir=("${HOMEBREW_PREFIX}"/opt/python@*(N,n,On[1]))
+    if [[ -n "${__python_brew_dir}" ]]; then
+        export PYTHONHOME="${__python_brew_dir}"
+        add path "${PYTHONHOME}/libexec/bin"
+    fi
+}
+
+zi auto has"python3" silent for OMZP::python
 
 python-each() {
     :each */python.mk(:h) do "$@"
@@ -245,9 +252,13 @@ zi auto has"uv" for uv
 # python/argcomplete: completion for python programs
 # https://github.com/kislyuk/argcomplete#readme
 :argcomplete-load() {
-    local __argcomplete_brew_dir=("${HOMEBREW_PREFIX}"/Cellar/python-argcomplete/*(n,On[1]))
-    local __argcomplete_python_dir=(${__argcomplete_brew_dir}/libexec/lib/python*(n,On[1]))
-    add fpath ${__argcomplete_python_dir}/site-packages/argcomplete/bash_completion.d
+    local __argcomplete_brew_dir=("${HOMEBREW_PREFIX}"/Cellar/python-argcomplete/*(N,n,On[1]))
+    if [[ -n "${__argcomplete_brew_dir}" ]]; then
+        local __argcomplete_python_dir=(${__argcomplete_brew_dir}/libexec/lib/python*(N,n,On[1]))
+        if [[ -n "${__argcomplete_python_dir}" ]]; then
+            add fpath ${__argcomplete_python_dir}/site-packages/argcomplete/bash_completion.d
+        fi
+    fi
 }
 
 zi auto has"register-python-argcomplete" for argcomplete
@@ -639,13 +650,15 @@ mkdir -p ${PARALLEL_HOME}
 
 # postgresql:
 :postgresql-load() {
-    local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(n,On[1]))
-    add path "${__postgresql_brew_dir}/bin"
-    add ldflags "-L${__postgresql_brew_dir}/lib"
-    add cppflags "-I${__postgresql_brew_dir}/include"
+    local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(N,n,On[1]))
+    if [[ -n "${__postgresql_brew_dir}" ]]; then
+        add path "${__postgresql_brew_dir}/bin"
+        add ldflags "-L${__postgresql_brew_dir}/lib"
+        add cppflags "-I${__postgresql_brew_dir}/include"
+    fi
 }
 
-zi auto has"brew" for postgresql
+zi auto has"psql" for postgresql
 
 # pwgen: generate random passwords
 pw() { pwgen -s 32 1 | clipcopy }
@@ -667,8 +680,15 @@ export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
 export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
 export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
 
-export RUBYHOME=("${HOMEBREW_PREFIX}"/opt/ruby@*(n,On[1]))
-add path "${RUBYHOME}/bin"
+:ruby-load() {
+    local __ruby_brew_dir=("${HOMEBREW_PREFIX}"/opt/ruby@*(N,n,On[1]))
+    if [[ -n "${__ruby_brew_dir}" ]]; then
+        export RUBYHOME="${__ruby_brew_dir}"
+        add path "${RUBYHOME}/bin"
+    fi
+}
+
+zi auto has"ruby" for ruby
 
 # sqlite: database engine
 # https://sqlite.org
