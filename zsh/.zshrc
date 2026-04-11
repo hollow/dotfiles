@@ -193,8 +193,14 @@ zstyle ':completion:*:git-checkout:*' sort false
 }
 
 :brew-update() {
-    has brew || return 0
-    brew bundle dump -f
+    if ! has brew; then
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        :brew-init
+    else
+        brew bundle dump -f
+    fi
+
     brew update
     brew upgrade
     brew bundle install
@@ -212,17 +218,17 @@ zi auto has"dscl" for brew
 
 # python: programming language
 # https://docs.python.org/3/
-export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+#export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 
-:python-load() {
-    local __python_brew_dir=("${HOMEBREW_PREFIX}"/opt/python@*(N,n,On[1]))
-    if [[ -n "${__python_brew_dir}" ]]; then
-        export PYTHONHOME="${__python_brew_dir}"
-        add path "${PYTHONHOME}/libexec/bin"
-    fi
-}
+#:python-load() {
+#    local __python_brew_dir=("${HOMEBREW_PREFIX}"/opt/python@*(N,n,On[1]))
+#    if [[ -n "${__python_brew_dir}" ]]; then
+#        export PYTHONHOME="${__python_brew_dir}"
+#        add path "${PYTHONHOME}/libexec/bin"
+#    fi
+#}
 
-zi auto has"python3" silent for OMZP::python
+#zi auto has"python3" silent for OMZP::python
 
 python-each() {
     :each */python.mk(:h) do "$@"
@@ -251,21 +257,25 @@ zi auto has"uv" for uv
 
 # python/argcomplete: completion for python programs
 # https://github.com/kislyuk/argcomplete#readme
-:argcomplete-load() {
-    local __argcomplete_brew_dir=("${HOMEBREW_PREFIX}"/Cellar/python-argcomplete/*(N,n,On[1]))
-    if [[ -n "${__argcomplete_brew_dir}" ]]; then
-        local __argcomplete_python_dir=(${__argcomplete_brew_dir}/libexec/lib/python*(N,n,On[1]))
-        if [[ -n "${__argcomplete_python_dir}" ]]; then
-            add fpath ${__argcomplete_python_dir}/site-packages/argcomplete/bash_completion.d
-        fi
-    fi
-}
+#:argcomplete-load() {
+#    local __argcomplete_brew_dir=("${HOMEBREW_PREFIX}"/Cellar/python-argcomplete/*(N,n,On[1]))
+#    if [[ -n "${__argcomplete_brew_dir}" ]]; then
+#        local __argcomplete_python_dir=(${__argcomplete_brew_dir}/libexec/lib/python*(N,n,On[1]))
+#        if [[ -n "${__argcomplete_python_dir}" ]]; then
+#            add fpath ${__argcomplete_python_dir}/site-packages/argcomplete/bash_completion.d
+#        fi
+#    fi
+#}
 
-zi auto has"register-python-argcomplete" for argcomplete
+#zi auto has"register-python-argcomplete" for argcomplete
 
 # vscode: visual studio code editor
 # https://code.visualstudio.com
 :vscode-load() {
+    if ! has "${HOME}/Library/Application Support/Code/User"; then
+        return
+    fi
+
     for i in settings keybindings mcp; do
         link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
     done
@@ -276,6 +286,7 @@ zi auto has"code" wait for vscode
 # 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-eval() {
+    chmod 0700 "${XDG_CONFIG_HOME}/op"
     op completion zsh
 }
 
@@ -754,17 +765,18 @@ zi auto has"terraform" for terraform
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
-:tmux-update() {
-    clone tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
-    ${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
-}
-
 :tmux-load() {
     export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
     export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
     export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
     export ZSH_TMUX_FIXTERM="false"
     alias T=tmux
+}
+
+:tmux-update() {
+    :tmux-load
+    clone tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
+    ${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
 }
 
 zi auto has"tmux" silent for OMZP::tmux
