@@ -8,7 +8,7 @@ unfocused-split-fill = #000000
 
 # macOS
 macos-non-native-fullscreen = visible-menu
-window-decoration = false
+macos-window-shadow = false
 
 # macOS clipboard keybindings
 keybind = super+c=copy_to_clipboard

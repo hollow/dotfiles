@@ -35,7 +35,6 @@ local -a DOMAINS=(
   com.apple.HIToolbox
   com.apple.screencapture
   com.apple.screensaver
-  com.apple.spaces
   com.apple.controlcenter
   com.apple.loginwindow
   com.apple.Safari
@@ -117,6 +116,16 @@ local -a NOISE_PATTERNS=(
   'AppleEnabledInputSources'
   'AppleCurrentKeyboardLayoutInputSourceID'
   'com\.apple\.finder\.SyncExtensions'
+  'trash-full'
+  '^raw='
+  'History'
+  'MouseKeys'
+  'closeView'
+  'liveSpeech'
+  'slowKey'
+  'stickyKey'
+  'sessionChange'
+  'useStickyKeys'
 )
 
 is_noise() {
@@ -131,6 +140,8 @@ is_noise() {
 
 typeset -A TRACKED
 TRACKED[NSGlobalDomain${TAB}AppleInterfaceStyle]="Dark"
+TRACKED[NSGlobalDomain${TAB}AppleMenuBarVisibleInFullscreen]="1"
+TRACKED[com.apple.controlcenter${TAB}AutoHideMenuBarOption]="3"
 TRACKED[com.apple.Accessibility${TAB}reduceTransparency]="1"
 TRACKED[NSGlobalDomain${TAB}AppleActionOnDoubleClick]="Maximize"
 TRACKED[com.apple.dock${TAB}autohide]="1"
@@ -147,6 +158,11 @@ TRACKED[com.apple.finder${TAB}ShowExternalHardDrivesOnDesktop]="1"
 TRACKED[com.apple.HIToolbox${TAB}AppleFnUsageType]="2"
 TRACKED[NSGlobalDomain${TAB}InitialKeyRepeat]="15"
 TRACKED[NSGlobalDomain${TAB}KeyRepeat]="2"
+TRACKED[NSGlobalDomain${TAB}ApplePressAndHoldEnabled]="0"
+TRACKED[NSGlobalDomain${TAB}NSAutomaticCapitalizationEnabled]="0"
+TRACKED[NSGlobalDomain${TAB}NSAutomaticSpellingCorrectionEnabled]="0"
+TRACKED[NSGlobalDomain${TAB}WebAutomaticSpellingCorrectionEnabled]="0"
+TRACKED[NSGlobalDomain${TAB}NSAutomaticInlinePredictionEnabled]="0"
 
 
 # ── Dump current state as sorted TSV: domain\tkey\tvalue ─

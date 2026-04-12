@@ -31,6 +31,12 @@ echo "--- Appearance"
 # Dark mode
 w NSGlobalDomain AppleInterfaceStyle -string "Dark"
 
+# Menu bar: auto-hide (3 = always, 2 = in fullscreen only, 1 = never)
+w com.apple.controlcenter AutoHideMenuBarOption -int 3
+
+# Show menu bar in fullscreen
+w NSGlobalDomain AppleMenuBarVisibleInFullscreen -bool true
+
 # Disable transparency (windows, menu bar)
 w com.apple.Accessibility reduceTransparency -bool true
 
@@ -95,6 +101,26 @@ w com.apple.HIToolbox AppleFnUsageType -int 2
 # Requires logout/restart to take effect.
 w NSGlobalDomain InitialKeyRepeat -int 15
 w NSGlobalDomain KeyRepeat -int 2
+
+# ─── Typing & Text ────────────────────────────────────────
+
+echo "--- Typing & Text"
+
+# Disable press-and-hold accent popup (enables key repeat for accented keys)
+# Default: 1 (popup). Set to 0 so holding a key repeats the character.
+w NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# Disable auto-capitalization
+w NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+
+# Disable auto-correct (spelling)
+w NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+# Disable auto-correct in web views
+w NSGlobalDomain WebAutomaticSpellingCorrectionEnabled -bool false
+
+# Disable inline predictive text completions
+w NSGlobalDomain NSAutomaticInlinePredictionEnabled -bool false
 
 # ─── Hot Corners ──────────────────────────────────────────
 # All hot corners disabled (macOS default).
