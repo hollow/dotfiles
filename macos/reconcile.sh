@@ -128,6 +128,124 @@ local -a NOISE_PATTERNS=(
   'stickyKey'
   'sessionChange'
   'useStickyKeys'
+  # Safari runtime/migration/config state
+  'ExtensionsEnabled'
+  'HideStartPage'
+  'HomePage'
+  'LocalFileRestrictions'
+  'PrivateBrowsingRequires'
+  'ShowSidebarInTopSites'
+  # SoftwareUpdate notification state
+  'AvailableUpdatesNotification'
+  'DDMUpdateNotification'
+  'UserNotificationDate'
+  'AutoUpdateMajorOSVersion'
+  # universalaccess UI state (side-effects of enabling reduceTransparency)
+  'AssistiveControlType'
+  'customFonts'
+  'dwellEnabled'
+  'grayscale'
+  'hoverTextEnabled'
+  'hudNotified'
+  'switchOnOffKey'
+  'virtualKeyboardOnOff'
+  'voiceOverOnOffKey'
+  # Finder window/sidebar state
+  'FXConnectTo'
+  'FXICloudDrive'
+  'FXLastSearchScope'
+  'FXPreferencesWindow'
+  'FXPreferredSearchViewStyle'
+  'FXSidebarUpgraded'
+  'FXDetached'
+  'CopyProgressWindowLocation'
+  'EmptyTrashProgressWindowLocation'
+  'MountProgressWindowLocation'
+  'PreferencesWindow\.'
+  'PreviewPane'
+  'SearchRecentsSavedViewStyle'
+  'Sidebar.*SectionDisclosedState'
+  'SidebarShowing'
+  'SidebarWidth'
+  'FontSizeCategory'
+  # NSGlobalDomain UI/input noise
+  '_HIHideMenuBar'
+  'AppleKeyboardUIMode'
+  'com\.apple\.keyboard\.fnState'
+  'com\.apple\.mouse\.scaling'
+  'com\.apple\.sound\.uiaudio'
+  'NavPanelFileListMode'
+  'NSPersonNameDefaultDisplayNameOrder'
+  'NSPreferredSpellServerLanguage'
+  # Terminal/TextEdit session state
+  'TTAppPreferences'
+  'DefaultProfilesVersion'
+  'NSNavLastUserSetHideExtensionButtonState'
+  # loginwindow / screencapture session state
+  'TALLogoutSavesState'
+  'last-selection-display'
+  # AppleDictation side-effect
+  'AppleDictationAutoEnable'
+  # Accessibility side-effects of reduceTransparency
+  'AccessibilityEnabled'
+  'ApplicationAccessibilityEnabled'
+  'GenericAccessibilityClientEnabled'
+  'EnhancedBackgroundContrastEnabled'
+  # universalaccess duplicate reduceTransparency key
+  'reduceTransparency'
+  # ActivityMonitor view preferences
+  'ShowCategory'
+  # controlcenter / dock noise
+  'RemoteLiveActivitiesEnabled'
+  'launchanim'
+  # Trackpad gesture settings (managed via System Settings)
+  'HIDScrollZoomModifierMask'
+  'TrackpadThreeFinger'
+  'TrackpadFourFinger'
+  'TrackpadFiveFinger'
+  'TrackpadTwoFinger'
+  'TrackpadCorner'
+  'TrackpadHand'
+  'TrackpadHorizScroll'
+  'TrackpadMomentumScroll'
+  'TrackpadPinch'
+  'TrackpadRightClick'
+  'TrackpadRotate'
+  'TrackpadScroll'
+  'TrackpadDrag'
+  'ActuateDetents'
+  'Clicking'
+  'Dragging'
+  'DragLock'
+  'FirstClickThreshold'
+  'SecondClickThreshold'
+  'ForceSuppressed'
+  'USBMouseStopsTrackpad'
+  'UserPreferences'
+  # mail/terminal one-off migration keys
+  'MailUpgraderPrePersistenceVersion'
+  'Shell'
+  # Safari runtime/migration state
+  'DidMigrate'
+  'DidClear'
+  'DidGrant'
+  'DidUpdate'
+  'WBS'
+  'IIO_LaunchInfo'
+  'NewestLaunched'
+  'NewTabPageLastModified'
+  'SuccessfulLaunch'
+  'Autoplay.*Whitelist'
+  'UserAgentQuirks'
+  'SafariVersion'
+  'LastOS.*Safari'
+  'SkipLoading'
+  'UniversalSearch.*Notification'
+  'SearchProviderIdentifier.*Migrated'
+  'SafariProfiles'
+  'com\.apple\.WebPrivacy'
+  'WebKitPreferences\.'
+  'WebKitRespect'
 )
 
 is_noise() {
@@ -145,14 +263,14 @@ TRACKED[NSGlobalDomain${TAB}AppleInterfaceStyle]="Dark"
 TRACKED[NSGlobalDomain${TAB}AppleMenuBarVisibleInFullscreen]="1"
 TRACKED[com.apple.controlcenter${TAB}AutoHideMenuBarOption]="3"
 TRACKED[com.apple.Accessibility${TAB}reduceTransparency]="1"
-TRACKED[NSGlobalDomain${TAB}AppleActionOnDoubleClick]="Maximize"
+TRACKED[NSGlobalDomain${TAB}AppleActionOnDoubleClick]="Fill"
 TRACKED[com.apple.dock${TAB}autohide]="1"
 TRACKED[com.apple.dock${TAB}show-recents]="0"
 TRACKED[com.apple.WindowManager${TAB}EnableTiledWindowMargins]="0"
 TRACKED[com.apple.WindowManager${TAB}EnableTilingByEdgeDrag]="0"
 TRACKED[com.apple.WindowManager${TAB}EnableTopTilingByEdgeDrag]="0"
 TRACKED[com.apple.WindowManager${TAB}HideDesktop]="1"
-TRACKED[com.apple.WindowManager${TAB}StandardHideDesktopIcons]="1"
+TRACKED[com.apple.WindowManager${TAB}StandardHideDesktopIcons]="0"
 TRACKED[com.apple.WindowManager${TAB}StandardHideWidgets]="1"
 TRACKED[com.apple.WindowManager${TAB}StageManagerHideWidgets]="1"
 TRACKED[com.apple.finder${TAB}FXPreferredViewStyle]="Nlsv"
@@ -165,7 +283,16 @@ TRACKED[NSGlobalDomain${TAB}NSAutomaticCapitalizationEnabled]="0"
 TRACKED[NSGlobalDomain${TAB}NSAutomaticSpellingCorrectionEnabled]="0"
 TRACKED[NSGlobalDomain${TAB}WebAutomaticSpellingCorrectionEnabled]="0"
 TRACKED[NSGlobalDomain${TAB}NSAutomaticInlinePredictionEnabled]="0"
-
+TRACKED[NSGlobalDomain${TAB}NSAllowContinuousSpellChecking]="0"
+TRACKED[NSGlobalDomain${TAB}AppleShowAllExtensions]="1"
+TRACKED[NSGlobalDomain${TAB}NSQuitAlwaysKeepsWindows]="1"
+TRACKED[com.apple.finder${TAB}ShowPathbar]="1"
+TRACKED[com.apple.finder${TAB}ShowStatusBar]="1"
+TRACKED[com.apple.finder${TAB}NewWindowTarget]="PfHm"
+TRACKED[com.apple.finder${TAB}_FXSortFoldersFirst]="1"
+TRACKED[com.apple.finder${TAB}FXRemoveOldTrashItems]="1"
+TRACKED[com.apple.TextEdit${TAB}RichText]="0"
+TRACKED[com.apple.DiskUtility${TAB}SidebarShowAllDevices]="1"
 
 # ── Dump current state as sorted TSV: domain\tkey\tvalue ─
 
