@@ -158,6 +158,7 @@ local -a NOISE_PATTERNS=(
   'FXPreferredSearchViewStyle'
   'FXSidebarUpgraded'
   'FXDetached'
+  'NewWindowTargetPath'
   'CopyProgressWindowLocation'
   'EmptyTrashProgressWindowLocation'
   'MountProgressWindowLocation'

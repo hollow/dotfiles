@@ -150,6 +150,21 @@ section "Keyboard"
 # Fn key: Show Emoji & Symbols (0=nothing, 1=input source, 2=emoji, 3=dictation)
 w com.apple.HIToolbox AppleFnUsageType -int 2
 
+# Keyboard shortcuts (system-wide)
+# Edit macos/symbolichotkeys.plist or re-export after changing in System Settings:
+#   defaults export com.apple.symbolichotkeys macos/symbolichotkeys.plist
+DIR="$(cd "$(dirname "$0")" && pwd)"
+if $DRY_RUN; then
+  if ! diff -q <(defaults export com.apple.symbolichotkeys - | plutil -convert xml1 - -o -) "$DIR/symbolichotkeys.plist" &>/dev/null; then
+    printf "  %-8s  %-26s  %-38s  %s\n" "change" "com.apple.symbolichotkeys" "(plist)" "differs from stored"
+    (( _dry_change++ ))
+  else
+    (( _dry_ok++ ))
+  fi
+else
+  defaults import com.apple.symbolichotkeys "$DIR/symbolichotkeys.plist"
+fi
+
 # Fast key repeat. Units of ~15ms. macOS defaults: InitialKeyRepeat=68, KeyRepeat=6
 # InitialKeyRepeat=15 ≈ 0.225s delay before repeat kicks in
 # KeyRepeat=2 ≈ 0.03s interval between repeats
