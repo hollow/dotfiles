@@ -8,7 +8,6 @@ unfocused-split-fill = #000000
 
 # macOS
 macos-non-native-fullscreen = visible-menu
-macos-window-shadow = false
 
 # macOS clipboard keybindings
 keybind = super+c=copy_to_clipboard
@@ -21,4 +20,3 @@ scrollback-limit = 134217728
 working-directory = home
 window-inherit-working-directory = false
 tab-inherit-working-directory = false
-
