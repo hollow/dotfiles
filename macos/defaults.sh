@@ -2,23 +2,41 @@
 #
 # macOS defaults — non-default settings
 #
-# Apply:  ./macos/defaults.sh
-# Review: ./macos/defaults.sh --dry-run
+# Apply:         ./macos/defaults.sh
+# Review:        ./macos/defaults.sh --dry-run
+# List tracked:  ./macos/defaults.sh --list-tracked  (used by reconcile.sh)
 #
 # Some changes require a logout/restart to take full effect.
 # Affected services (Dock, Finder, etc.) are restarted at the end.
 #
 
 DRY_RUN=false
-[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
+LIST_TRACKED=false
+case "${1:-}" in
+  --dry-run)      DRY_RUN=true ;;
+  --list-tracked) LIST_TRACKED=true ;;
+esac
 
 typeset -i _dry_ok=0 _dry_change=0
 
-# In dry-run, section headers are suppressed (table has no sub-headers)
-section() { $DRY_RUN || echo "--- $*"; }
+# In dry-run/list-tracked, section headers are suppressed
+section() { $DRY_RUN || $LIST_TRACKED || echo "--- $*"; }
 
 w() {
   local domain="$1" key="$2" type="$3" val="$4"
+
+  if $LIST_TRACKED; then
+    # Emit TSV for reconcile.sh to auto-build its TRACKED map
+    [[ "$type" == -array* || "$type" == -dict* ]] && return
+    local normalized
+    case "$type" in
+      -bool)   [[ "$val" == "true"  ]] && normalized="1" || normalized="0" ;;
+      -int|-float|-string) normalized="$val" ;;
+      *) normalized="$type" ;;  # no type flag: w domain key value
+    esac
+    printf "%s\t%s\t%s\n" "$domain" "$key" "$normalized"
+    return
+  fi
 
   if $DRY_RUN; then
     # Arrays/dicts can't be compared as scalars — always report as change
@@ -55,13 +73,15 @@ w() {
   fi
 }
 
-echo "==> Applying macOS defaults…"
-if $DRY_RUN; then
+if ! $LIST_TRACKED; then
+  echo "==> Applying macOS defaults…"
+  if $DRY_RUN; then
+    echo ""
+    printf "  %-8s  %-26s  %-38s  %s\n" "STATUS" "DOMAIN" "KEY" "VALUE"
+    printf "  %-8s  %-26s  %-38s  %s\n" "--------" "--------------------------" "--------------------------------------" "-----"
+  fi
   echo ""
-  printf "  %-8s  %-26s  %-38s  %s\n" "STATUS" "DOMAIN" "KEY" "VALUE"
-  printf "  %-8s  %-26s  %-38s  %s\n" "--------" "--------------------------" "--------------------------------------" "-----"
 fi
-echo ""
 
 # ─── Appearance ───────────────────────────────────────────
 
@@ -153,16 +173,18 @@ w com.apple.HIToolbox AppleFnUsageType -int 2
 # Keyboard shortcuts (system-wide)
 # Edit macos/symbolichotkeys.plist or re-export after changing in System Settings:
 #   defaults export com.apple.symbolichotkeys macos/symbolichotkeys.plist
-DIR="$(cd "$(dirname "$0")" && pwd)"
-if $DRY_RUN; then
-  if ! diff -q <(defaults export com.apple.symbolichotkeys - | plutil -convert xml1 - -o -) "$DIR/symbolichotkeys.plist" &>/dev/null; then
-    printf "  %-8s  %-26s  %-38s  %s\n" "change" "com.apple.symbolichotkeys" "(plist)" "differs from stored"
-    (( _dry_change++ ))
+if ! $LIST_TRACKED; then
+  DIR="$(cd "$(dirname "$0")" && pwd)"
+  if $DRY_RUN; then
+    if ! diff -q <(defaults export com.apple.symbolichotkeys - | plutil -convert xml1 - -o -) "$DIR/symbolichotkeys.plist" &>/dev/null; then
+      printf "  %-8s  %-26s  %-38s  %s\n" "change" "com.apple.symbolichotkeys" "(plist)" "differs from stored"
+      (( _dry_change++ ))
+    else
+      (( _dry_ok++ ))
+    fi
   else
-    (( _dry_ok++ ))
+    defaults import com.apple.symbolichotkeys "$DIR/symbolichotkeys.plist"
   fi
-else
-  defaults import com.apple.symbolichotkeys "$DIR/symbolichotkeys.plist"
 fi
 
 # Fast key repeat. Units of ~15ms. macOS defaults: InitialKeyRepeat=68, KeyRepeat=6
@@ -223,15 +245,17 @@ w com.apple.DiskUtility SidebarShowAllDevices -bool true
 
 # ─── Restart affected services ────────────────────────────
 
-if ! $DRY_RUN; then
-  echo ""
-  echo "==> Restarting affected services…"
-  killall Dock    2>/dev/null || true
-  killall Finder  2>/dev/null || true
-  killall SystemUIServer 2>/dev/null || true
-  echo "==> Done. Some changes may require logout/restart."
-else
-  echo ""
-  echo "==> $_dry_change would change, $_dry_ok already correct."
-  echo "    Run without --dry-run to apply."
+if ! $LIST_TRACKED; then
+  if ! $DRY_RUN; then
+    echo ""
+    echo "==> Restarting affected services…"
+    killall Dock    2>/dev/null || true
+    killall Finder  2>/dev/null || true
+    killall SystemUIServer 2>/dev/null || true
+    echo "==> Done. Some changes may require logout/restart."
+  else
+    echo ""
+    echo "==> $_dry_change would change, $_dry_ok already correct."
+    echo "    Run without --dry-run to apply."
+  fi
 fi

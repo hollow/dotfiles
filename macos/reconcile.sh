@@ -249,51 +249,17 @@ local -a NOISE_PATTERNS=(
   'WebKitRespect'
 )
 
-is_noise() {
-  local key="$1" pat
-  for pat in "${NOISE_PATTERNS[@]}"; do
-    [[ "$key" =~ $pat ]] && return 0
-  done
-  return 1
-}
+# Build single alternation regex for O(1) noise checks
+NOISE_RE="${(j:|:)NOISE_PATTERNS}"
+is_noise() { [[ "$1" =~ $NOISE_RE ]]; }
 
-# ── Tracked settings (must match defaults.sh) ───────────
+# ── Tracked settings — auto-generated from defaults.sh ──
+# defaults.sh is the single source of truth; no manual sync needed.
 
 typeset -A TRACKED
-TRACKED[NSGlobalDomain${TAB}AppleInterfaceStyle]="Dark"
-TRACKED[NSGlobalDomain${TAB}AppleMenuBarVisibleInFullscreen]="1"
-TRACKED[com.apple.controlcenter${TAB}AutoHideMenuBarOption]="3"
-TRACKED[com.apple.Accessibility${TAB}reduceTransparency]="1"
-TRACKED[NSGlobalDomain${TAB}AppleActionOnDoubleClick]="Fill"
-TRACKED[com.apple.dock${TAB}autohide]="1"
-TRACKED[com.apple.dock${TAB}show-recents]="0"
-TRACKED[com.apple.WindowManager${TAB}EnableTiledWindowMargins]="0"
-TRACKED[com.apple.WindowManager${TAB}EnableTilingByEdgeDrag]="0"
-TRACKED[com.apple.WindowManager${TAB}EnableTopTilingByEdgeDrag]="0"
-TRACKED[com.apple.WindowManager${TAB}HideDesktop]="1"
-TRACKED[com.apple.WindowManager${TAB}StandardHideDesktopIcons]="0"
-TRACKED[com.apple.WindowManager${TAB}StandardHideWidgets]="1"
-TRACKED[com.apple.WindowManager${TAB}StageManagerHideWidgets]="1"
-TRACKED[com.apple.finder${TAB}FXPreferredViewStyle]="Nlsv"
-TRACKED[com.apple.finder${TAB}ShowExternalHardDrivesOnDesktop]="1"
-TRACKED[com.apple.HIToolbox${TAB}AppleFnUsageType]="2"
-TRACKED[NSGlobalDomain${TAB}InitialKeyRepeat]="15"
-TRACKED[NSGlobalDomain${TAB}KeyRepeat]="2"
-TRACKED[NSGlobalDomain${TAB}ApplePressAndHoldEnabled]="0"
-TRACKED[NSGlobalDomain${TAB}NSAutomaticCapitalizationEnabled]="0"
-TRACKED[NSGlobalDomain${TAB}NSAutomaticSpellingCorrectionEnabled]="0"
-TRACKED[NSGlobalDomain${TAB}WebAutomaticSpellingCorrectionEnabled]="0"
-TRACKED[NSGlobalDomain${TAB}NSAutomaticInlinePredictionEnabled]="0"
-TRACKED[NSGlobalDomain${TAB}NSAllowContinuousSpellChecking]="0"
-TRACKED[NSGlobalDomain${TAB}AppleShowAllExtensions]="1"
-TRACKED[NSGlobalDomain${TAB}NSQuitAlwaysKeepsWindows]="1"
-TRACKED[com.apple.finder${TAB}ShowPathbar]="1"
-TRACKED[com.apple.finder${TAB}ShowStatusBar]="1"
-TRACKED[com.apple.finder${TAB}NewWindowTarget]="PfHm"
-TRACKED[com.apple.finder${TAB}_FXSortFoldersFirst]="1"
-TRACKED[com.apple.finder${TAB}FXRemoveOldTrashItems]="1"
-TRACKED[com.apple.TextEdit${TAB}RichText]="0"
-TRACKED[com.apple.DiskUtility${TAB}SidebarShowAllDevices]="1"
+while IFS=$'\t' read -r _d _k _v; do
+  TRACKED["${_d}${TAB}${_k}"]="$_v"
+done < <("$SCRIPT_DIR/defaults.sh" --list-tracked)
 
 # ── Dump current state as sorted TSV: domain\tkey\tvalue ─
 
@@ -359,6 +325,12 @@ CURRENT=$(mktemp)
 trap 'rm -f "$CURRENT"' EXIT INT TERM
 dump_current > "$CURRENT"
 
+# Build key set for O(1) removed-key lookup (avoids O(n*m) grep in diff loop)
+typeset -A CURRENT_KEYS
+while IFS=$'\t' read -r _d _k _v; do
+  CURRENT_KEYS["${_d}${TAB}${_k}"]=1
+done < "$CURRENT"
+
 drift_lines=()
 new_lines=()
 removed_lines=()
@@ -403,9 +375,7 @@ print -r -- "$diffout" | while IFS= read -r line; do
     is_noise "$key" && continue
 
     # Only report if truly removed (not just changed value)
-    if ! grep -qF "${domain}${TAB}${key}${TAB}" "$CURRENT" 2>/dev/null; then
-      removed_lines+=("$domain → $key (was: $val)")
-    fi
+    (( ${+CURRENT_KEYS[${domain}${TAB}${key}]} )) || removed_lines+=("$domain → $key (was: $val)")
   fi
 done
 
