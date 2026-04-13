@@ -69,7 +69,7 @@ local -a NOISE_PATTERNS=(
   'RecentSearches'
   'NSNavPanel'
   'NSWindow Frame'
-  'NSStatusItem Preferred Position'
+  'NSStatusItem'
   'NSToolbar'
   'NSSplitView'
   'NSTableView'
@@ -78,6 +78,8 @@ local -a NOISE_PATTERNS=(
   'GoToField'
   'SearchCriteria'
   'BackupAlias'
+  'bootUUID'
+  'urgentSubmission'
   'FK_SidebarWidth'
   'TrashState'
   'SpacesDisplayConfiguration'
@@ -174,7 +176,9 @@ dump_current() {
     raw=$(defaults read "$domain" 2>/dev/null) || continue
     print -r -- "$raw" | while IFS= read -r line; do
       # Match top-level keys: exactly 4 leading spaces, key = value;
-      if [[ "$line" =~ '^    "?([^"=]+)"? = (.+);$' ]]; then
+      # [^"= ] ensures first char of key is not a space, preventing nested entries
+      # (nested entries have 8+ leading spaces; the extra spaces would land in key)
+      if [[ "$line" =~ '^    "?([^"= ][^"=]*)"? = (.+);$' ]]; then
         local key="${match[1]}"
         local val="${match[2]}"
         key="${key## }"
