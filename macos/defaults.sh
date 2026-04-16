@@ -112,6 +112,12 @@ w com.apple.dock autohide -bool true
 # Don't show recent applications in Dock
 w com.apple.dock show-recents -bool false
 
+# Enable App Exposé trackpad gesture (three-finger swipe down)
+w com.apple.dock showAppExposeGestureEnabled -bool true
+
+# Enable Mission Control trackpad gesture (three-finger swipe up)
+w com.apple.dock showMissionControlGestureEnabled -bool true
+
 # ─── Window Manager ──────────────────────────────────────
 
 section "Window Manager"
@@ -193,6 +199,9 @@ fi
 # Requires logout/restart to take effect.
 w NSGlobalDomain InitialKeyRepeat -int 15
 w NSGlobalDomain KeyRepeat -int 2
+
+# Disable swipe-to-navigate (two-finger swipe between pages in browsers, etc.)
+w NSGlobalDomain AppleEnableSwipeNavigateWithScrolls -bool false
 
 # ─── Typing & Text ────────────────────────────────────────
 

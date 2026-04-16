@@ -258,7 +258,7 @@ is_noise() { [[ "$1" =~ $NOISE_RE ]]; }
 
 typeset -A TRACKED
 while IFS=$'\t' read -r _d _k _v; do
-  TRACKED["${_d}${TAB}${_k}"]="$_v"
+  TRACKED[${_d}${TAB}${_k}]="$_v"
 done < <("$SCRIPT_DIR/defaults.sh" --list-tracked)
 
 # ── Dump current state as sorted TSV: domain\tkey\tvalue ─
@@ -328,7 +328,7 @@ dump_current > "$CURRENT"
 # Build key set for O(1) removed-key lookup (avoids O(n*m) grep in diff loop)
 typeset -A CURRENT_KEYS
 while IFS=$'\t' read -r _d _k _v; do
-  CURRENT_KEYS["${_d}${TAB}${_k}"]=1
+  CURRENT_KEYS[${_d}${TAB}${_k}]=1
 done < "$CURRENT"
 
 drift_lines=()
