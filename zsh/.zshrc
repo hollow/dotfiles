@@ -512,7 +512,6 @@ zi auto has"gcloud" wait1 for gcloud
 zi auto id-as"git" as"completion" blockf mv"git->_git" wait for \
     https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
 
-alias c="git changes"
 alias ga="git add --all"
 alias gap="git add --patch"
 alias gcl="git checkout-latest main"
@@ -520,7 +519,7 @@ alias gcm="git co \$(git main-branch)"
 alias gcu="git co upstream"
 alias gd="git diff"
 alias gdc="git dc"
-alias gdm="git diff \$(git main-branch)"
+alias gdm="git diff origin/\$(git main-branch)"
 alias gdu="git diff upstream/\$(git main-branch)"
 alias gf="git fetch --prune"
 alias gl="git lg"
@@ -574,6 +573,16 @@ ghc() {
 ghm() {
     gh pr merge --merge "$@" && \
     ghc
+}
+
+grc() {
+    git reset --soft origin/$(git main-branch) && git add --all && git commit -m "$@"
+}
+
+git-dmb-configure() {
+    git config set remote.origin.dmb-enabled true
+    git config set branch.$(git main-branch).dmb-required true
+    git config set delete-merged-branches.configured 5.0.0+
 }
 
 # gnupg: GNU privacy guard

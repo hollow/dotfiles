@@ -11,18 +11,16 @@
 [alias]
 	aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
 	amend = ci --amend --reuse-message=HEAD
-	changes = status --untracked-files=no --short
+	b = !git --no-pager log --decorate --format="%D" -1
 	ci = commit
 	co = checkout
 	dc = diff --cached
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	ls = ls-tree -r HEAD
-	new = !sh -c 'git lg $1@{1}..$1@{0} "$@"'
-	rank = shortlog -sn --no-merges
-	st = status --short --branch
+	st = status --short
 	stat = diff --stat
 	tags = tag -l
-	whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+	w = !git --no-pager show -s --pretty='tformat:%h %ad %s' --date=short
 
 [advice]
 	detachedHead = false
