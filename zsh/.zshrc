@@ -393,6 +393,7 @@ zi auto has"checkov" wait for checkov
 # claude: AI assistant by Anthropic
 # https://claude.ai
 export CLAUDE_CONFIG_DIR="${XDG_CONFIG_HOME}/claude"
+export CLAUDE_CODE_NEW_INIT=1
 link claude .claude
 
 # colordiff: syntax highlighting for diff

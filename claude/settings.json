@@ -1,32 +1,68 @@
 {
   "permissions": {
+    "deny": [
+      "EnterPlanMode"
+    ],
     "defaultMode": "auto"
   },
   "model": "opus[1m]",
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline.sh"
+    "command": "~/.local/bin/starship-claude",
+    "padding": 0
   },
   "enabledPlugins": {
+    "atlassian@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
-    "confluence@remerge-plugins": true,
-    "bet-assistant@remerge-plugins": true,
-    "jira-branch-naming@remerge-plugins": true
+    "gopls-lsp@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "ruby-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "slack@claude-plugins-official": true,
+    "starship-claude@starship-claude": true,
+    "superpowers-extended-cc@superpowers-extended-cc-marketplace": true,
+    "terraform-code-generation@hashicorp": true,
+    "terraform-module-generation@hashicorp": true,
+    "terraform@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "bet-assistant@remerge-ai-assets": true,
+    "confluence@remerge-ai-assets": true,
+    "branch-naming@remerge-ai-assets": true
   },
   "extraKnownMarketplaces": {
+    "hashicorp": {
+      "source": {
+        "source": "github",
+        "repo": "hashicorp/agent-skills"
+      }
+    },
     "remerge-plugins": {
       "source": {
         "source": "github",
         "repo": "remerge/claude-plugins"
       }
+    },
+    "superpowers-extended-cc-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "pcvelz/superpowers"
+      }
+    },
+    "starship-claude": {
+      "source": {
+        "source": "github",
+        "repo": "martinemde/starship-claude"
+      }
+    },
+    "remerge-ai-assets": {
+      "source": {
+        "source": "github",
+        "repo": "remerge/ai-assets"
+      }
     }
   },
-  "alwaysThinkingEnabled": true,
   "skipAutoPermissionPrompt": true
 }
