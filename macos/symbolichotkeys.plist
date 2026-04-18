@@ -4,6 +4,86 @@
 <dict>
 	<key>AppleSymbolicHotKeys</key>
 	<dict>
+		<key>184</key>
+		<dict>
+			<key>enabled</key>
+			<false/>
+			<key>value</key>
+			<dict>
+				<key>parameters</key>
+				<array>
+					<integer>53</integer>
+					<integer>23</integer>
+					<integer>1179648</integer>
+				</array>
+				<key>type</key>
+				<string>standard</string>
+			</dict>
+		</dict>
+		<key>28</key>
+		<dict>
+			<key>enabled</key>
+			<false/>
+			<key>value</key>
+			<dict>
+				<key>parameters</key>
+				<array>
+					<integer>51</integer>
+					<integer>20</integer>
+					<integer>1179648</integer>
+				</array>
+				<key>type</key>
+				<string>standard</string>
+			</dict>
+		</dict>
+		<key>29</key>
+		<dict>
+			<key>enabled</key>
+			<false/>
+			<key>value</key>
+			<dict>
+				<key>parameters</key>
+				<array>
+					<integer>51</integer>
+					<integer>20</integer>
+					<integer>1441792</integer>
+				</array>
+				<key>type</key>
+				<string>standard</string>
+			</dict>
+		</dict>
+		<key>30</key>
+		<dict>
+			<key>enabled</key>
+			<false/>
+			<key>value</key>
+			<dict>
+				<key>parameters</key>
+				<array>
+					<integer>52</integer>
+					<integer>21</integer>
+					<integer>1179648</integer>
+				</array>
+				<key>type</key>
+				<string>standard</string>
+			</dict>
+		</dict>
+		<key>31</key>
+		<dict>
+			<key>enabled</key>
+			<false/>
+			<key>value</key>
+			<dict>
+				<key>parameters</key>
+				<array>
+					<integer>52</integer>
+					<integer>21</integer>
+					<integer>1441792</integer>
+				</array>
+				<key>type</key>
+				<string>standard</string>
+			</dict>
+		</dict>
 		<key>64</key>
 		<dict>
 			<key>enabled</key>
@@ -15,6 +95,22 @@
 					<integer>32</integer>
 					<integer>49</integer>
 					<integer>1048576</integer>
+				</array>
+				<key>type</key>
+				<string>standard</string>
+			</dict>
+		</dict>
+		<key>65</key>
+		<dict>
+			<key>enabled</key>
+			<true/>
+			<key>value</key>
+			<dict>
+				<key>parameters</key>
+				<array>
+					<integer>32</integer>
+					<integer>49</integer>
+					<integer>1572864</integer>
 				</array>
 				<key>type</key>
 				<string>standard</string>

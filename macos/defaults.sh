@@ -149,12 +149,18 @@ section "Finder"
 # Show all file extensions in Finder
 w NSGlobalDomain AppleShowAllExtensions -bool true
 
+# Disable warning when changing a file's extension
+w com.apple.finder FXEnableExtensionChangeWarning -bool false
+
 # Default to list view in all windows
 # Nlsv = list, icnv = icon, clmv = column, glyv = gallery
 w com.apple.finder FXPreferredViewStyle -string "Nlsv"
 
-# Show external hard drives on desktop
-w com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+# Hide external hard drives on desktop
+w com.apple.finder ShowExternalHardDrivesOnDesktop -bool false
+
+# Hide removable media (CDs, DVDs, iPods) on desktop
+w com.apple.finder ShowRemovableMediaOnDesktop -bool false
 
 # Show path bar and status bar
 w com.apple.finder ShowPathbar -bool true
