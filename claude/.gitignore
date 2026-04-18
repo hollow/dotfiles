@@ -6,9 +6,12 @@ debug/
 file-history/
 history.jsonl
 ide/
+image-cache/
 plans/
 plugins/
 policy-limits.json
 projects/
 remote-settings.json
+sessions/
+shell-snapshots/
 tasks/

@@ -90,11 +90,13 @@ section "Appearance"
 # Dark mode
 w NSGlobalDomain AppleInterfaceStyle -string "Dark"
 
-# Menu bar: auto-hide (0 = always, 1 = desktop only, 2 = fullscreen only, 3 = never)
-w com.apple.controlcenter AutoHideMenuBarOption -int 3
+# Menu bar: auto-hide (0 = always, 1 = desktop only, 2 = fullscreen only, 3 = never).
+# `defaults write` here is unreliable — ControlCenter writes back its in-memory value on
+# restart. Change via System Settings > Control Center > Automatically hide menu bar.
+w com.apple.controlcenter AutoHideMenuBarOption -int 2
 
-# Show menu bar in fullscreen
-w NSGlobalDomain AppleMenuBarVisibleInFullscreen -bool true
+# Hide menu bar in fullscreen (paired with AutoHideMenuBarOption=2 above)
+w NSGlobalDomain AppleMenuBarVisibleInFullscreen -bool false
 
 # Disable transparency (windows, menu bar)
 w com.apple.Accessibility reduceTransparency -bool true
@@ -182,6 +184,9 @@ section "Keyboard"
 # Fn key: Show Emoji & Symbols (0=nothing, 1=input source, 2=emoji, 3=dictation)
 w com.apple.HIToolbox AppleFnUsageType -int 2
 
+# Use F1, F2, etc. keys as standard function keys (hold fn for special features)
+w NSGlobalDomain com.apple.keyboard.fnState -bool true
+
 # Keyboard shortcuts (system-wide)
 # Edit macos/symbolichotkeys.plist or re-export after changing in System Settings:
 #   defaults export com.apple.symbolichotkeys macos/symbolichotkeys.plist
@@ -246,45 +251,45 @@ w com.apple.DiskUtility SidebarShowAllDevices -bool true
 # To track a new app: find its domain via `defaults domains | tr ',' '\n' | grep -i <name>`,
 # then add `w <domain> <key> ...` lines below AND the domain to DOMAINS in reconcile.sh.
 
-# Lungo: prevent display sleep
-w com.sindresorhus.Lungo-setapp activateAtLaunch -bool false
-w com.sindresorhus.Lungo-setapp activateOnLeftClick -bool true
-w com.sindresorhus.Lungo-setapp allowDisplayToSleep -bool true
-w com.sindresorhus.Lungo-setapp deactivateWhenOnBattery -bool true
-w com.sindresorhus.Lungo-setapp dimIconWhenDeactivated -bool true
-
-# CleanMyMac: system maintenance
+# CleanMyMac: maintenance / malware scanner
+# Enable menu bar app
+w com.macpaw.CleanMyMac-setapp MenuAppEnabled -bool true
+# Show assistant recommendations in the UI
 w com.macpaw.CleanMyMac-setapp ShowAssistantRecommendations -bool true
-# CleanMyMac stores most prefs in a sandboxed group container, not the regular domain.
-# `defaults` accepts a full plist path in place of a domain name.
-CMM_GROUP="$HOME/Library/Group Containers/S8EX82NJP6.com.macpaw.CleanMyMac-setapp/Library/Preferences/S8EX82NJP6.com.macpaw.CleanMyMac-setapp"
-w "$CMM_GROUP" SoundsEnabled -bool false
-w "$CMM_GROUP" TrashSizeAlertsEnabled -bool false
+# Settings in the Setapp group container plist (not a regular defaults domain,
+# so addressed by full path).
+CMM_PLIST="$HOME/Library/Group Containers/S8EX82NJP6.com.macpaw.CleanMyMac-setapp/Library/Preferences/S8EX82NJP6.com.macpaw.CleanMyMac-setapp.plist"
+# Disable Smart Care reminder nags
+w "$CMM_PLIST" SmartCareReminderEnabled -bool false
+# Disable custom themes (use system appearance)
+w "$CMM_PLIST" CustomThemes -bool false
+# Silence sound effects
+w "$CMM_PLIST" SoundsEnabled -bool false
+# Disable trash-size alerts
+w "$CMM_PLIST" TrashSizeAlertsEnabled -bool false
+# Malware scan mode: "protected" (continuous) vs "manual"
+w "$CMM_PLIST" MalwareScanMode -string "protected"
 
-# CleanShot X: screenshot/recording tool
-w com.getcleanshot.app-setapp captureWithoutDesktopIcons -bool true
-w com.getcleanshot.app-setapp exportPath -string "$HOME/Documents/Screenshots"
-w com.getcleanshot.app-setapp playSounds -bool false
-w com.getcleanshot.app-setapp popupAskForDestinationWhenSaving -bool false
-# After capture actions. Action IDs: 0=QAO, 1=Copy, 2=Save, 3=Annotate, 4=Pin, 5=VideoEditor (mapping inferred, may be off)
-w com.getcleanshot.app-setapp afterScreenshotActions -array -int 2 3
-w com.getcleanshot.app-setapp afterVideoActions -array -int 2 5
+# ForkLift: file manager / SFTP client
+w com.binarynights.forklift-setapp theme -string "DefaultDark"
+# Terminal app for "Open in Terminal". 5 = Ghostty (mapping inferred)
+w com.binarynights.forklift-setapp TerminalApplication -int 5
+# Hide title bar (show toolbar only)
+w com.binarynights.forklift-setapp hideTitleBar -bool true
+# Show path bar
+w com.binarynights.forklift-setapp hidePathBar -bool false
+# Hide device info in sidebar
+w com.binarynights.forklift-setapp showDeviceInfo -bool false
+# Info pane mode: 0 = off
+w com.binarynights.forklift-setapp infoMode -int 0
 
-# ─── Hot Corners ──────────────────────────────────────────
-# All hot corners disabled (macOS default).
-
-# ─── Locale ───────────────────────────────────────────────
-# English UI with German region formats (dates, currency, etc.)
-# Set via System Settings > General > Language & Region; not settable
-# via defaults write alone. Documented for reference:
-#   AppleLocale = "en_US@rg=dezzzz"
-#   AppleLanguages = ("en-US", "de-DE")
-
-# ─── Keyboard Layout ─────────────────────────────────────
-# ABC keyboard layout. Set via System Settings > Keyboard > Input Sources.
-# Documented for reference:
-#   KeyboardLayout Name = ABC
-#   KeyboardLayout ID = 252
+# Raycast: launcher (replaces Spotlight; Spotlight hotkey disabled in symbolichotkeys.plist)
+# Global hotkey format: "<Modifier>-<keycode>". 49 = spacebar, so Command-49 = ⌘Space.
+w com.raycast.macos raycastGlobalHotkey -string "Command-49"
+# Hide menu bar icon
+w com.raycast.macos "NSStatusItem VisibleCC raycastIcon" -bool false
+# Esc key behavior: 1 = close window (vs minimize)
+w com.raycast.macos raycastWindowEscapeKeyBehavior -int 1
 
 # ─── Restart affected services ────────────────────────────
 

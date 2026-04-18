@@ -57,13 +57,10 @@ local -a DOMAINS=(
   com.apple.NetworkBrowser
   com.apple.TimeMachine
   # Third-party apps
-  com.sindresorhus.Lungo-setapp
-  com.macpaw.CleanMyMac-setapp
-  com.macpaw.CleanMyMac-setapp.Menu
   com.eltima.elmedia-setapp
-  com.getcleanshot.app-setapp
-  # Group containers (full plist path; sandboxed apps store prefs here, not in regular domains)
-  "$HOME/Library/Group Containers/S8EX82NJP6.com.macpaw.CleanMyMac-setapp/Library/Preferences/S8EX82NJP6.com.macpaw.CleanMyMac-setapp"
+  com.raycast.macos
+  com.binarynights.forklift-setapp
+  com.macpaw.CleanMyMac-setapp
 )
 
 # ── Keys to ignore (ephemeral / noise) ──────────────────
@@ -106,7 +103,6 @@ local -a NOISE_PATTERNS=(
   'oneTimeSS'
   'MiniBuddy'
   'GuestPassDeviceUUID'
-  'CommandHistory'
   'shouldShowRSVP'
   'tokenRemovalAction'
   'SecureKeyboardEntry'
@@ -127,7 +123,6 @@ local -a NOISE_PATTERNS=(
   'AppleCurrentKeyboardLayoutInputSourceID'
   'com\.apple\.finder\.SyncExtensions'
   'trash-full'
-  '^raw='
   'History'
   'MouseKeys'
   'closeView'
@@ -180,7 +175,6 @@ local -a NOISE_PATTERNS=(
   # NSGlobalDomain UI/input noise
   '_HIHideMenuBar'
   'AppleKeyboardUIMode'
-  'com\.apple\.keyboard\.fnState'
   'com\.apple\.mouse\.scaling'
   'com\.apple\.sound\.uiaudio'
   'NavPanelFileListMode'
@@ -259,28 +253,42 @@ local -a NOISE_PATTERNS=(
   '^SS_'
   '^STP_'
   'com_apple_SwiftUI_Settings_selectedTabIndex'
-  # CleanMyMac: announcement-shown tracking, service state, migration markers
-  '^Announcements_'
-  '^FRService'
-  '^KeychainAccessibilityMigration$'
+  # Raycast: onboarding flags, AI/extension/calculator runtime state, UI restore data,
+  # internal migration markers, install-time defaults, granted folder permissions, install IDs
+  '^onboarding'
+  '^raycastAI_'
+  '^calculator_'
+  '^commandsPreferencesExpandedItemIds$'
+  '^emojiPicker_skinTone$'
+  '^fallbackSearches_didMigrateScriptCommands$'
+  '^raycast-preferences-restorableData$'
+  '^raycastGlobalHotkeyMigrated$'
+  '^aiDynamicPlaceholdersMigrationDate$'
+  '^database_lastValid'
+  '^floatingNotes_'
+  '^hasQueuedStatusBarHint$'
+  '^hasShownStatusBarHintAfterOnboarding$'
+  '^mainWindow_isMonitoringGlobalHotkeys$'
+  '^permissions\.'
+  '^raycastAnonymousId$'
+  '^raycastInstallationDate$'
+  '^raycastLoginItemAutoInstalled$'
+  '^raycastPreferredWindowMode$'
+  '^raycastShouldFollowSystemAppearance$'
+  '^showGettingStartedLink$'
+  '^store_migrated'
+  '^store_termsAccepted$'
+  '^subscriptions_active$'
+  '^useHyperKeyIcon$'
+  '^command-extension_'
+  # ForkLift: ephemeral UI/session state
+  '^previewDividerPosition$'
+  '^settingsSelection$'
+  '^connectViewProtocol$'
+  # CleanMyMac: one-time migration flags, telemetry eligibility, version tracking
   '^CMIsUserEligibleForAppsStatistics$'
-  '^AnalyticsIdentifier$'
-  '^FinderSyncExtensionWasAutoEnabled$'
-  '^IntroVideoWasViewed$'
-  '^HealthMonitorLastKnownVersion$'
-  # CleanShot X: onboarding/feature-awareness flags, drawing tool state, session counters,
-  # privacy-sensitive analytics UUID, and one-time migration markers.
-  '^LAVA'
-  '^MGR[0-9]+$'
-  '^QTIP_'
-  '^s00[0-9]$'
-  '^annotateLast'
-  '^annotateTextStyle$'
-  '^markupLast'
-  '^lastLaunchVersion$'
-  '^lastAcceptedEulaVersion$'
-  '^onboardingDisplayed$'
-  '^IKAnonymousIdentifier$'
+  '^FRServiceLastKnownVersion$'
+  '^KeychainAccessibilityMigration$'
 )
 
 # Build single alternation regex for O(1) noise checks
@@ -298,28 +306,21 @@ done < <("$SCRIPT_DIR/defaults.sh" --list-tracked)
 # ── Dump current state as sorted TSV: domain\tkey\tvalue ─
 
 dump_current() {
-  local domain
+  local domain raw line key val
   for domain in "${DOMAINS[@]}"; do
-    local raw
     raw=$(defaults read "$domain" 2>/dev/null) || continue
-    print -r -- "$raw" | while IFS= read -r line; do
+    while IFS= read -r line; do
       # Match top-level keys: exactly 4 leading spaces, key = value;
       # [^"= ] ensures first char of key is not a space, preventing nested entries
       # (nested entries have 8+ leading spaces; the extra spaces would land in key)
-      if [[ "$line" =~ '^    "?([^"= ][^"=]*)"? = (.+);$' ]]; then
-        local key="${match[1]}"
-        local val="${match[2]}"
-        key="${key## }"
-        key="${key%% }"
-        val="${val## }"
-        val="${val%% }"
-        # Skip nested structures
-        [[ "$val" == "(" || "$val" == "{" ]] && continue
-        # Skip binary/data blobs
-        [[ "$val" == *"length ="*"bytes ="* ]] && continue
-        print "${domain}${TAB}${key}${TAB}${val}"
-      fi
-    done
+      [[ "$line" =~ '^    "?([^"= ][^"=]*)"? = (.+);$' ]] || continue
+      key="${match[1]## }"; key="${key%% }"
+      val="${match[2]## }"; val="${val%% }"
+      # Skip nested structures and binary/data blobs
+      [[ "$val" == "(" || "$val" == "{" ]] && continue
+      [[ "$val" == *"length ="*"bytes ="* ]] && continue
+      print "${domain}${TAB}${key}${TAB}${val}"
+    done <<< "$raw"
   done | sort
 }
 
@@ -385,7 +386,7 @@ done
 
 diffout=$(diff "$BASELINE" "$CURRENT" 2>/dev/null) || true
 
-print -r -- "$diffout" | while IFS= read -r line; do
+while IFS= read -r line; do
   if [[ "$line" == "> "* ]]; then
     entry="${line#> }"
     domain="${entry%%${TAB}*}"
@@ -411,7 +412,7 @@ print -r -- "$diffout" | while IFS= read -r line; do
     # Only report if truly removed (not just changed value)
     (( ${+CURRENT_KEYS[${domain}${TAB}${key}]} )) || removed_lines+=("$domain → $key (was: $val)")
   fi
-done
+done <<< "$diffout"
 
 # ── Report ───────────────────────────────────────────────
 
