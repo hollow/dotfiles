@@ -1,6 +1,14 @@
 .claude.json
 backups/
 cache/
+chrome/
+debug/
+file-history/
 history.jsonl
+ide/
+plans/
 plugins/
+policy-limits.json
 projects/
+remote-settings.json
+tasks/
