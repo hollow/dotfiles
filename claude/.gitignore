@@ -1,0 +1,6 @@
+.claude.json
+backups/
+cache/
+history.jsonl
+plugins/
+projects/
