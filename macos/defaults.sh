@@ -242,6 +242,34 @@ w com.apple.TextEdit RichText -bool false
 # Disk Utility: show all devices in sidebar
 w com.apple.DiskUtility SidebarShowAllDevices -bool true
 
+# ─── Third-party apps ─────────────────────────────────────
+# To track a new app: find its domain via `defaults domains | tr ',' '\n' | grep -i <name>`,
+# then add `w <domain> <key> ...` lines below AND the domain to DOMAINS in reconcile.sh.
+
+# Lungo: prevent display sleep
+w com.sindresorhus.Lungo-setapp activateAtLaunch -bool false
+w com.sindresorhus.Lungo-setapp activateOnLeftClick -bool true
+w com.sindresorhus.Lungo-setapp allowDisplayToSleep -bool true
+w com.sindresorhus.Lungo-setapp deactivateWhenOnBattery -bool true
+w com.sindresorhus.Lungo-setapp dimIconWhenDeactivated -bool true
+
+# CleanMyMac: system maintenance
+w com.macpaw.CleanMyMac-setapp ShowAssistantRecommendations -bool true
+# CleanMyMac stores most prefs in a sandboxed group container, not the regular domain.
+# `defaults` accepts a full plist path in place of a domain name.
+CMM_GROUP="$HOME/Library/Group Containers/S8EX82NJP6.com.macpaw.CleanMyMac-setapp/Library/Preferences/S8EX82NJP6.com.macpaw.CleanMyMac-setapp"
+w "$CMM_GROUP" SoundsEnabled -bool false
+w "$CMM_GROUP" TrashSizeAlertsEnabled -bool false
+
+# CleanShot X: screenshot/recording tool
+w com.getcleanshot.app-setapp captureWithoutDesktopIcons -bool true
+w com.getcleanshot.app-setapp exportPath -string "$HOME/Documents/Screenshots"
+w com.getcleanshot.app-setapp playSounds -bool false
+w com.getcleanshot.app-setapp popupAskForDestinationWhenSaving -bool false
+# After capture actions. Action IDs: 0=QAO, 1=Copy, 2=Save, 3=Annotate, 4=Pin, 5=VideoEditor (mapping inferred, may be off)
+w com.getcleanshot.app-setapp afterScreenshotActions -array -int 2 3
+w com.getcleanshot.app-setapp afterVideoActions -array -int 2 5
+
 # ─── Hot Corners ──────────────────────────────────────────
 # All hot corners disabled (macOS default).
 

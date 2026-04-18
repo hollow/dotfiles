@@ -56,6 +56,14 @@ local -a DOMAINS=(
   com.apple.frameworks.diskimages
   com.apple.NetworkBrowser
   com.apple.TimeMachine
+  # Third-party apps
+  com.sindresorhus.Lungo-setapp
+  com.macpaw.CleanMyMac-setapp
+  com.macpaw.CleanMyMac-setapp.Menu
+  com.eltima.elmedia-setapp
+  com.getcleanshot.app-setapp
+  # Group containers (full plist path; sandboxed apps store prefs here, not in regular domains)
+  "$HOME/Library/Group Containers/S8EX82NJP6.com.macpaw.CleanMyMac-setapp/Library/Preferences/S8EX82NJP6.com.macpaw.CleanMyMac-setapp"
 )
 
 # ── Keys to ignore (ephemeral / noise) ──────────────────
@@ -247,6 +255,32 @@ local -a NOISE_PATTERNS=(
   'com\.apple\.WebPrivacy'
   'WebKitPreferences\.'
   'WebKitRespect'
+  # Setapp internal state (third-party apps distributed via Setapp)
+  '^SS_'
+  '^STP_'
+  'com_apple_SwiftUI_Settings_selectedTabIndex'
+  # CleanMyMac: announcement-shown tracking, service state, migration markers
+  '^Announcements_'
+  '^FRService'
+  '^KeychainAccessibilityMigration$'
+  '^CMIsUserEligibleForAppsStatistics$'
+  '^AnalyticsIdentifier$'
+  '^FinderSyncExtensionWasAutoEnabled$'
+  '^IntroVideoWasViewed$'
+  '^HealthMonitorLastKnownVersion$'
+  # CleanShot X: onboarding/feature-awareness flags, drawing tool state, session counters,
+  # privacy-sensitive analytics UUID, and one-time migration markers.
+  '^LAVA'
+  '^MGR[0-9]+$'
+  '^QTIP_'
+  '^s00[0-9]$'
+  '^annotateLast'
+  '^annotateTextStyle$'
+  '^markupLast'
+  '^lastLaunchVersion$'
+  '^lastAcceptedEulaVersion$'
+  '^onboardingDisplayed$'
+  '^IKAnonymousIdentifier$'
 )
 
 # Build single alternation regex for O(1) noise checks

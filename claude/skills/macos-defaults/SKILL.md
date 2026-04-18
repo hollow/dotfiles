@@ -1,11 +1,28 @@
 ---
 name: macos-defaults
-description: Help discover macOS plist keys and add/update entries in macos/defaults.sh. Use when the user wants to track a new macOS setting or remove an existing one.
+description: Help discover macOS plist keys, add/update entries in macos/defaults.sh, and check for drift from tracked settings. Use when the user wants to track a new macOS setting, remove one, or check whether manually-changed settings have diverged from what's checked in.
 ---
 
-The user wants to add, change, or remove a macOS default in this dotfiles repo.
+The user wants to add, change, or remove a macOS default in this dotfiles repo — or check for drift between their live system and what's tracked.
 
-## Workflow
+## Check-drift workflow
+
+Use this when the user asks to "check drift", "check for drift", or similar. Scalar settings and keyboard shortcuts live in different files and must both be checked:
+
+1. **Scalar drift** — `./macos/reconcile.sh` compares tracked scalars and all baseline-tracked domains.
+2. **Keyboard shortcut drift** — `reconcile.sh` can't see nested dicts, so also diff the symbolichotkeys plist directly:
+   ```
+   diff <(defaults export com.apple.symbolichotkeys - | plutil -convert xml1 - -o -) macos/symbolichotkeys.plist
+   ```
+   If it differs, offer to re-export:
+   ```
+   defaults export com.apple.symbolichotkeys - | plutil -convert xml1 - -o macos/symbolichotkeys.plist
+   ```
+3. **Resolve** — For each reported change, ask whether to adopt (update `defaults.sh` / re-export the plist), revert (manually reset), or snapshot (treat as baseline noise without tracking).
+4. **Confirm clean** — Re-run `./macos/reconcile.sh` and the plist diff until both are clean.
+5. **Snapshot** — Once clean, offer `./macos/reconcile.sh --snapshot` to update the scalar baseline.
+
+## Add/update/remove workflow
 
 1. **Discover the key** — If the user describes a setting rather than giving the exact key, run:
    ```
