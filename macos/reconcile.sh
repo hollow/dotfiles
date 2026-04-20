@@ -68,6 +68,8 @@ local -a DOMAINS=(
 local -a NOISE_PATTERNS=(
   '(last|Last|LAST).*(stamp|Stamp|date|Date|time|Time|check|Check|interval|Interval|posted|Posted)'
   '(analytics|Analytics|telemetry|Telemetry|heartbeat|Heartbeat)'
+  # CloudKit startup time (written on every launch by many apps)
+  '^CKStartupTime$'
   'mod-count'
   'recent-apps'
   'RecentDocuments'
@@ -228,6 +230,10 @@ local -a NOISE_PATTERNS=(
   # mail/terminal one-off migration keys
   'MailUpgraderPrePersistenceVersion'
   'Shell'
+  # Mail runtime counters/state
+  '^MailDockBadge$'
+  '^kDefaultsKeyLastVerifiedMessageID$'
+  '^MSAssetDownloadRetryInterval\.'
   # Safari runtime/migration state
   'DidMigrate'
   'DidClear'
@@ -249,6 +255,11 @@ local -a NOISE_PATTERNS=(
   'com\.apple\.WebPrivacy'
   'WebKitPreferences\.'
   'WebKitRespect'
+  # Safari UI/session state
+  '\.UpdateDate$'
+  '^DateOfLastSessionStateDataCleanup$'
+  '^LastExtensionSelectedInPreferences$'
+  '^NSPreferencesSelectedIndex$'
   # Setapp internal state (third-party apps distributed via Setapp)
   '^SS_'
   '^STP_'
@@ -285,10 +296,21 @@ local -a NOISE_PATTERNS=(
   '^previewDividerPosition$'
   '^settingsSelection$'
   '^connectViewProtocol$'
+  '^latestCrashReport$'
+  '^GetInfoWindowFrame$'
+  '^DatabaseModified$'
+  '^KeyWindow(Left|Right)ViewMode$'
   # CleanMyMac: one-time migration flags, telemetry eligibility, version tracking
   '^CMIsUserEligibleForAppsStatistics$'
   '^FRServiceLastKnownVersion$'
   '^KeychainAccessibilityMigration$'
+  # CleanMyMac: DB hash/size, launch/clean counters, instance/bundle state
+  '^DbHash$'
+  '^DbSize$'
+  '^LaunchCount$'
+  '^TotalCleansCount$'
+  '^CMAUIdentifier$'
+  '^LastActiveBundle$'
 )
 
 # Build single alternation regex for O(1) noise checks
