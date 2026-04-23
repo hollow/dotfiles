@@ -394,6 +394,7 @@ zi auto has"checkov" wait for checkov
 # https://claude.ai
 export CLAUDE_CONFIG_DIR="${XDG_CONFIG_HOME}/claude"
 export CLAUDE_CODE_NEW_INIT=1
+export ENABLE_CLAUDEAI_MCP_SERVERS=false
 link claude .claude
 
 # colordiff: syntax highlighting for diff
