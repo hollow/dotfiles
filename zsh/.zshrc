@@ -485,6 +485,9 @@ zi auto has"fzf" wait for Aloxaf/fzf-tab
 # preview directory content with eza when completing cd
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
 
+# fnox:
+export FNOX_AGE_KEY_FILE="${HOME}/.ssh/id_ed25519"
+
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 :gcloud-update() {
