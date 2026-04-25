@@ -286,6 +286,7 @@ local -a NOISE_PATTERNS=(
   '^raycastLoginItemAutoInstalled$'
   '^raycastPreferredWindowMode$'
   '^raycastShouldFollowSystemAppearance$'
+  '^raycast-updates-'
   '^showGettingStartedLink$'
   '^store_migrated'
   '^store_termsAccepted$'

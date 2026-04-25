@@ -255,8 +255,8 @@ w com.apple.DiskUtility SidebarShowAllDevices -bool true
 # then add `w <domain> <key> ...` lines below AND the domain to DOMAINS in reconcile.sh.
 
 # CleanMyMac: maintenance / malware scanner
-# Enable menu bar app
-w com.macpaw.CleanMyMac-setapp MenuAppEnabled -bool true
+# Disable menu bar app
+w com.macpaw.CleanMyMac-setapp MenuAppEnabled -bool false
 # Show assistant recommendations in the UI
 w com.macpaw.CleanMyMac-setapp ShowAssistantRecommendations -bool true
 # Settings in the Setapp group container plist (not a regular defaults domain,
