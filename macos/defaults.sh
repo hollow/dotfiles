@@ -98,6 +98,9 @@ w com.apple.controlcenter AutoHideMenuBarOption -int 2
 # Hide menu bar in fullscreen (paired with AutoHideMenuBarOption=2 above)
 w NSGlobalDomain AppleMenuBarVisibleInFullscreen -bool false
 
+# Show blurred menu bar background (vs fully transparent over wallpaper)
+w NSGlobalDomain SLSMenuBarUseBlurredAppearance -bool true
+
 # Disable transparency (windows, menu bar)
 w com.apple.Accessibility reduceTransparency -bool true
 
