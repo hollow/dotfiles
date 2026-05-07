@@ -3,18 +3,6 @@ if [[ -n "${ZSH_PROF+1}" ]]; then
     zmodload zsh/zprof
 fi
 
-if [[ -n "${ZSH_DEBUGRC+1}" ]]; then
-    zmodload zsh/datetime
-    setopt PROMPT_SUBST
-    PS4='+$EPOCHREALTIME %N:%i> '
-
-    logfile=$(mktemp zsh_profile.XXXXXXXX)
-    echo "Logging to $logfile"
-    exec 3>&2 2>$logfile
-
-    setopt XTRACE
-fi
-
 # user information (for git, gpg, etc)
 export USER_NAME="Benedikt Böhm"
 export USER_EMAIL="bb@xnull.de"
@@ -74,8 +62,8 @@ typeset -TUx FPATH fpath=(
 # but `command foo` still resolves to system binaries first
 path+=("${ZDOTDIR}")
 
-# autoload all regular files in ZDOTDIR (excluding .awk helpers)
-autoload -Uz ${ZDOTDIR}/*~*.awk(.N:t)
+# autoload all regular files in ZDOTDIR
+autoload -Uz ${ZDOTDIR}/*(.N:t)
 
 # add homebrew path as early as possible
 if has /opt/homebrew/bin/brew; then
@@ -694,6 +682,10 @@ zi auto wait for hlissner/zsh-autopair
 zi auto blockf atpull'zinit creinstall -q .' \
     wait for zsh-users/zsh-completions
 
+# zsh-bench: benchmark zsh startup and interactive lag
+# https://github.com/romkatv/zsh-bench
+zi as"program" wait for romkatv/zsh-bench
+
 # Load .envrc after shell initialization if present
 if [[ -e .envrc ]]; then
     pushd "${HOME}" &>/dev/null && popd
@@ -703,7 +695,3 @@ if [[ -n "${ZSH_PROF+1}" ]]; then
     zprof
 fi
 
-if [[ -n "${ZSH_DEBUGRC+1}" ]]; then
-    unsetopt XTRACE
-    exec 2>&3 3>&-
-fi
