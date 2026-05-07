@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+[[ $TRACE -eq 1 ]] && set -x
+
+git reset --soft "origin/$(git main-branch)" && git add --all && git commit -m "$@"

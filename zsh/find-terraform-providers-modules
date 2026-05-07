@@ -1,37 +1,38 @@
 #!/usr/bin/env zsh
-
 # Terraform Provider and Module Version Finder
 # Uses fd, gawk for fast scanning
 
+emulate -L zsh
 set -euo pipefail
 
 # Colors
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-DIM='\033[2m'
-NC='\033[0m'
+typeset GREEN='\033[0;32m'
+typeset BLUE='\033[0;34m'
+typeset YELLOW='\033[1;33m'
+typeset CYAN='\033[0;36m'
+typeset DIM='\033[2m'
+typeset NC='\033[0m'
 
 # Folders to ignore
-IGNORE_FOLDERS=(
+typeset -a IGNORE_FOLDERS=(
     "terraform-google-lb-http"
     "terraform-modules"
 )
 
-SEARCH_DIR="${1:-.}"
+typeset SEARCH_DIR="${1:-.}"
 
 print -P "${BLUE}Scanning Terraform files in: ${SEARCH_DIR}${NC}\n"
 
 # Build fd exclude arguments
-FD_EXCLUDES=()
+typeset -a FD_EXCLUDES=()
+typeset folder
 for folder in "${IGNORE_FOLDERS[@]}"; do
     FD_EXCLUDES+=(-E "$folder")
 done
 
 # Temp files
-PROVIDER_RESULTS=$(mktemp)
-MODULE_RESULTS=$(mktemp)
+typeset PROVIDER_RESULTS=$(mktemp)
+typeset MODULE_RESULTS=$(mktemp)
 trap "rm -f $PROVIDER_RESULTS $MODULE_RESULTS" EXIT
 
 # Find all .tf files and process for providers
@@ -103,7 +104,7 @@ in_module && /^\}/ {
         # Clean source: remove ?ref= and // submodule paths
         gsub(/\?ref=.*$/, "", source)
         gsub(/\/\/.*$/, "", source)
-        
+
         if (version == "") version = "-"
         print source "\t" version "\t" FILENAME
     }

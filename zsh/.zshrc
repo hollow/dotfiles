@@ -70,9 +70,12 @@ typeset -TUx FPATH fpath=(
     ${fpath[@]}
 )
 
-# load standard functions
-autoload -Uz add clone debug has link log
-autoload -Uz :each :parallel
+# append ZDOTDIR so `git foo` and subprocess lookups can find user scripts,
+# but `command foo` still resolves to system binaries first
+path+=("${ZDOTDIR}")
+
+# autoload all regular files in ZDOTDIR (excluding .awk helpers)
+autoload -Uz ${ZDOTDIR}/*~*.awk(.N:t)
 
 # add homebrew path as early as possible
 if has /opt/homebrew/bin/brew; then
@@ -230,13 +233,8 @@ zi auto has"dscl" for brew
 
 #zi auto has"python3" silent for OMZP::python
 
-python-each() {
-    :each */python.mk(:h) do "$@"
-}
-
-python-parallel() {
-    :parallel */python.mk(:h) do "$@"
-}
+alias python-each=':each */python.mk(:h) do'
+alias python-parallel=':parallel */python.mk(:h) do'
 
 # python/uv: an extremely fast Python package manager
 # https://github.com/astral-sh/uv
@@ -306,59 +304,13 @@ export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
 alias ad="ansible-doc"
 alias ai="ansible-inventory"
 alias ap="ansible-playbook"
-
-ah() {
-    ansible "${1:-all}" --list-hosts \
-    | sed '/hosts.*:$/d;s/ //g' \
-    | sort -u
-}
-
-assh() {
-    local pattern="all"
-    if [[ $# -ge 1 ]]; then
-        pattern="$1" && shift
-    fi
-
-    if [[ $# -eq 0 ]]; then
-        set -- uptime
-    fi
-
-    if [[ -e "${pattern}" ]]; then
-        sshp -f "${pattern}" "$@"
-    else
-        ah "${pattern}" | sshp "$@"
-    fi
-}
-
-ansible-each() {
-    :each */ansible.mk(:h) do "$@"
-}
-
-ansible-parallel() {
-    :parallel */ansible.mk(:h) do "$@"
-}
+alias ansible-each=':each */ansible.mk(:h) do'
+alias ansible-parallel=':parallel */ansible.mk(:h) do'
 
 # ansible/ara: ARA Records Ansible
 export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
 export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
 export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
-
-ara-server() {
-    mkdir -p "${ARA_BASE_DIR}"
-    docker stop ara-server
-    docker rm ara-server
-    docker run --name ara-server --detach --tty \
-        --volume ${ARA_BASE_DIR}:/opt/ara -p 8000:8000 \
-        docker.io/recordsansible/ara-api:latest
-}
-
-ara-client() {
-    set -x
-    source <(python3 -m ara.setup.env)
-    export ARA_API_CLIENT="http"
-    export ARA_API_SERVER="http://127.0.0.1:8000"
-    set +x
-}
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
@@ -397,9 +349,6 @@ export ENABLE_CLAUDEAI_MCP_SERVERS=true
 
 # colordiff: syntax highlighting for diff
 # https://www.colordiff.org
-cdl() { colordiff | less -R }
-cdu() { diff -u "$@" | cdl }
-
 # consul: distributed, highly available service discovery
 # https://github.com/hashicorp/consul
 :consul-load() {
@@ -412,13 +361,8 @@ zi auto has"consul" wait1 for consul
 # https://copier.readthedocs.io/en/stable/
 zi auto has"copier" wait for copier
 
-copier-each() {
-    :each */.copier-answers.yml(:h) do "$@"
-}
-
-copier-parallel() {
-    :parallel */.copier-answers.yml(:h) do "$@"
-}
+alias copier-each=':each */.copier-answers.yml(:h) do'
+alias copier-parallel=':parallel */.copier-answers.yml(:h) do'
 
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
@@ -469,12 +413,6 @@ zi auto has"fd" for fd
 
 # fping: send ICMP echo probes to network hosts
 # https://fping.org/
-netping() {
-    for i in "$@"; do
-        fping -g "${i}" 2>/dev/null
-    done
-}
-
 # fzf:
 zi auto has"fzf" wait for fzf
 
@@ -531,62 +469,8 @@ alias gpr="git pull --rebase --autostash"
 alias grh="git reset HEAD"
 alias gsp="git show -p"
 alias s="git st ."
-
-git-each () {
-    :each */.git(:h) do "$@"
-}
-
-git-parallel () {
-    :parallel */.git(:h) do "$@"
-}
-
-gh-repo-list() {
-    gh repo list --limit 1000 --json nameWithOwner "$@" |
-    jq -r '.[].nameWithOwner'
-}
-
-gh-clone-all() {
-    gh-repo-list --no-archived "$@" |
-    parallel --bar --tagstring "[{}]" --jobs 5 \
-        git-clone-clean-main https://github.com/{} "${HOME}/src/{}"
-}
-
-gh-remove-archived() {
-    gh-repo-list --archived "$@" |
-    parallel \
-        rm -rvf "${HOME}/src/{}"
-}
-
-pr() {
-    git push && \
-    gh pr create -f "$@"
-    gh pr view --web
-}
-
-ghc() {
-    # git fetch --prune
-    # comm -12 \
-    #     <(git branch -r | grep -v HEAD | sed 's|  origin/||' | sed 's/^ *//' | sort) \
-    #     <(gh pr list --limit 1000 --state closed --json headRefName --jq '[.[].headRefName] | sort[]' | sort) |
-    # xargs -r -I{} echo {}
-    git checkout-latest main
-    git dmb -y
-}
-
-ghm() {
-    gh pr merge --merge "$@" && \
-    ghc
-}
-
-grc() {
-    git reset --soft origin/$(git main-branch) && git add --all && git commit -m "$@"
-}
-
-git-dmb-configure() {
-    git config set remote.origin.dmb-enabled true
-    git config set branch.$(git main-branch).dmb-required true
-    git config set delete-merged-branches.configured 5.0.0+
-}
+alias git-each=':each */.git(:h) do'
+alias git-parallel=':parallel */.git(:h) do'
 
 # gnupg: GNU privacy guard
 # https://gnupg.org/
@@ -599,28 +483,15 @@ zi auto wait for OMZP::gpg-agent
 export GOPATH="${XDG_CACHE_HOME}/go"
 add path "${GOPATH}/bin"
 
-go-each() {
-    :each */go.mk(:h) do "$@"
-}
-
-go-parallel() {
-    :parallel */go.mk(:h:a) do "$@"
-}
-
 zi auto has"go" for golang
-
-# ip: helper to get public ip
-# http://4.ifconfig.pro
-IP() {
-    curl -s http://4.ifconfig.pro/ip.host | awk '{print $1}'
-}
+alias go-each=':each */go.mk(:h) do'
+alias go-parallel=':parallel */go.mk(:h:a) do'
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 mkdir -p "$(dirname "${LESSHISTFILE}")"
-sl() { sort -u | less }
 
 # man: unix documentation system
 # https://www.nongnu.org/man-db/
@@ -653,13 +524,8 @@ zi auto has"mise" for jdx/mise
 zi auto has"nomad" wait1 for nomad
 
 # node: JavaScript runtime
-node-each() {
-    :each */nodejs.mk(:h) do "$@"
-}
-
-node-parallel() {
-    :parallel */nodejs.mk(:h) do "$@"
-}
+alias node-each=':each */nodejs.mk(:h) do'
+alias node-parallel=':parallel */nodejs.mk(:h) do'
 
 # npm: node package manager
 # https://github.com/npm/cli
@@ -682,9 +548,6 @@ mkdir -p ${PARALLEL_HOME}
 }
 
 zi auto has"psql" for postgresql
-
-# pwgen: generate random passwords
-pw() { pwgen -s 32 1 | clipcopy }
 
 # ripgrep: fast grep replacement
 # https://github.com/BurntSushi/ripgrep
@@ -748,30 +611,8 @@ link terraform .terraform.d
 alias tf="terraform"
 alias tfd="tf destroy"
 alias tfi="tf import"
-
-tfa() {
-    if [[ $# -eq 0 ]]; then
-        tf apply
-    else
-        tf apply "${@[@]/#/-target=}"
-    fi
-}
-
-tfp() {
-    if [[ $# -eq 0 ]]; then
-        tf plan
-    else
-        tf plan "${@[@]/#/-target=}"
-    fi
-}
-
-terraform-each() {
-    :each */terraform.mk(:h) do "$@"
-}
-
-terraform-parallel() {
-    :parallel */terraform.mk(:h) do "$@"
-}
+alias terraform-each=':each */terraform.mk(:h) do'
+alias terraform-parallel=':parallel */terraform.mk(:h) do'
 
 zi auto has"terraform" for terraform
 
@@ -815,9 +656,6 @@ alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 
 # misc other aliases
 alias X="TERM=xterm-256color ssh -t 10.0.0.11 \"/usr/local/bin/zsh -i -c T\""
-
-# add local path last so it takes precendence
-add path "${XDG_CONFIG_HOME}/bin"
 
 # reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use

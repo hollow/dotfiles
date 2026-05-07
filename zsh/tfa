@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+
+if (( $# == 0 )); then
+    tf apply
+else
+    tf apply "${@[@]/#/-target=}"
+fi

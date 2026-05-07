@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
+emulate -L zsh
 
 # connect to a live/rescue system without
 # host key check or known hosts

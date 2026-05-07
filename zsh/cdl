@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+colordiff | less -R

@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+[[ $TRACE -eq 1 ]] && set -x
+
+git push && gh pr create -f "$@"
+gh pr view --web

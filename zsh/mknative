@@ -1,12 +1,13 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
+emulate -L zsh
+set -e
 
-app_name="$1" && shift
+typeset app_name="$1"; shift
+typeset app_path="${HOME}/Applications/${app_name}.app"
+typeset build_version="$(date +YYYYMMDDHHMMSS)"
+typeset temp_path="$(mktemp -d)"
 
-app_path="${HOME}/Applications/${app_name}.app"
-build_version="$(date +YYYYMMDDHHMMSS)"
-
-temp_path="$(mktemp -d)"
-cd "${temp_path}" || exit 1
+cd "${temp_path}"
 
 nativefier \
     --name "${app_name}" \
@@ -20,6 +21,6 @@ nativefier \
 
 rm -rf "${app_path}"
 mv ./*/*.app "${app_path}"
-
 rm -rf "${temp_path}"
+
 exec open "${app_path}"
