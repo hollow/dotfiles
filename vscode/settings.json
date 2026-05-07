@@ -91,4 +91,6 @@
   "explorer.confirmDragAndDrop": false,
   "chat.autopilot.enabled": true,
   "chat.viewSessions.orientation": "stacked",
+  "workbench.remoteIndicator.showExtensionRecommendations": false,
+  "mise.checkForNewMiseVersion": false,
 }
