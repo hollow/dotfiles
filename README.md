@@ -59,10 +59,13 @@ enhancing shell performance and functionality.
   - `termsupport.zsh`: Terminal title and tab management
 
 - **Prompt & Visual Feedback**: The shell uses
-  [Powerlevel10k](https://github.com/romkatv/powerlevel10k), a fast and highly
-  customizable zsh theme that provides instant command feedback with a rich,
-  informative prompt. It displays Git status, command execution time, exit
-  codes, background jobs, and more—all updated asynchronously for zero lag.
+  [Starship](https://starship.rs), a minimal, blazing-fast, cross-shell prompt
+  written in Rust. It shows Git status, language/runtime versions, command
+  duration, exit codes, and cloud/Kubernetes context, with module rendering
+  done in parallel for low latency. The configuration uses Starship's
+  [Nerd Font Symbols preset](https://starship.rs/presets/nerd-font), which
+  pairs with the `font-meslo-lg-nerd-font` cask to render rich glyphs across
+  the prompt.
 
   Combined with [Fast Syntax Highlighting
   (F-Sy-H)](https://github.com/z-shell/F-Sy-H), commands are color-coded as you

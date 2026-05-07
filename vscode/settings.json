@@ -1,96 +1,93 @@
 {
   "[github-actions-workflow]": {
-    "editor.autoIndent": "keep",
+    "editor.autoIndent": "keep"
   },
   "[html]": {
-    "editor.defaultFormatter": "vscode.html-language-features",
+    "editor.defaultFormatter": "vscode.html-language-features"
   },
   "[ignore]": {
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": false
   },
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
-    "editor.wordWrap": "off",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "off"
   },
   "[python]": {
-    "editor.formatOnType": true,
+    "editor.formatOnType": true
   },
   "[terraform]": {
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[yaml]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "ansible.lightspeed.enabled": false,
   "ansible.lightspeed.suggestions.enabled": false,
   "ansible.validation.lint.enabled": false,
   "chat.agent.enabled": true,
+  "chat.autopilot.enabled": true,
   "chat.mcp.gallery.enabled": true,
+  "chat.tools.urls.autoApprove": {
+    "https://nodejs.org/en/download": true,
+    "https://pypi.org": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://pypi.org/simple": true,
+    "https://python.org/downloads": true,
+    "https://registry.npmjs.org": true,
+    "https://www.python.org/downloads": true
+  },
+  "chat.viewSessions.orientation": "stacked",
+  "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
+  "containers.orchestratorClient": "com.microsoft.visualstudio.orchestrators.dockercompose",
   "csv-preview.resizeColumns": "all",
-  "direnv.restart.automatic": true,
   "docker.extension.enableComposeLanguageServer": false,
   "editor.cursorSurroundingLines": 5,
+  "editor.fontFamily": "'MesloLGS Nerd Font', Menlo, Monaco, 'Courier New', monospace",
   "editor.formatOnSave": true,
   "editor.minimap.enabled": false,
   "editor.showFoldingControls": "always",
   "editor.wordWrap": "on",
   "explorer.autoReveal": false,
+  "explorer.confirmDragAndDrop": false,
   "files.associations": {
     "*.alloy": "grafana-alloy",
-    "*.jinja": "jinja",
+    "*.jinja": "jinja"
   },
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   "git.enableCommitSigning": true,
   "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.githubMcpServer.enabled": true,
   "github.copilot.nextEditSuggestions.enabled": true,
+  "githubPullRequests.pullBranch": "never",
   "go.useLanguageServer": true,
-  "inlineChat.enableV2": true,
+  "makefile.configureOnOpen": false,
+  "mise.checkForNewMiseVersion": false,
   "python.analysis.typeCheckingMode": "standard",
   "redhat.telemetry.enabled": false,
   "search.showLineNumbers": true,
-  "terminal.integrated.macOptionIsMeta": true,
-  "window.newWindowDimensions": "inherit",
-  "yaml.customTags": ["!encrypted/pkcs1-oaep scalar", "!vault scalar"],
-  "github.copilot.chat.githubMcpServer.enabled": true,
-  "workbench.experimental.share.enabled": true,
-  "window.customTitleBarVisibility": "never",
-  "gitlens.ai.model": "vscode",
-  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
-  "chat.tools.urls.autoApprove": {
-    "https://nodejs.org/en/download": true,
-    "https://www.python.org/downloads": true,
-    "https://registry.npmjs.org": true,
-    "https://python.org/downloads": true,
-    "https://pypi.org/simple": true,
-    "https://pypi.org": {
-      "approveRequest": false,
-      "approveResponse": true,
-    },
-  },
-  "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
-  "containers.orchestratorClient": "com.microsoft.visualstudio.orchestrators.dockercompose",
-  "terminal.integrated.suggest.enabled": false,
-  "workbench.startupEditor": "none",
-  "editor.fontFamily": "'MesloLGS Nerd Font', Menlo, Monaco, 'Courier New', monospace",
-  "makefile.configureOnOpen": false,
-  "gitlens.plusFeatures.enabled": false,
-  "gitlens.codeLens.scopes": [],
-  "githubPullRequests.pullBranch": "never",
   "terminal.integrated.initialHint": false,
-  "explorer.confirmDragAndDrop": false,
-  "chat.autopilot.enabled": true,
-  "chat.viewSessions.orientation": "stacked",
+  "terminal.integrated.macOptionIsMeta": true,
+  "terminal.integrated.suggest.enabled": false,
+  "window.newWindowDimensions": "inherit",
+  "workbench.colorTheme": "Dark Modern",
+  "workbench.experimental.share.enabled": true,
   "workbench.remoteIndicator.showExtensionRecommendations": false,
-  "mise.checkForNewMiseVersion": false,
+  "workbench.startupEditor": "none",
+  "yaml.customTags": [
+    "!encrypted/pkcs1-oaep scalar",
+    "!vault scalar"
+  ]
 }

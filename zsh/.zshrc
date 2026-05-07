@@ -302,6 +302,7 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
+export SHOW_AWS_PROMPT=false
 zi auto has"aws" wait for OMZP::aws
 
 # bat: cat(1) clone with wings
@@ -411,9 +412,6 @@ zi auto has"fzf" wait for Aloxaf/fzf-tab
 # preview directory content with eza when completing cd
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group $realpath'
 
-# fnox:
-export FNOX_AGE_KEY_FILE="${HOME}/.ssh/id_ed25519"
-
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 :gcloud-update() {
@@ -435,6 +433,9 @@ export FNOX_AGE_KEY_FILE="${HOME}/.ssh/id_ed25519"
 }
 
 zi auto has"gcloud" wait1 for gcloud
+
+# ghostty
+add path "${GHOSTTY_BIN_DIR}"
 
 # git: distributed version control system
 # https://github.com/git/git
@@ -658,10 +659,15 @@ zi auto wait for zsh-users/zsh-history-substring-search
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
-# zsh/p10k is a theme for Zsh
-# https://github.com/romkatv/powerlevel10k
-zi auto depth'1' atload'source "${ZDOTDIR}"/.p10k.zsh' \
-    for romkatv/powerlevel10k
+# starship: minimal, blazing-fast, customizable prompt
+# https://starship.rs
+if has starship; then
+    eval "$(starship init zsh)"
+    # `starship init zsh` sets both PROMPT and RPROMPT, so the starship binary
+    # is spawned twice per prompt redraw (~40ms each). The right prompt is
+    # empty by default — drop RPROMPT to halve command_lag.
+    unset RPROMPT
+fi
 
 # zsh/f-sy-h: feature-rich syntax highlighting for ZSH
 # https://github.com/z-shell/F-Sy-H
@@ -694,4 +700,3 @@ fi
 if [[ -n "${ZSH_PROF+1}" ]]; then
     zprof
 fi
-
