@@ -47,7 +47,6 @@
     "https://registry.npmjs.org": true,
     "https://www.python.org/downloads": true
   },
-  "chat.viewSessions.orientation": "stacked",
   "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
   "containers.orchestratorClient": "com.microsoft.visualstudio.orchestrators.dockercompose",
   "csv-preview.resizeColumns": "all",
@@ -82,12 +81,16 @@
   "terminal.integrated.macOptionIsMeta": true,
   "terminal.integrated.suggest.enabled": false,
   "window.newWindowDimensions": "inherit",
-  "workbench.colorTheme": "Dark Modern",
+  "workbench.colorTheme": "Catppuccin Mocha",
   "workbench.experimental.share.enabled": true,
+  "workbench.iconTheme": "catppuccin-mocha",
   "workbench.remoteIndicator.showExtensionRecommendations": false,
   "workbench.startupEditor": "none",
   "yaml.customTags": [
     "!encrypted/pkcs1-oaep scalar",
     "!vault scalar"
-  ]
+  ],
+  "catppuccin.italicKeywords": false,
+  "workbench.activityBar.location": "hidden",
+  "chat.viewSessions.orientation": "stacked"
 }

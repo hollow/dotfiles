@@ -27,8 +27,8 @@ endif
 " Load plugins
 call plug#begin($XDG_DATA_HOME . "/vim/plugged")
 
-" https://github.com/tomasiser/vim-code-dark
-Plug 'tomasiser/vim-code-dark'
+" https://github.com/catppuccin/vim
+Plug 'catppuccin/vim', { 'as': 'catppuccin' }
 
 call plug#end()
 
@@ -171,7 +171,7 @@ if $COLORTERM == 'gnome-terminal'
 endif
 
 try
-    colorscheme codedark
+    colorscheme catppuccin_mocha
 catch
 endtry
 

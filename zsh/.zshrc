@@ -1,8 +1,3 @@
-# profiling and debugging zsh startup time
-if [[ -n "${ZSH_PROF+1}" ]]; then
-    zmodload zsh/zprof
-fi
-
 # user information (for git, gpg, etc)
 export USER_NAME="Benedikt Böhm"
 export USER_EMAIL="bb@xnull.de"
@@ -200,11 +195,6 @@ zstyle ':completion:*:git-checkout:*' sort false
     chmod go-w "${HOMEBREW_PREFIX}/share"
 }
 
-.brew-install() {
-    has brew || return 0
-    brew install "$@"
-}
-
 zi auto has"dscl" for brew
 
 # python: programming language
@@ -289,11 +279,12 @@ export ANSIBLE_GALAXY_TOKEN_PATH="${XDG_DATA_HOME}/ansible/galaxy_token"
 export ANSIBLE_LOCAL_TEMP="${XDG_RUNTIME_DIR}/ansible/tmp"
 export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
 
+alias ansible-each=':each */ansible.mk(:h) do'
+alias ansible-parallel=':parallel */ansible.mk(:h) do'
+
 alias ad="ansible-doc"
 alias ai="ansible-inventory"
 alias ap="ansible-playbook"
-alias ansible-each=':each */ansible.mk(:h) do'
-alias ansible-parallel=':parallel */ansible.mk(:h) do'
 
 # ansible/ara: ARA Records Ansible
 export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
@@ -336,8 +327,6 @@ zi auto has"checkov" wait for checkov
 export CLAUDE_CODE_NEW_INIT=1
 export ENABLE_CLAUDEAI_MCP_SERVERS=true
 
-# colordiff: syntax highlighting for diff
-# https://www.colordiff.org
 # consul: distributed, highly available service discovery
 # https://github.com/hashicorp/consul
 :consul-load() {
@@ -397,12 +386,18 @@ zi auto has"duf" wait for duf
 
 zi auto has"eza" wait for eza
 
-# fd:
+# fd
 zi auto has"fd" for fd
 
-# fping: send ICMP echo probes to network hosts
-# https://fping.org/
-# fzf:
+# fzf
+# https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
+export FZF_DEFAULT_OPTS=" \
+    --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
+    --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
+    --color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8 \
+    --color=selected-bg:#45475A \
+    --color=border:#6C7086,label:#CDD6F4"
+
 zi auto has"fzf" wait for fzf
 
 # fzf/tab: replace completion selection menu with fzf
@@ -442,6 +437,9 @@ add path "${GHOSTTY_BIN_DIR}"
 zi auto id-as"git" as"completion" blockf mv"git->_git" wait for \
     https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
 
+alias git-each=':each */.git(:h) do'
+alias git-parallel=':parallel */.git(:h) do'
+
 alias ga="git add --all"
 alias gap="git add --patch"
 alias gcl="git checkout-latest main"
@@ -458,8 +456,6 @@ alias gpr="git pull --rebase --autostash"
 alias grh="git reset HEAD"
 alias gsp="git show -p"
 alias s="git st ."
-alias git-each=':each */.git(:h) do'
-alias git-parallel=':parallel */.git(:h) do'
 
 # gnupg: GNU privacy guard
 # https://gnupg.org/
@@ -471,10 +467,13 @@ zi auto wait for OMZP::gpg-agent
 # https://www.golang.org
 export GOPATH="${XDG_CACHE_HOME}/go"
 add path "${GOPATH}/bin"
-
 zi auto has"go" for golang
 alias go-each=':each */go.mk(:h) do'
 alias go-parallel=':parallel */go.mk(:h:a) do'
+
+# glamour/glow
+export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
+export GLOW_STYLE="${GLAMOUR_STYLE}"
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
@@ -488,7 +487,6 @@ zi auto wait for OMZP::colored-man-pages
 
 # mc: midnight commander
 # https://midnight-commander.org
-export MC_SKIN="${XDG_CONFIG_HOME}/mc/solarized-dark-truecolor.ini"
 alias mc="mc --nosubshell"
 
 # ncdu: disk usage analyzer
@@ -695,8 +693,4 @@ zi as"program" wait for romkatv/zsh-bench
 # Load .envrc after shell initialization if present
 if [[ -e .envrc ]]; then
     pushd "${HOME}" &>/dev/null && popd
-fi
-
-if [[ -n "${ZSH_PROF+1}" ]]; then
-    zprof
 fi

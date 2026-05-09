@@ -2,7 +2,7 @@
 font-family = MesloLGS Nerd Font
 
 # theme
-theme = Dark Modern
+theme = Catppuccin Mocha
 unfocused-split-opacity = 0.6
 unfocused-split-fill = #000000
 
