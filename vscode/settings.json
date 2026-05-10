@@ -1,38 +1,11 @@
 {
-  "[github-actions-workflow]": {
-    "editor.autoIndent": "keep"
-  },
-  "[html]": {
-    "editor.defaultFormatter": "vscode.html-language-features"
-  },
   "[ignore]": {
     "editor.formatOnSave": false
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.wordWrap": "off"
-  },
-  "[python]": {
-    "editor.formatOnType": true
-  },
-  "[terraform]": {
-    "editor.tabSize": 2
-  },
-  "[yaml]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "ansible.lightspeed.enabled": false,
   "ansible.lightspeed.suggestions.enabled": false,
   "ansible.validation.lint.enabled": false,
+  "catppuccin.italicKeywords": false,
   "chat.agent.enabled": true,
   "chat.autopilot.enabled": true,
   "chat.mcp.gallery.enabled": true,
@@ -47,8 +20,7 @@
     "https://registry.npmjs.org": true,
     "https://www.python.org/downloads": true
   },
-  "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
-  "containers.orchestratorClient": "com.microsoft.visualstudio.orchestrators.dockercompose",
+  "chat.viewSessions.orientation": "stacked",
   "csv-preview.resizeColumns": "all",
   "docker.extension.enableComposeLanguageServer": false,
   "editor.cursorSurroundingLines": 5,
@@ -74,23 +46,18 @@
   "go.useLanguageServer": true,
   "makefile.configureOnOpen": false,
   "mise.checkForNewMiseVersion": false,
-  "python.analysis.typeCheckingMode": "standard",
   "redhat.telemetry.enabled": false,
   "search.showLineNumbers": true,
   "terminal.integrated.initialHint": false,
   "terminal.integrated.macOptionIsMeta": true,
   "terminal.integrated.suggest.enabled": false,
   "window.newWindowDimensions": "inherit",
+  "workbench.activityBar.location": "hidden",
   "workbench.colorTheme": "Catppuccin Mocha",
-  "workbench.experimental.share.enabled": true,
   "workbench.iconTheme": "catppuccin-mocha",
-  "workbench.remoteIndicator.showExtensionRecommendations": false,
   "workbench.startupEditor": "none",
   "yaml.customTags": [
     "!encrypted/pkcs1-oaep scalar",
     "!vault scalar"
-  ],
-  "catppuccin.italicKeywords": false,
-  "workbench.activityBar.location": "hidden",
-  "chat.viewSessions.orientation": "stacked"
+  ]
 }

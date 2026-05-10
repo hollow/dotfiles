@@ -1,5 +1,6 @@
 # typography
 font-family = MesloLGS Nerd Font
+font-size = 12
 
 # theme
 theme = Catppuccin Mocha
