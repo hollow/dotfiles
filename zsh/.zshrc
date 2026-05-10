@@ -326,6 +326,8 @@ zi auto has"checkov" wait for checkov
 # https://claude.ai
 export CLAUDE_CODE_NEW_INIT=1
 export ENABLE_CLAUDEAI_MCP_SERVERS=true
+cp "${HOME}/Library/Application Support/Claude/claude_desktop_config.json" \
+    "${HOME}/.claude/claude_desktop_config.json"
 
 # consul: distributed, highly available service discovery
 # https://github.com/hashicorp/consul
