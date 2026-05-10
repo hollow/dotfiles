@@ -459,8 +459,10 @@ alias s="git st ."
 
 # gnupg: GNU privacy guard
 # https://gnupg.org/
-export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 export GPG_TTY="${TTY}"
+export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
+mkdir -p "${GNUPGHOME}"
+chmod 0700 "${GNUPGHOME}"
 zi auto wait for OMZP::gpg-agent
 
 # go: programming language
