@@ -291,6 +291,18 @@ export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
 export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
 export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 
+# atuin: magical shell history with optional sync
+# https://github.com/atuinsh/atuin
+:atuin-load() {
+    alias a="atuin"
+}
+
+:atuin-eval() {
+    atuin init zsh
+}
+
+zi auto has"atuin" wait for atuin
+
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
 export SHOW_AWS_PROMPT=false
@@ -655,12 +667,6 @@ if has tput; then
     YSU_MESSAGE_POSITION="after"
 fi
 
-# load zsh history search and create bindings for it
-# https://github.com/zsh-users/zsh-history-substring-search
-zi auto wait for zsh-users/zsh-history-substring-search
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-
 # starship: minimal, blazing-fast, customizable prompt
 # https://starship.rs
 if has starship; then
@@ -687,7 +693,7 @@ zi auto wait for hlissner/zsh-autopair
 
 # zsh/completions: initialize completion system
 # https://github.com/zsh-users/zsh-completions
-zi auto blockf atpull'zinit creinstall -q .' \
+zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
     wait for zsh-users/zsh-completions
 
 # zsh-bench: benchmark zsh startup and interactive lag
