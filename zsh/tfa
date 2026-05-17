@@ -2,7 +2,7 @@
 emulate -L zsh
 
 if (( $# == 0 )); then
-    tf apply
+    terraform apply
 else
-    tf apply "${@[@]/#/-target=}"
+    terraform apply "${@[@]/#/-target=}"
 fi

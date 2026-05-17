@@ -2,7 +2,7 @@
 emulate -L zsh
 
 if (( $# == 0 )); then
-    tf plan
+    terraform plan
 else
-    tf plan "${@[@]/#/-target=}"
+    terraform plan "${@[@]/#/-target=}"
 fi

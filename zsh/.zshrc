@@ -298,7 +298,7 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 }
 
 :atuin-eval() {
-    atuin init zsh
+    atuin init zsh --disable-up-arrow
 }
 
 zi auto has"atuin" wait for atuin
@@ -612,8 +612,8 @@ mkdir -p "${TF_PLUGIN_CACHE_DIR}"
 link terraform .terraform.d
 
 alias tf="terraform"
-alias tfd="tf destroy"
-alias tfi="tf import"
+alias tfd="terraform destroy"
+alias tfi="terraform import"
 alias terraform-each=':each */terraform.mk(:h) do'
 alias terraform-parallel=':parallel */terraform.mk(:h) do'
 

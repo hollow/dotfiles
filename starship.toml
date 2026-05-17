@@ -2,8 +2,6 @@
 
 palette = "catppuccin_mocha"
 
-add_newline = false
-
 # https://starship.rs/config/#default-prompt-format
 #format = """
 #$username\
