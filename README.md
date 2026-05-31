@@ -141,7 +141,7 @@ enhancing shell performance and functionality.
   installed and configured for an improved terminal experience:
 
   - `bat`: Syntax-highlighted `cat` with paging integration and man page coloring
-  - `btop`: Rich terminal resource monitor (CPU, memory, processes)
+  - `bottom` (`btm`): Rich terminal resource monitor (CPU, memory, processes)
   - `duf`: Readable disk/file system usage instead of classic `df`
   - `eza`: Feature-rich `ls` alternative with colors, icons, and tree views
   - `fd`: Fast, intuitive alternative to `find` with sensible defaults
