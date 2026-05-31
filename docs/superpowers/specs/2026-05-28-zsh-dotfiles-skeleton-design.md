@@ -88,7 +88,12 @@ already installed. This is documented in the README, not engineered around.
 - `zsh/link` — idempotent symlink helper (autoloads `uri-parse`)
 - `zsh/uri-parse` — dependency of `link`
 - `starship.toml` — prompt config (catppuccin-mocha palette, nerd-font symbols)
-- `LICENSE`
+
+### Preserve existing (do NOT overwrite)
+
+- `LICENSE` — the repo already ships its own Apache 2.0 `LICENSE` (from the
+  initial commit). Keep it untouched; do **not** copy `hollow/dotfiles`'s
+  license over it.
 
 ### Keep trimmed
 
@@ -164,9 +169,9 @@ Keep the exact ordering and idioms of the source file; remove blocks only.
   copier, dircolors, direnv, docker, duf, eza, fd, fzf + fzf-tab, gcloud,
   ghostty, git completion + git aliases, gnupg, go, glow, less/pager,
   colored-man-pages, mc, ncdu, mise, nomad, node, npm, parallel, postgresql,
-  ripgrep, rsync, ruby, sqlite, ssh + ssh config linking, sshp, terraform, tmux
-  + xpanes, neovim/vim, wget, yt-dlp, the `X` alias, you-should-use, zsh-bench,
-  and the trailing `.envrc` block.
+  ripgrep, rsync, ruby, sqlite, ssh + ssh config linking, sshp, terraform,
+  tmux/xpanes, neovim/vim, wget, yt-dlp, the `X` alias, you-should-use,
+  zsh-bench, and the trailing `.envrc` block.
 
 ## `Brewfile` — specification
 
@@ -225,9 +230,11 @@ Written for someone who has never used a terminal:
 - One sentence: what this gives you (a fully set-up modern zsh: prompt,
   autosuggestions, syntax highlighting, autocompletion).
 - **Install** — the single command:
+
   ```sh
   curl -fsSL https://raw.githubusercontent.com/remerge/dotfiles/main/install.sh | sh
   ```
+
 - "What happens" (3 bullets: installs developer tools + Homebrew, sets up your
   shell, done — the first launch takes a minute).
 - "What you get" — short bullet list (zi, starship, the four plugins, OMZL libs).
