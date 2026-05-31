@@ -1,13 +1,17 @@
 # Remerge dotfiles
 
-A ready-to-use shell setup for your Mac. One command gives you a modern
-terminal — a clean prompt, command autocompletion, syntax highlighting, and
+A ready-to-use shell setup for your Mac. One command gives you a modern terminal
+— a clean prompt, command autocompletion, syntax highlighting, and
 autosuggestions — with nothing to configure.
 
-## Contents
+Linux is supported on a best-effort basis: the installer clones the config and
+links `~/.zshrc`, but it does **not** auto-install Homebrew or starship (that
+step is macOS-only). Install [Homebrew](https://brew.sh) and
+[starship](https://starship.rs) yourself, then open a new shell.
 
-- [Install](#install)
-- [Updating](#updating)
+## Contents <!-- omit in toc -->
+
+- [Getting started](#getting-started)
 - [What you get](#what-you-get)
   - [Homebrew](#homebrew)
   - [Z Shell and the ZI plugin manager](#z-shell-and-the-zi-plugin-manager)
@@ -16,9 +20,8 @@ autosuggestions — with nothing to configure.
   - [Autosuggestions](#autosuggestions)
   - [Autopair](#autopair)
   - [Tab completion](#tab-completion)
-- [Linux](#linux)
 
-## Install
+## Getting started
 
 Open the **Terminal** app, paste this line, and press Enter:
 
@@ -32,8 +35,6 @@ That's it. The installer will:
 2. Set up your shell configuration.
 3. Open a fresh shell. **The first launch takes about a minute** while it
    downloads the prompt and plugins — this happens only once.
-
-## Updating
 
 To update everything later (Homebrew packages and plugins), run:
 
@@ -83,8 +84,8 @@ paths are highlighted — so you spot typos before pressing Enter.
 ### Autosuggestions
 
 [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) suggests
-the rest of a command in grey as you type, based on your history. Press the right
-arrow (`→`) to accept the suggestion.
+the rest of a command in grey as you type, based on your history. Press the
+right arrow (`→`) to accept the suggestion.
 
 ### Autopair
 
@@ -96,11 +97,5 @@ parenthesis — and removes both when you delete one.
 
 Press `Tab` to complete commands, file paths, options, git branches, and more.
 [zsh-completions](https://github.com/zsh-users/zsh-completions) adds many extra
-completion definitions, on top of sensible, error-correcting completion defaults.
-
-## Linux
-
-Linux is supported on a best-effort basis. The installer clones the config and
-links `~/.zshrc`, but it does **not** auto-install Homebrew or starship (that
-step is macOS-only). Install [Homebrew](https://brew.sh) and
-[starship](https://starship.rs) yourself, then open a new shell.
+completion definitions, on top of sensible, error-correcting completion
+defaults.
