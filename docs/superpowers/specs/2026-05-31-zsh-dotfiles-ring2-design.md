@@ -48,8 +48,11 @@ explicit and enumerated below.
 2. `git/config` omits upstream's personal sections and ends with an
    `[include] path = local` directive (see below).
 3. `git/local.example` — a tracked template for per-user git identity.
-4. `git/.gitignore` — ignores the untracked `git/local` (follows the upstream
-   per-directory `.gitignore` convention, e.g. `auth0/.gitignore`).
+
+`git/local` itself is **not** ignored: the intended model is that a user forks
+this repo and commits their own `git/local` to their fork (the `[include]` just
+reads whatever is present). The skeleton ships only `git/local.example`; a fresh
+install seeds `git/local` from it for the user to edit and commit.
 
 ## File inventory
 
@@ -76,7 +79,8 @@ explicit and enumerated below.
 
 - `git/config` — impersonal settings + alias block + the `[include]` directive.
 - `git/local.example` — commented `[user]` identity template (name + email).
-- `git/.gitignore` — `/local`.
+
+`git/local` is intentionally **not** gitignored, so a fork can commit it.
 
 ### Not added
 
@@ -303,7 +307,8 @@ later ring.
 - `git config user.email` reflects the real value once set.
 - `install.sh` copies `git/local.example` → `git/local` on first install if
   absent. `zsh/.zshrc` is untouched.
-- `git/.gitignore` (`/local`) keeps the per-user file out of version control.
+- `git/local` is **not** gitignored: a user forks this repo and commits their
+  own `git/local` to their fork. The skeleton tracks only `git/local.example`.
 
 **Caveat (documented in README):** because the repo lives at `~/.config`, the
 tracked `git/config` *is* git's XDG global file. `git config --global …` may
@@ -344,9 +349,8 @@ until it's set.
   parses.
 - **Validity:** `glow/styles/catppuccin-mocha.json` parses as JSON;
   `glow/glow.yml` parses as YAML.
-- **Net-new, not checked against upstream:** `git/local.example`,
-  `git/.gitignore`, the `[include]` directive, `brew "glow"`, and the
-  `install.sh` seed step.
+- **Net-new, not checked against upstream:** `git/local.example`, the
+  `[include]` directive, `brew "glow"`, and the `install.sh` seed step.
 - **Manual smoke test (extended):** `l` (eza, colored), `bat` paging + colored
   man pages, a `you-should-use` reminder, `df` → duf, `glow` renders a markdown
   file with the theme, `gl`/`gd`/`s` work, `gcl`/`gcm` resolve the main branch
