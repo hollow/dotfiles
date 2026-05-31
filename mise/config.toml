@@ -1,5 +1,6 @@
 [tools]
 bun = "latest"
+markdownlint-cli2 = "latest"
 node = "24.14.1"
 opentofu = "latest"
 prettier = "latest"
