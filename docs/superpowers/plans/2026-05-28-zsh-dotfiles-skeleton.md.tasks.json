@@ -1,0 +1,43 @@
+{
+  "planPath": "docs/superpowers/plans/2026-05-28-zsh-dotfiles-skeleton.md",
+  "tasks": [
+    {
+      "id": 1,
+      "subject": "Task 1: Vendor verbatim files from reference repo",
+      "status": "completed",
+      "description": "**Goal:** Bring over every unchanged file from hollow/dotfiles (zsh scaffolding, helpers, starship.toml) byte-identical from pinned raw URLs.\n\n**Files:** Create zsh/zzinit, zsh/z-a-auto/z-a-auto.plugin.zsh, zsh/has, zsh/add, zsh/link, zsh/uri-parse, zsh/.gitignore, starship.toml\n\n**Acceptance Criteria:** 8 files exist non-empty; byte-identical to hollow@main; zsh -n parses all zsh files; starship.toml valid TOML.\n\n**Verify:** for f in zsh/zzinit zsh/z-a-auto/z-a-auto.plugin.zsh zsh/has zsh/add zsh/link zsh/uri-parse; do zsh -n \"$f\" || echo PARSE FAIL $f; done; python3 -c \"import tomllib; tomllib.load(open('starship.toml','rb'))\" && echo TOML-OK\n\n```json:metadata\n{\"files\": [\"zsh/zzinit\",\"zsh/z-a-auto/z-a-auto.plugin.zsh\",\"zsh/has\",\"zsh/add\",\"zsh/link\",\"zsh/uri-parse\",\"zsh/.gitignore\",\"starship.toml\"], \"verifyCommand\": \"zsh -n on all zsh files; python3 tomllib load starship.toml\", \"acceptanceCriteria\": [\"8 files exist non-empty\",\"byte-identical to hollow@main\",\"zsh -n parses\",\"valid TOML\"]}\n```"
+    },
+    {
+      "id": 2,
+      "subject": "Task 2: Write trimmed zsh/.zshrc",
+      "status": "completed",
+      "description": "**Goal:** Trimmed subset of reference .zshrc — core scaffold + 4 plugins + brew self-bootstrap, no personal/tool blocks.\n\n**Files:** Create zsh/.zshrc (full content in plan doc Task 2 Step 1)\n\n**Acceptance Criteria:** zsh -n parses exit 0; has brew bootstrap + starship + 4 plugins; no USER_EMAIL/dropped tool blocks; zup trimmed.\n\n**Verify:** zsh -n zsh/.zshrc && echo SYNTAX-OK; grep -c -E 'USER_EMAIL|terraform|fzf|atuin|gcloud' zsh/.zshrc -> 0\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"zsh -n zsh/.zshrc && echo SYNTAX-OK && grep -c -E 'USER_EMAIL|terraform|fzf|atuin|gcloud' zsh/.zshrc\", \"acceptanceCriteria\": [\"zsh -n exit 0\",\"brew bootstrap + starship + 4 plugins\",\"no identity/dropped blocks\",\"zup trimmed\"]}\n```"
+    },
+    {
+      "id": 3,
+      "subject": "Task 3: Write the Brewfile",
+      "status": "completed",
+      "description": "**Goal:** Minimal-but-coherent Brewfile: starship, nerd font, GNU tools from :brew-init, git/gh.\n\n**Files:** Create Brewfile\n\n**Acceptance Criteria:** exactly 11 brews (coreutils, findutils, gawk, gh, git, gnu-sed, gnu-tar, gnu-time, grep, make, starship) + cask font-meslo-lg-nerd-font; brew bundle list parses 12; all gnubin tools present.\n\n**Verify:** brew bundle list --file=./Brewfile | sort | tr '\\n' ' '\n\n```json:metadata\n{\"files\": [\"Brewfile\"], \"verifyCommand\": \"brew bundle list --file=./Brewfile | sort\", \"acceptanceCriteria\": [\"11 brews + 1 cask\",\"brew bundle list parses 12\",\"all :brew-init gnubin tools present\"]}\n```"
+    },
+    {
+      "id": 4,
+      "subject": "Task 4: Write install.sh",
+      "status": "completed",
+      "description": "**Goal:** Thin POSIX sh bootstrap: ensure git (Xcode CLT on macOS), clone into ~/.config (handle pre-existing), symlink ~/.zshrc, re-exec interactive zsh.\n\n**Files:** Create install.sh (full content in plan doc Task 4 Step 1)\n\n**Acceptance Criteria:** shellcheck -s sh clean; sh -n exit 0; 3 clone cases handled; symlinks ~/.zshrc; re-execs zsh via /dev/tty; non-Darwin Linux note; executable.\n\n**Verify:** shellcheck -s sh install.sh && sh -n install.sh && echo LINT-OK && test -x install.sh && echo EXECUTABLE\n\n```json:metadata\n{\"files\": [\"install.sh\"], \"verifyCommand\": \"shellcheck -s sh install.sh && sh -n install.sh && echo LINT-OK && test -x install.sh\", \"acceptanceCriteria\": [\"shellcheck clean\",\"sh -n exit 0\",\"3 clone cases\",\"symlinks ~/.zshrc\",\"re-exec zsh via /dev/tty\",\"Linux note\",\"executable\"]}\n```"
+    },
+    {
+      "id": 5,
+      "subject": "Task 5: Rewrite README.md for non-technical users",
+      "status": "completed",
+      "description": "**Goal:** Replace placeholder README with jargon-light install instructions + what-you-get / updating / Linux sections.\n\n**Files:** Modify README.md (full content in plan doc Task 5 Step 1)\n\n**Acceptance Criteria:** exact curl|sh one-liner present; single H1; explains 3 steps + slow first launch; no markdownlint errors.\n\n**Verify:** grep -q 'curl -fsSL https://raw.githubusercontent.com/remerge/dotfiles/main/install.sh | sh' README.md && [ \"$(grep -c '^# ' README.md)\" -eq 1 ] && echo README-OK\n\n```json:metadata\n{\"files\": [\"README.md\"], \"verifyCommand\": \"grep -q curl-one-liner README.md && single H1 check && echo README-OK\", \"acceptanceCriteria\": [\"exact curl|sh one-liner\",\"single H1\",\"3 steps + slow first launch\",\"no markdownlint errors\"]}\n```"
+    },
+    {
+      "id": 6,
+      "subject": "Task 6: Verify faithful subset and document smoke test",
+      "status": "completed",
+      "blockedBy": [1, 2, 3, 4, 5],
+      "description": "**Goal:** Prove repo is a faithful stripped subset of hollow/dotfiles (vendored files byte-identical) and record a manual fresh-Mac smoke test.\n\n**USER-ORDERED GATE — NON-SKIPPABLE.** Requested by the user in conversation. MUST NOT be closed by walking around it or substituting a cheaper check. Close only after every acceptanceCriteria item is re-validated independently with output captured.\n\n**Files:** Create docs/superpowers/plans/2026-05-28-zsh-dotfiles-skeleton-smoketest.md\n\n**Acceptance Criteria:** all 8 vendored files byte-identical to hollow@main via diff; LICENSE unchanged (Apache 2.0); manual smoke-test checklist file exists.\n\n**Verify:** clone hollow/dotfiles to temp, diff the 8 vendored paths -> FAITHFUL-OK no DIFFERS; git log --oneline -- LICENSE shows only initial commit.\n\n```json:metadata\n{\"files\": [\"docs/superpowers/plans/2026-05-28-zsh-dotfiles-skeleton-smoketest.md\"], \"verifyCommand\": \"diff 8 vendored files vs fresh hollow/dotfiles clone -> FAITHFUL-OK; git log --oneline -- LICENSE\", \"acceptanceCriteria\": [\"8 vendored files byte-identical\",\"LICENSE unchanged Apache 2.0\",\"smoke-test checklist file exists\"], \"userGate\": true, \"tags\": [\"user-gate\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-05-28T12:00:00Z"
+}

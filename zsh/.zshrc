@@ -1,0 +1,220 @@
+# force locale to english
+export LANG="en_US.UTF-8"
+export LC_CTYPE=${LANG}
+
+# enforce truecolor support
+export COLORTERM="truecolor"
+
+# shell options
+setopt extendedglob
+
+# set resource limits
+ulimit -n $((1024*1024))
+
+# words are complete shell command arguments
+autoload -Uz select-word-style
+select-word-style shell
+
+# system path
+typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
+
+# user paths
+# https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
+export XDG_RUNTIME_DIR="${HOME}/.local/run"
+
+mkdir -p "${XDG_CONFIG_HOME}"
+mkdir -p "${XDG_CACHE_HOME}"
+mkdir -p "${XDG_DATA_HOME}"
+mkdir -p "${XDG_STATE_HOME}"
+mkdir -p "${XDG_RUNTIME_DIR}"
+chmod 0700 "${XDG_RUNTIME_DIR}"
+
+# shell paths
+# https://zsh.sourceforge.io/Intro/intro_3.html
+ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
+ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
+ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
+
+mkdir -p "${ZSH_CACHE_DIR}"{,/completions}
+mkdir -p "${ZSH_DATA_DIR}"
+
+# shell functions
+typeset -TUx FPATH fpath=(
+    ${ZDOTDIR}
+    ${ZSH_CACHE_DIR}/completions
+    ${fpath[@]}
+)
+
+# append ZDOTDIR so `git foo` and subprocess lookups can find user scripts,
+# but `command foo` still resolves to system binaries first
+path+=("${ZDOTDIR}")
+
+# autoload all regular files in ZDOTDIR
+autoload -Uz ${ZDOTDIR}/*(.N:t)
+
+# add homebrew path as early as possible
+if has /opt/homebrew/bin/brew; then
+    eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+fi
+
+# add local bin to path
+add path "${HOME}/.local/bin"
+
+# compiler flags
+typeset -TUx LDFLAGS ldflags ":"
+typeset -TUx CPPFLAGS cppflags ":"
+
+# zi: Flexible and fast ZSH plugin manager
+# https://github.com/z-shell/zi
+typeset -Ag ZI
+ZI[HOME_DIR]="${XDG_CACHE_HOME}/zi"
+ZI[BIN_DIR]="${ZI[HOME_DIR]}/bin"
+source "${ZDOTDIR}/zzinit" && zzinit
+
+alias zre="exec zsh"
+alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
+
+zup() {
+    local oldpwd="${PWD}"
+    :brew-update && \
+    zi self-update && \
+    zi update --all
+    cd "${oldpwd}"
+}
+
+# zinit/default: set global default ice
+# https://github.com/z-shell/z-a-default-ice
+zi id-as for z-shell/z-a-default-ice
+zi default-ice -q lucid light-mode
+
+# zinit/eval: creates a cache containing the output of a command
+# https://github.com/z-shell/z-a-eval
+zi id-as for z-shell/z-a-eval
+
+# zi/auto: load plugins with conventions
+zi id-as for "${ZDOTDIR}/z-a-auto"
+
+# ohmyzsh: community driven zsh framework
+# https://github.com/ohmyzsh/ohmyzsh
+COMPLETION_WAITING_DOTS="true"
+zi for \
+    OMZL::completion.zsh \
+    OMZL::directories.zsh \
+    OMZL::functions.zsh \
+    OMZL::grep.zsh \
+    OMZL::history.zsh \
+    OMZL::key-bindings.zsh \
+    OMZL::spectrum.zsh \
+    OMZL::termsupport.zsh
+
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
+# history configuration
+# https://zsh.sourceforge.io/Doc/Release/Options.html#History
+HISTSIZE=2000000000 SAVEHIST=1000000000
+HISTFILE="${ZSH_DATA_DIR}/history"
+link "${HISTFILE}" .zsh_history
+
+# use approximate completion with error correction
+# https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Control-Functions
+zstyle ':completion:*' completer _complete _correct _approximate
+zstyle ':completion:*:match:*' original only
+zstyle -e ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3>7?7:($#PREFIX+$#SUFFIX)/3))numeric)'
+
+# set descriptions format to enable group support
+zstyle ':completion:*:descriptions' format '%d'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*:corrections' format '%d (errors: %e)'
+
+# improve make autocompletion
+# https://unix.stackexchange.com/questions/657256/autocompletion-of-makefile-with-makro-in-zsh-not-correct-works-in-bash
+zstyle ':completion::complete:make:*:targets' call-command true
+
+# ignore completion functions for commands we don’t have
+zstyle ':completion:*:functions' ignored-patterns '_*'
+
+# ignore completion for git ORIG_HEAD
+# https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete#comment99936479_14325591
+zstyle ':completion:*:*:git*:*' ignored-patterns '*ORIG_HEAD'
+
+# disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+
+# brew: the missing package manager
+# https://github.com/Homebrew/brew
+:brew-init() {
+    export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
+    export HOMEBREW_BUNDLE_NO_LOCK=1
+    export HOMEBREW_AUTO_UPDATE_SECS=86400
+    export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
+    export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
+
+    add path "${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/gawk/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/gnu-sed/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/gnu-tar/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/gnu-time/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin"
+    add path "${HOMEBREW_PREFIX}/opt/make/libexec/gnubin"
+    add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+
+    alias bbd="brew bundle dump -f"
+    alias bz="brew uninstall --zap"
+}
+
+:brew-update() {
+    if ! has brew; then
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        :brew-init
+    else
+        brew bundle dump -f
+    fi
+
+    brew update
+    brew upgrade
+    brew bundle install
+    brew autoremove
+    brew cleanup -s --prune=all
+    chmod go-w "${HOMEBREW_PREFIX}/share"
+}
+
+zi auto has"dscl" for brew
+
+# starship: minimal, blazing-fast, customizable prompt
+# https://starship.rs
+if has starship; then
+    eval "$(starship init zsh)"
+    # `starship init zsh` sets both PROMPT and RPROMPT, so the starship binary
+    # is spawned twice per prompt redraw (~40ms each). The right prompt is
+    # empty by default — drop RPROMPT to halve command_lag.
+    unset RPROMPT
+fi
+
+# zsh/f-sy-h: feature-rich syntax highlighting for ZSH
+# https://github.com/z-shell/F-Sy-H
+zi auto atinit"zicompinit; zicdreplay" \
+    wait for z-shell/F-Sy-H
+
+# zsh/autosuggestions: fish-like autosuggestions for zsh
+# https://github.com/zsh-users/zsh-autosuggestions
+zi auto atload"_zsh_autosuggest_start" \
+    wait for zsh-users/zsh-autosuggestions
+
+# zsh/autopair: automatically close quotes, brackets and other delimiters
+# https://github.com/hlissner/zsh-autopair
+zi auto wait for hlissner/zsh-autopair
+
+# zsh/completions: initialize completion system
+# https://github.com/zsh-users/zsh-completions
+zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
+    wait for zsh-users/zsh-completions
