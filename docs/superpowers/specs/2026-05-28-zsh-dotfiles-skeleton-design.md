@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-28
 **Status:** Approved (design); ready for implementation planning
-**Repo:** https://github.com/remerge/dotfiles
+**Repo:** <https://github.com/remerge/dotfiles>
 
 ## Goal
 
@@ -11,7 +11,7 @@ Remerge employee (and the public) can install on a fresh Mac with a single
 command, with **no prior knowledge of terminals, shells, or package managers**.
 
 The skeleton is derived from the author's personal dotfiles
-(https://github.com/hollow/dotfiles) and must remain a faithful **subset** of
+(<https://github.com/hollow/dotfiles>) and must remain a faithful **subset** of
 that repo: a `diff -r` against `hollow/dotfiles` should show only (a) deletions
 of personal/advanced content, (b) two trimmed files (`zsh/.zshrc`, `Brewfile`),
 and (c) additive new files (`install.sh`, rewritten `README.md`). Nothing is

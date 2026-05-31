@@ -24,8 +24,10 @@ That's it. The installer will:
 - [**zi**](https://github.com/z-shell/zi) — a fast zsh plugin manager
   (installs itself)
 - [**starship**](https://starship.rs) — a clean, informative prompt
-- **Syntax highlighting**, **autosuggestions**, **autopair**, and richer
-  **tab completion**
+- [**Syntax highlighting**](https://github.com/z-shell/F-Sy-H),
+  [**autosuggestions**](https://github.com/zsh-users/zsh-autosuggestions),
+  [**autopair**](https://github.com/hlissner/zsh-autopair), and richer
+  [**tab completion**](https://github.com/zsh-users/zsh-completions)
 - Sensible history and completion defaults
 
 ## Updating
