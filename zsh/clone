@@ -1,0 +1,29 @@
+#!zsh
+
+autoload -Uz uri-parse
+
+local repo_url="$1"
+local repo_path="$2"
+
+if [[ -z "${repo_url}" ]]; then
+    print -P "usage: %N <url> [<path>]"
+    return 1
+fi
+
+if [[ "${repo_url}" != *':'* ]]; then
+    repo_url="https://github.com/${repo_url}"
+fi
+
+if [[ "${repo_path}" == "" ]]; then
+    uri-parse rpath ${repo_url} || return
+    repo_path="${HOME}/src/${REPLY}"
+fi
+
+if [[ ! -e "${repo_path}" ]]; then
+    mkdir -p "$(dirname ${repo_path})"
+    git clone "${repo_url}" "${repo_path}" || return
+fi
+
+if ! (( zsh_eval_context[(I)file] )); then
+    cd "${repo_path}"
+fi

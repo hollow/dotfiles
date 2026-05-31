@@ -262,9 +262,38 @@ mkdir -p "$(dirname "${LESSHISTFILE}")"
 # https://www.nongnu.org/man-db/
 zi auto wait for OMZP::colored-man-pages
 
+# ncdu: disk usage analyzer
+# https://dev.yorhel.nl/ncdu
+link ncduignore .ncduignore
+
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
 zi auto wait for OMZP::rsync
+
+# tmux: a terminal multiplexer
+# https://github.com/tmux/tmux
+:tmux-load() {
+    export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
+    export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
+    export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
+    export ZSH_TMUX_FIXTERM="false"
+    alias T=tmux
+}
+
+:tmux-update() {
+    :tmux-load
+    clone tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
+    ${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
+}
+
+zi auto has"tmux" silent for OMZP::tmux
+
+# vi improved
+# https://github.com/vim/vim
+zi auto has"nvim" for neovim
+alias vim=nvim
+export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
+export EDITOR="${commands[nvim]}"
 
 # wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/

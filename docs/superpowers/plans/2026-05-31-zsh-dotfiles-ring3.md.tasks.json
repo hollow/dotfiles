@@ -1,0 +1,40 @@
+{
+  "planPath": "docs/superpowers/plans/2026-05-31-zsh-dotfiles-ring3.md",
+  "tasks": [
+    {
+      "id": 9,
+      "subject": "Task 1: Add config-free CLI utilities to the Brewfile",
+      "status": "completed",
+      "description": "**Goal:** Add the six standalone brew utilities that need no config or `.zshrc` block.\n\n**Files:**\n- Modify: `Brewfile`\n\n**Acceptance Criteria:**\n- atool, colordiff, jq, less, sponge, watch present; brew block alphabetical; each exists upstream; `brew bundle list --file=./Brewfile --all` parses.\n\n**Verify:** `brew bundle list --file=./Brewfile --all >/dev/null && echo OK`\n\n```json:metadata\n{\"files\": [\"Brewfile\"], \"verifyCommand\": \"brew bundle list --file=./Brewfile --all >/dev/null && echo OK\", \"acceptanceCriteria\": [\"six brew entries present\", \"brew block alphabetical\", \"each entry exists upstream\", \"brew bundle list parses\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 2: bottom (system monitor)",
+      "status": "completed",
+      "blockedBy": [9],
+      "description": "**Goal:** Install `bottom` and vendor its self-contained config.\n\n**Files:**\n- Create: `bottom/bottom.toml`\n- Modify: `Brewfile`\n\n**Acceptance Criteria:**\n- bottom.toml byte-identical to upstream; brew bottom present (bat↔colordiff); no .zshrc change; Brewfile parses.\n\n**Verify:** `diff /Users/bene/src/hollow/dotfiles/bottom/bottom.toml bottom/bottom.toml && echo IDENTICAL`\n\n```json:metadata\n{\"files\": [\"bottom/bottom.toml\", \"Brewfile\"], \"verifyCommand\": \"diff /Users/bene/src/hollow/dotfiles/bottom/bottom.toml bottom/bottom.toml && echo IDENTICAL\", \"acceptanceCriteria\": [\"bottom.toml byte-identical to upstream\", \"brew bottom present alphabetically\", \"no .zshrc change\", \"Brewfile parses\"]}\n```"
+    },
+    {
+      "id": 11,
+      "subject": "Task 3: ncdu (disk-usage analyzer)",
+      "status": "completed",
+      "blockedBy": [10],
+      "description": "**Goal:** Install `ncdu`, vendor its ignore file, and add the `.zshrc` block that links it.\n\n**Files:**\n- Create: `ncduignore`\n- Modify: `Brewfile`\n- Modify: `zsh/.zshrc`\n\n**Acceptance Criteria:**\n- ncduignore byte-identical (single line `Library/CloudStorage/*`); brew ncdu present (make↔ripgrep); ncdu block between colored-man-pages and rsync; `zsh -n zsh/.zshrc` passes.\n\n**Verify:** `diff /Users/bene/src/hollow/dotfiles/ncduignore ncduignore && zsh -n zsh/.zshrc && echo OK`\n\n```json:metadata\n{\"files\": [\"ncduignore\", \"Brewfile\", \"zsh/.zshrc\"], \"verifyCommand\": \"diff /Users/bene/src/hollow/dotfiles/ncduignore ncduignore && zsh -n zsh/.zshrc && echo OK\", \"acceptanceCriteria\": [\"ncduignore byte-identical to upstream\", \"brew ncdu present alphabetically\", \"ncdu .zshrc block between colored-man-pages and rsync\", \"zsh -n passes\"]}\n```"
+    },
+    {
+      "id": 12,
+      "subject": "Task 4: tmux (terminal multiplexer)",
+      "status": "completed",
+      "blockedBy": [11],
+      "description": "**Goal:** Install `tmux`, vendor its config and the `clone` helper, and add the `.zshrc` block with TPM auto-bootstrap.\n\n**Files:**\n- Create: `tmux/tmux.conf`\n- Create: `zsh/clone`\n- Modify: `Brewfile`\n- Modify: `zsh/.zshrc`\n\n**Acceptance Criteria:**\n- tmux.conf + clone byte-identical to upstream; clone non-executable (-rw-r-----); brew tmux present (starship↔watch), NOT tmux-xpanes; tmux block between rsync and wget; `zsh -n` passes for .zshrc and clone.\n\n**Verify:** `diff /Users/bene/src/hollow/dotfiles/tmux/tmux.conf tmux/tmux.conf && diff /Users/bene/src/hollow/dotfiles/zsh/clone zsh/clone && zsh -n zsh/.zshrc && echo OK`\n\n```json:metadata\n{\"files\": [\"tmux/tmux.conf\", \"zsh/clone\", \"Brewfile\", \"zsh/.zshrc\"], \"verifyCommand\": \"diff /Users/bene/src/hollow/dotfiles/tmux/tmux.conf tmux/tmux.conf && diff /Users/bene/src/hollow/dotfiles/zsh/clone zsh/clone && zsh -n zsh/.zshrc && echo OK\", \"acceptanceCriteria\": [\"tmux.conf + clone byte-identical to upstream\", \"clone non-executable\", \"brew tmux present (not tmux-xpanes)\", \"tmux .zshrc block between rsync and wget\", \"zsh -n passes for .zshrc and clone\"]}\n```"
+    },
+    {
+      "id": 13,
+      "subject": "Task 5: neovim (editor, invoked as vim)",
+      "status": "completed",
+      "blockedBy": [12],
+      "description": "**Goal:** Install `neovim`, vendor the vimrc and the vim-plug autoloader, and add the `.zshrc` block.\n\n**Files:**\n- Create: `vim/vimrc`\n- Create: `vim/autoload/plug.vim`\n- Modify: `Brewfile`\n- Modify: `zsh/.zshrc`\n\n**Acceptance Criteria:**\n- vimrc + plug.vim byte-identical to upstream; brew neovim present (ncdu↔ripgrep); vim block between tmux and wget; `zsh -n zsh/.zshrc` passes; whole-ring audit shows no brew deviations vs upstream.\n\n**Verify:** `diff /Users/bene/src/hollow/dotfiles/vim/vimrc vim/vimrc && diff /Users/bene/src/hollow/dotfiles/vim/autoload/plug.vim vim/autoload/plug.vim && zsh -n zsh/.zshrc && echo OK`\n\n```json:metadata\n{\"files\": [\"vim/vimrc\", \"vim/autoload/plug.vim\", \"Brewfile\", \"zsh/.zshrc\"], \"verifyCommand\": \"diff /Users/bene/src/hollow/dotfiles/vim/vimrc vim/vimrc && diff /Users/bene/src/hollow/dotfiles/vim/autoload/plug.vim vim/autoload/plug.vim && zsh -n zsh/.zshrc && echo OK\", \"acceptanceCriteria\": [\"vimrc + plug.vim byte-identical to upstream\", \"brew neovim present alphabetically\", \"vim .zshrc block between tmux and wget\", \"zsh -n passes\", \"no brew deviations vs upstream (comm empty)\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-05-31T16:10:00Z"
+}
