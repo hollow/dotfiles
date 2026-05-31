@@ -1,7 +1,3 @@
-# user information (for git, gpg, etc)
-export USER_NAME="Benedikt Böhm"
-export USER_EMAIL="bb@xnull.de"
-
 # force locale to english
 export LANG="en_US.UTF-8"
 export LC_CTYPE=${LANG}
@@ -611,9 +607,7 @@ export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/terraform/plugins"
 mkdir -p "${TF_PLUGIN_CACHE_DIR}"
 link terraform .terraform.d
 
-alias tf="terraform"
-alias tfd="terraform destroy"
-alias tfi="terraform import"
+alias tf="tofu"
 alias terraform-each=':each */terraform.mk(:h) do'
 alias terraform-parallel=':parallel */terraform.mk(:h) do'
 

@@ -1,6 +1,7 @@
 [tools]
 bun = "latest"
 node = "24.14.1"
+opentofu = "latest"
 prettier = "latest"
 terraform = "latest"
 yarn = "latest"
