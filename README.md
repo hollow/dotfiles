@@ -53,7 +53,8 @@ any of it — this section just explains what the pieces are.
 ### Homebrew
 
 [Homebrew](https://brew.sh) is the package manager for macOS — the tool that
-installs command-line programs. The first time you open your shell, the config
+installs both command-line programs and native macOS apps. The first time you
+open your shell, the config
 installs Homebrew (if it isn't already there) and then installs everything
 listed in the [`Brewfile`](Brewfile): the prompt, a terminal font with icons,
 the GNU command-line tools, `git`, and a few common utilities.
