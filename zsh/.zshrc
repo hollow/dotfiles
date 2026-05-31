@@ -548,11 +548,6 @@ mkdir -p ${PARALLEL_HOME}
 
 zi auto has"psql" for postgresql
 
-# ripgrep: fast grep replacement
-# https://github.com/BurntSushi/ripgrep
-export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}"/ripgrep/config
-zi auto has"rg" for ripgrep
-
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
 zi auto wait for OMZP::rsync
