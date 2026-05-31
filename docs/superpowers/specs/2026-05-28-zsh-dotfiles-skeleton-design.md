@@ -175,27 +175,33 @@ Keep the exact ordering and idioms of the source file; remove blocks only.
 
 ## `Brewfile` — specification
 
-Option (b), "coherent": include the prompt, a nerd font, and the core GNU tools
-that `:brew-init` adds to `PATH` (so those gnubin entries are meaningful), plus
-`git`/`gh`.
+Option (b), "coherent": include the prompt, a nerd font, the core GNU tools that
+`:brew-init` adds to `PATH` (so those gnubin entries are meaningful), `git`/`gh`,
+and a handful of common base CLI tools that ship in the reference Brewfile
+(`bash`, `curl`, `gnu-getopt`, `rsync`, `wget`).
 
 ```ruby
-brew "starship"
+brew "bash"
 brew "coreutils"
+brew "curl"
 brew "findutils"
 brew "gawk"
+brew "gh"
+brew "git"
+brew "gnu-getopt"
 brew "gnu-sed"
 brew "gnu-tar"
 brew "gnu-time"
 brew "grep"
 brew "make"
-brew "git"
-brew "gh"
+brew "rsync"
+brew "starship"
+brew "wget"
 cask "font-meslo-lg-nerd-font"
 ```
 
-(Exact formula ordering to match the source file's alphabetical style where it
-overlaps.)
+(Alphabetical, matching the reference Brewfile's style. All entries also appear
+in `hollow/dotfiles`, keeping this a strict subset.)
 
 ## `starship.toml` — specification
 

@@ -363,41 +363,47 @@ git commit -m "Add trimmed .zshrc: core scaffold, brew bootstrap, starship, 4 pl
 
 ## Task 3: Write the `Brewfile`
 
-**Goal:** Provide a minimal-but-coherent Brewfile: the prompt, a Nerd Font, and the GNU tools that `:brew-init` adds to `PATH`, plus `git`/`gh`.
+**Goal:** Provide a minimal-but-coherent Brewfile: the prompt, a Nerd Font, the GNU tools that `:brew-init` adds to `PATH`, `git`/`gh`, plus common base CLI tools (`bash`, `curl`, `gnu-getopt`, `rsync`, `wget`).
 
 **Files:**
 - Create: `Brewfile`
 
 **Acceptance Criteria:**
-- [ ] Contains exactly: `starship`, `coreutils`, `findutils`, `gawk`, `gnu-sed`, `gnu-tar`, `gnu-time`, `grep`, `make`, `git`, `gh` (brews) and `font-meslo-lg-nerd-font` (cask).
-- [ ] `brew bundle list --file=./Brewfile` lists all 12 entries without error.
+- [ ] Contains exactly these 16 brews: `bash`, `coreutils`, `curl`, `findutils`, `gawk`, `gh`, `git`, `gnu-getopt`, `gnu-sed`, `gnu-tar`, `gnu-time`, `grep`, `make`, `rsync`, `starship`, `wget`; and 1 cask: `font-meslo-lg-nerd-font`.
+- [ ] `brew bundle list --file=./Brewfile --all` lists all 17 entries without error.
 - [ ] Every GNU tool whose gnubin path appears in `:brew-init` is present in the Brewfile.
+- [ ] Every entry also exists in `hollow/dotfiles`'s Brewfile (keeps this a strict subset).
 
-**Verify:** `brew bundle list --file=./Brewfile | sort | tr '\n' ' '` → lists the 12 package names; exit 0.
+**Verify:** `brew bundle list --file=./Brewfile --all | sort | tr '\n' ' '` → lists the 17 package names; exit 0.
 
 **Steps:**
 
 - [ ] **Step 1: Write `Brewfile` with exactly this content (alphabetical, matching reference style)**
 
 ```ruby
+brew "bash"
 brew "coreutils"
+brew "curl"
 brew "findutils"
 brew "gawk"
 brew "gh"
 brew "git"
+brew "gnu-getopt"
 brew "gnu-sed"
 brew "gnu-tar"
 brew "gnu-time"
 brew "grep"
 brew "make"
+brew "rsync"
 brew "starship"
+brew "wget"
 cask "font-meslo-lg-nerd-font"
 ```
 
 - [ ] **Step 2: Verify it parses**
 
-Run: `brew bundle list --file=./Brewfile`
-Expected: prints the 11 brews + 1 cask names; exit 0. (Does not install anything; `list` only reads the file.)
+Run: `brew bundle list --file=./Brewfile --all`
+Expected: prints the 16 brews + 1 cask names; exit 0. (Does not install anything; `list` only reads the file.)
 
 - [ ] **Step 3: Commit**
 
