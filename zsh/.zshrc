@@ -494,10 +494,6 @@ mkdir -p "$(dirname "${LESSHISTFILE}")"
 # https://www.nongnu.org/man-db/
 zi auto wait for OMZP::colored-man-pages
 
-# mc: midnight commander
-# https://midnight-commander.org
-alias mc="mc --nosubshell"
-
 # ncdu: disk usage analyzer
 # https://dev.yorhel.nl/ncdu
 link ncduignore .ncduignore
