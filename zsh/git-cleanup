@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+set -e
+[[ $TRACE -eq 1 ]] && set -x
+
+git fetch --quiet --all --tags --prune
+git gc --quiet
+git submodule init --quiet
+git submodule sync --quiet --recursive
+git submodule --quiet foreach git fetch --quiet --all --tags --prune --prune-tags
+git submodule --quiet foreach git gc --quiet

@@ -67,6 +67,12 @@ fi
 log "Linking ~/.zshrc -> $CONFIG_DIR/zsh/.zshrc"
 ln -nfs "$CONFIG_DIR/zsh/.zshrc" "$HOME/.zshrc"
 
+# Seed a per-user git identity file (edit it with your name/email).
+if [ -f "$CONFIG_DIR/git/local.example" ] && [ ! -f "$CONFIG_DIR/git/local" ]; then
+    log "Creating git identity file $CONFIG_DIR/git/local (edit it with your name/email)"
+    cp "$CONFIG_DIR/git/local.example" "$CONFIG_DIR/git/local"
+fi
+
 # 4. Hand off to a fresh interactive zsh to run the first-run bootstrap.
 if [ "$os" != "Darwin" ]; then
     log "Linux detected (best-effort): Homebrew and starship will NOT auto-install."

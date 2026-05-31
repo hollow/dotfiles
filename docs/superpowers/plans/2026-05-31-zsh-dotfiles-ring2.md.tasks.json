@@ -1,0 +1,49 @@
+{
+  "planPath": "docs/superpowers/plans/2026-05-31-zsh-dotfiles-ring2.md",
+  "tasks": [
+    {
+      "id": 1,
+      "subject": "Task 1: Vendor Ring 2 verbatim files (configs + git-* scripts)",
+      "status": "completed",
+      "description": "**Goal:** Bring over byte-identical the new config files and the four git-* subcommands from hollow/dotfiles@main.\n\n**Files:** Create bat/config, git/ignore, wgetrc, glow/glow.yml, glow/styles/catppuccin-mocha.json; create executable zsh/git-main-branch, zsh/git-latest, zsh/git-cleanup, zsh/git-checkout-latest.\n\n**Acceptance Criteria:** 9 files byte-identical to hollow@main; git-* scripts executable (100755) + zsh -n clean; glow style valid JSON.\n\n**Verify:** diff 9 files vs fresh hollow clone; zsh -n + test -x git-* scripts; json.load glow style.\n\n```json:metadata\n{\"files\": [\"bat/config\",\"git/ignore\",\"wgetrc\",\"glow/glow.yml\",\"glow/styles/catppuccin-mocha.json\",\"zsh/git-main-branch\",\"zsh/git-latest\",\"zsh/git-cleanup\",\"zsh/git-checkout-latest\"], \"verifyCommand\": \"diff vs fresh hollow clone; zsh -n + test -x; json.load glow style\", \"acceptanceCriteria\": [\"9 files byte-identical\",\"git-* executable + zsh -n\",\"glow style valid JSON\"]}\n```"
+    },
+    {
+      "id": 2,
+      "subject": "Task 2: Extend the Brewfile",
+      "status": "completed",
+      "description": "**Goal:** Add Ring 2 tools to the Brewfile, alphabetical and (except glow) a subset of upstream.\n\n**Files:** Modify Brewfile.\n\n**Acceptance Criteria:** adds bat, duf, eza, fd, glow, ripgrep alphabetically; brew bundle list --all parses; every entry in upstream except glow.\n\n**Verify:** brew bundle list --file=./Brewfile --all; subset-vs-upstream check (glow excepted) -> SUBSET-OK.\n\n```json:metadata\n{\"files\": [\"Brewfile\"], \"verifyCommand\": \"brew bundle list --all; subset check glow excepted\", \"acceptanceCriteria\": [\"adds bat/duf/eza/fd/glow/ripgrep\",\"brew bundle list parses\",\"subset of upstream except glow\"]}\n```"
+    },
+    {
+      "id": 3,
+      "subject": "Task 3: Add Ring 2 blocks to zsh/.zshrc",
+      "status": "completed",
+      "description": "**Goal:** Insert tool/nicety/git blocks into .zshrc at their original upstream relative position, keeping it a strict line-subset.\n\n**Files:** Modify zsh/.zshrc (exact blocks in plan doc Task 3 Step 1).\n\n**Acceptance Criteria:** 11 blocks inserted between `zi auto has\"dscl\" for brew` and `# starship:` in order; zsh -n exit 0; strict line-subset of upstream; git block has exactly the 14 aliases (no gcu/gdu/git-each/git-parallel).\n\n**Verify:** zsh -n zsh/.zshrc && echo SYNTAX-OK; strict-line-subset check -> STRICT-SUBSET-OK.\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"zsh -n; strict-line-subset vs upstream .zshrc\", \"acceptanceCriteria\": [\"11 blocks in upstream order\",\"zsh -n exit 0\",\"strict line-subset\",\"14 git aliases only\"]}\n```"
+    },
+    {
+      "id": 4,
+      "subject": "Task 4: Add git/config, git/local.example, git/.gitignore",
+      "status": "completed",
+      "description": "**Goal:** Impersonal shared git defaults + alias block with [include] for per-user identity, a tracked identity template, and a per-dir gitignore.\n\n**Files:** Create git/config, git/local.example, git/.gitignore.\n\n**Acceptance Criteria:** git/config has upstream [alias]/[advice]/[branch]/[color]/[diff]/[init]/[pull]/[push]/[rerere] byte-identical, omits [user]/[gpg]/[commit]/[filter lfs], ends with tab-indented [include] path=local; every line in upstream except include lines; git config --list parses; git/local.example [user] name+email only; git/.gitignore = /local.\n\n**Verify:** git config -f git/config --get include.path -> local; git/config subset check -> GITCONFIG-SUBSET-OK.\n\n```json:metadata\n{\"files\": [\"git/config\",\"git/local.example\",\"git/.gitignore\"], \"verifyCommand\": \"git config -f git/config --get include.path; subset check include excepted\", \"acceptanceCriteria\": [\"impersonal subset + [include]\",\"every line in upstream except include\",\"git config --list parses\",\"local.example name+email only\",\"git/.gitignore = /local\"]}\n```"
+    },
+    {
+      "id": 5,
+      "subject": "Task 5: Seed git/local from install.sh",
+      "status": "completed",
+      "description": "**Goal:** On first install, copy git/local.example -> git/local if absent.\n\n**Files:** Modify install.sh.\n\n**Acceptance Criteria:** seed step after the ~/.zshrc symlink and before `# 4. Hand off`; shellcheck -s sh clean; sh -n parses; idempotent (only when git/local absent).\n\n**Verify:** shellcheck -s sh install.sh && sh -n install.sh && echo LINT-OK; grep -q 'git/local.example' install.sh.\n\n```json:metadata\n{\"files\": [\"install.sh\"], \"verifyCommand\": \"shellcheck -s sh install.sh && sh -n install.sh && grep git/local.example\", \"acceptanceCriteria\": [\"seed step after symlink before hand-off\",\"shellcheck clean + sh -n\",\"idempotent\"]}\n```"
+    },
+    {
+      "id": 6,
+      "subject": "Task 6: Add \"Set your git identity\" to README.md",
+      "status": "completed",
+      "description": "**Goal:** Document setting git identity in git/local, including the --global caveat.\n\n**Files:** Modify README.md.\n\n**Acceptance Criteria:** `### Set your git identity` under `## Getting started`; tells user to edit ~/.config/git/local with name/email, mentions git config --file form, notes git prompts until set, warns against git config --global; single H1; no new markdownlint errors beyond pre-existing MD013 install line.\n\n**Verify:** grep -q 'git/local' README.md && grep -q 'Set your git identity' README.md && echo README-OK.\n\n```json:metadata\n{\"files\": [\"README.md\"], \"verifyCommand\": \"grep git/local + 'Set your git identity' in README.md\", \"acceptanceCriteria\": [\"### Set your git identity under Getting started\",\"edit git/local + --file + prompt + --global warning\",\"single H1, no new lint beyond MD013\"]}\n```"
+    },
+    {
+      "id": 7,
+      "subject": "Task 7: Faithfulness verification + extended smoke test",
+      "status": "completed",
+      "blockedBy": [1, 2, 3, 4, 5, 6],
+      "description": "**Goal:** Prove Ring 2 stays a faithful subset of hollow/dotfiles@main and record the extended manual smoke test.\n\n**USER-ORDERED GATE — NON-SKIPPABLE.** Requested by the user in conversation. MUST NOT be closed by walking around it or substituting a cheaper check. Close only after every acceptanceCriteria item is re-validated independently with output captured.\n\n**Files:** Create docs/superpowers/plans/2026-05-31-zsh-dotfiles-ring2-smoketest.md.\n\n**Acceptance Criteria:** 9 vendored files byte-identical to upstream; zsh/.zshrc strict line-subset; every Brewfile entry upstream except glow; every git/config line upstream except the two [include] lines; zsh -n + shellcheck -s sh pass + glow JSON valid; smoke-test checklist file exists.\n\n**Verify:** aggregate faithfulness suite (plan doc Task 7 Step 1) -> RING2-FAITHFUL-OK, no FAIL/DIFFERS/NOT-IN-UPSTREAM.\n\n```json:metadata\n{\"files\": [\"docs/superpowers/plans/2026-05-31-zsh-dotfiles-ring2-smoketest.md\"], \"verifyCommand\": \"aggregate faithfulness suite vs fresh hollow clone -> RING2-FAITHFUL-OK\", \"acceptanceCriteria\": [\"9 vendored files byte-identical\",\"zshrc strict subset\",\"Brewfile subset except glow\",\"git/config subset except include\",\"zsh -n + shellcheck pass + glow JSON valid\",\"smoke-test checklist exists\"], \"userGate\": true, \"tags\": [\"user-gate\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-05-31T15:00:00Z"
+}

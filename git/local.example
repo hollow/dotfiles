@@ -1,0 +1,6 @@
+# Personal git identity. Copied to ~/.config/git/local by the installer.
+# Edit THIS file's copy (git/local) — it is not tracked in git.
+# Until you set these, git will prompt you on your first commit.
+[user]
+	name = Your Name
+	email = you@remerge.io

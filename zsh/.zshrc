@@ -190,6 +190,94 @@ zstyle ':completion:*:git-checkout:*' sort false
 
 zi auto has"dscl" for brew
 
+# bat: cat(1) clone with wings
+# https://github.com/sharkdp/bat
+:bat-load() {
+    export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
+    export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
+}
+
+zi auto has"bat" wait for bat
+
+# dircolors: setup colors for ls and friends
+# https://github.com/trapd00r/LS_COLORS
+:dircolors-load() {
+    zstyle ":completion:*:default" list-colors "${(s.:.)LS_COLORS}"
+}
+
+:dircolors-eval() {
+    dircolors -b LS_COLORS
+}
+
+zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
+
+# duf: better `df` alternative
+# https://github.com/muesli/duf
+:duf-load() {
+    alias df=duf
+}
+
+zi auto has"duf" wait for duf
+
+# eza: a modern replacement for ‘ls’.
+# https://github.com/ogham/eza
+:eza-load() {
+    alias l="eza --all --long --group"
+    alias lR="l -R"
+}
+
+zi auto has"eza" wait for eza
+
+# git: distributed version control system
+# https://github.com/git/git
+zi auto id-as"git" as"completion" blockf mv"git->_git" wait for \
+    https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
+
+alias ga="git add --all"
+alias gap="git add --patch"
+alias gcl="git checkout-latest main"
+alias gcm="git co \$(git main-branch)"
+alias gd="git diff"
+alias gdc="git diff --cached"
+alias gdm="git diff origin/\$(git main-branch)"
+alias gf="git fetch --prune"
+alias gl="git lg"
+alias gp="git pull"
+alias gpr="git pull --rebase --autostash"
+alias grh="git reset HEAD"
+alias gsp="git show -p"
+alias s="git st ."
+
+# glamour/glow
+export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
+export GLOW_STYLE="${GLAMOUR_STYLE}"
+
+# less: pager configuration
+# https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
+export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
+export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
+mkdir -p "$(dirname "${LESSHISTFILE}")"
+
+# man: unix documentation system
+# https://www.nongnu.org/man-db/
+zi auto wait for OMZP::colored-man-pages
+
+# rsync: fast incremental file transfer
+# https://rsync.samba.org
+zi auto wait for OMZP::rsync
+
+# wget: retrieve files using HTTP, HTTPS, FTP and FTPS
+# https://www.gnu.org/software/wget/
+export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
+alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
+
+# reminds you to use existing aliases for commands you just typed
+# https://github.com/MichaelAquilina/zsh-you-should-use
+if has tput; then
+    zi auto wait for MichaelAquilina/zsh-you-should-use
+    YSU_MESSAGE_POSITION="after"
+fi
+
 # starship: minimal, blazing-fast, customizable prompt
 # https://starship.rs
 if has starship; then

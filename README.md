@@ -45,6 +45,28 @@ zup
 This updates your Homebrew packages, the ZI plugin manager, and all installed
 plugins in one go.
 
+### Set your git identity
+
+The installer creates `~/.config/git/local` for your personal git identity.
+Open it and set your name and email:
+
+```ini
+[user]
+  name = Your Name
+  email = you@remerge.io
+```
+
+You can also set it from the command line without editing the file:
+
+```sh
+git config --file ~/.config/git/local user.name "Your Name"
+git config --file ~/.config/git/local user.email "you@remerge.io"
+```
+
+Until you set it, git will ask you to configure your name and email on your
+first commit. (Avoid `git config --global` here — because this repo lives at
+`~/.config`, that may write into the shared `git/config` instead of `local`.)
+
 ## What you get
 
 Everything below is installed and configured for you. You don't need to touch
