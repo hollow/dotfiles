@@ -12,7 +12,6 @@
 	b = !git --no-pager log --decorate --format="%D" -1
 	ci = commit
 	co = checkout
-	dc = diff --cached
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	ls = ls-tree -r HEAD
 	st = status --short
