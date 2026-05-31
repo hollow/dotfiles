@@ -1,11 +1,3 @@
-[user]
-	name = Benedikt Böhm
-	email = bb@xnull.de
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO2wbcnPz2sPIU1T2FFt88ZHpOXvFqwNxNX+5WFo2A2b
-
-[gpg]
-	format = ssh
-
 [alias]
 	aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
 	amend = ci --amend --reuse-message=HEAD
@@ -28,9 +20,6 @@
 [color]
 	ui = true
 
-[commit]
-	gpgsign = true
-
 [diff]
 	renames = copies
 
@@ -52,3 +41,6 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+
+[include]
+	path = local
