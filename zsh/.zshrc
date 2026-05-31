@@ -396,9 +396,6 @@ zi auto has"duf" wait for duf
 
 zi auto has"eza" wait for eza
 
-# fd
-zi auto has"fd" for fd
-
 # fzf
 # https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
 export FZF_DEFAULT_OPTS=" \
