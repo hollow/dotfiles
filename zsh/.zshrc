@@ -602,10 +602,8 @@ zi make as"program" for bahamas10/sshp
 
 # terraform: manage cloud infrastructure
 # https://github.com/hashicorp/terraform
-export CHECKPOINT_DISABLE=true
-export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/terraform/plugins"
+export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
 mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-link terraform .terraform.d
 
 alias tf="tofu"
 alias terraform-each=':each */terraform.mk(:h) do'

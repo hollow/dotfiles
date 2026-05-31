@@ -535,45 +535,49 @@ infrastructure automation workflows.
   - `ansible-parallel DIRS... do <cmd>`: Run commands in parallel across
     Ansible projects (up to 5 jobs)
 
-### Terraform
+### OpenTofu
 
-Terraform is configured for infrastructure-as-code workflows with XDG-compliant
-paths and convenient aliases for common operations.
+[OpenTofu](https://opentofu.org/), the open-source fork of Terraform, is used
+for infrastructure-as-code workflows. The binary is managed declaratively via
+`mise` (`opentofu = "latest"`), so no manual install or `tfenv`-style version
+switching is required.
 
-- **XDG Directory Compliance**: Terraform plugin cache is stored in
-  `~/.cache/terraform/plugins` (`TF_PLUGIN_CACHE_DIR`), following the XDG Base
+- **XDG Directory Compliance**: The provider plugin cache is stored in
+  `~/.cache/opentofu/plugins` (`TF_PLUGIN_CACHE_DIR`), following the XDG Base
   Directory specification. This prevents duplicate provider downloads across
-  multiple Terraform projects and keeps plugin binaries organized.
+  multiple projects and keeps plugin binaries organized.
 
-- **Checkpoint Telemetry Disabled**: `CHECKPOINT_DISABLE=true` disables
-  HashiCorp's checkpoint telemetry system, preventing version checks and
-  analytics reporting for enhanced privacy and performance.
+- **Credentials**: CLI configuration and credentials live in
+  `opentofu/credentials.tfrc.json`, which is git-ignored to keep registry
+  tokens out of version control.
 
-- **Configuration Symlink**: The `.terraform.d` directory is symlinked from
-  `terraform/config.tfrc` in the dotfiles, centralizing Terraform CLI
-  configuration.
+- **Quick Alias**: `tf` is a shorthand for `tofu`, the OpenTofu CLI.
 
-- **Quick Aliases**: Short commands for common Terraform operations:
-
-  - `tf`: Shorthand for `terraform`
-  - `tfd`: Destroy infrastructure (`terraform destroy`)
-  - `tfi`: Import existing resources (`terraform import`)
-
-- **Targeted Operations**: Helper functions for selective plan/apply operations:
+- **Targeted Operations**: Helper scripts for selective plan/apply operations:
 
   - `tfa [resources...]`: Apply changes, optionally targeting specific resources
-    (e.g., `tfa module.vpc aws_instance.web` expands to `terraform apply
+    (e.g., `tfa module.vpc aws_instance.web` expands to `tofu apply
     -target=module.vpc -target=aws_instance.web`)
   - `tfp [resources...]`: Plan changes with optional resource targeting, using
     the same syntax as `tfa`
 
-  When called without arguments, these functions operate on the entire
+  When called without arguments, these scripts operate on the entire
   configuration. With arguments, they automatically prefix each resource with
   `-target=` for selective operations.
 
-- **Batch Operations**: Apply commands across multiple Terraform projects:
+- **HCP Terraform Helper**: `tfe` wraps the HCP Terraform (Terraform Cloud) API
+  for the workspace inferred from the current directory (`<org>/<workspace>`).
+  Subcommands include `call` for raw API requests, `local` and `agent` to switch
+  a workspace's execution mode, and `list-active-runs` to show in-flight runs
+  across the organization.
+
+- **Batch Operations**: Apply commands across multiple OpenTofu projects:
 
   - `terraform-each DIRS... do <cmd>`: Run commands sequentially in directories
     containing `terraform.mk`
   - `terraform-parallel DIRS... do <cmd>`: Run commands in parallel across
-    Terraform projects (up to 5 jobs)
+    projects (up to 5 jobs)
+
+- **Editor Integration**: The `opentofu.vscode-opentofu` VS Code extension
+  replaces the former HashiCorp Terraform extension for syntax highlighting,
+  validation, and formatting of `.tf` files.
