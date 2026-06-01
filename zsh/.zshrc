@@ -297,6 +297,11 @@ export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
 
 zi auto has"mise" for jdx/mise
 
+# parallel: run commands in parallel
+# https://www.gnu.org/software/parallel/
+export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
+mkdir -p ${PARALLEL_HOME}
+
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
 zi auto wait for OMZP::rsync

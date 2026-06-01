@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+[[ $TRACE -eq 1 ]] && set -x
+
+gh repo list --limit 1000 --json nameWithOwner "$@" | jq -r '.[].nameWithOwner'

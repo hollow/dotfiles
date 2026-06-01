@@ -44,6 +44,9 @@
         (uv)
             uv tool install ${___ehid}
             ;;
+        (mise)
+            mise use -g ${___ehid}
+            ;;
     esac
 
     if (( ${+functions[:${___ehid}-update]} )) {

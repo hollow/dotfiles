@@ -1,0 +1,3 @@
+#!zsh
+(( ${+DOT_DEBUG} )) || return 0
++zi-message "{pre}[${functrace[1]}]{rst} {msg}$*{rst}" 1>&2

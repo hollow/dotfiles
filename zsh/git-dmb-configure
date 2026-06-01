@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+[[ $TRACE -eq 1 ]] && set -x
+
+git config set remote.origin.dmb-enabled true
+git config set branch."$(git main-branch)".dmb-required true
+git config set delete-merged-branches.configured 5.0.0+
