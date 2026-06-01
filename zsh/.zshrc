@@ -190,6 +190,15 @@ zstyle ':completion:*:git-checkout:*' sort false
 
 zi auto has"dscl" for brew
 
+# 1password: remembers all your passwords for you
+# https://1password.com
+:1password-cli-eval() {
+    chmod 0700 "${XDG_CONFIG_HOME}/op"
+    op completion zsh
+}
+
+zi auto has"op" wait for 1password-cli
+
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 :bat-load() {
@@ -227,6 +236,9 @@ zi auto has"duf" wait for duf
 }
 
 zi auto has"eza" wait for eza
+
+# ghostty
+add path "${GHOSTTY_BIN_DIR}"
 
 # git: distributed version control system
 # https://github.com/git/git
