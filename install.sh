@@ -67,10 +67,26 @@ fi
 log "Linking ~/.zshrc -> $CONFIG_DIR/zsh/.zshrc"
 ln -nfs "$CONFIG_DIR/zsh/.zshrc" "$HOME/.zshrc"
 
-# Seed a per-user git identity file (edit it with your name/email).
-if [ -f "$CONFIG_DIR/git/local.example" ] && [ ! -f "$CONFIG_DIR/git/local" ]; then
-    log "Creating git identity file $CONFIG_DIR/git/local (edit it with your name/email)"
-    cp "$CONFIG_DIR/git/local.example" "$CONFIG_DIR/git/local"
+# Seed a per-user git identity. Prompt interactively when we have a terminal;
+# otherwise fall back to copying the example for the user to edit later.
+if [ ! -f "$CONFIG_DIR/git/local" ]; then
+    if [ -e /dev/tty ]; then
+        log "Setting up your Git identity (used to author your commits)."
+        printf 'Full name (e.g. Jane Doe): ' > /dev/tty
+        read -r git_name < /dev/tty || git_name=""
+        printf 'Email (e.g. jane@remerge.io): ' > /dev/tty
+        read -r git_email < /dev/tty || git_email=""
+        if [ -n "$git_name" ] && [ -n "$git_email" ]; then
+            printf '[user]\n\tname = %s\n\temail = %s\n' "$git_name" "$git_email" > "$CONFIG_DIR/git/local"
+            log "Saved your Git identity to $CONFIG_DIR/git/local"
+        else
+            log "Skipped (empty input). Edit $CONFIG_DIR/git/local later to set your name/email."
+            [ -f "$CONFIG_DIR/git/local.example" ] && cp "$CONFIG_DIR/git/local.example" "$CONFIG_DIR/git/local"
+        fi
+    elif [ -f "$CONFIG_DIR/git/local.example" ]; then
+        log "Creating git identity file $CONFIG_DIR/git/local (edit it with your name/email)"
+        cp "$CONFIG_DIR/git/local.example" "$CONFIG_DIR/git/local"
+    fi
 fi
 
 # 4. Hand off to a fresh interactive zsh to run the first-run bootstrap.
