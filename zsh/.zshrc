@@ -588,16 +588,20 @@ fi
 # https://github.com/bahamas10/sshp
 zi make as"program" for bahamas10/sshp
 
-# terraform: manage cloud infrastructure
-# https://github.com/hashicorp/terraform
+# opentofu: open-source terraform fork, installed via mise
+# https://github.com/opentofu/opentofu
 export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
 mkdir -p "${TF_PLUGIN_CACHE_DIR}"
 
 alias tf="tofu"
-alias terraform-each=':each */terraform.mk(:h) do'
-alias terraform-parallel=':parallel */terraform.mk(:h) do'
+alias tf-each=':each */terraform.mk(:h) do'
+alias tf-parallel=':parallel */terraform.mk(:h) do'
 
-zi auto has"terraform" for terraform
+:opentofu-load() {
+    complete -o nospace -C tofu tofu
+}
+
+zi auto with"mise" wait1 for opentofu
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
