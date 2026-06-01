@@ -1,0 +1,8 @@
+Include %d/.config/ssh/config.crypto
+
+HashKnownHosts no
+StrictHostKeyChecking no
+
+# Prevent connections from beind dropped
+ServerAliveInterval 900
+ServerAliveCountMax 0

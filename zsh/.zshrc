@@ -260,6 +260,14 @@ alias grh="git reset HEAD"
 alias gsp="git show -p"
 alias s="git st ."
 
+# gnupg: GNU privacy guard
+# https://gnupg.org/
+export GPG_TTY="${TTY}"
+export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
+mkdir -p "${GNUPGHOME}"
+chmod 0700 "${GNUPGHOME}"
+zi auto wait for OMZP::gpg-agent
+
 # glamour/glow
 export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
 export GLOW_STYLE="${GLAMOUR_STYLE}"
@@ -281,6 +289,21 @@ link ncduignore .ncduignore
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
 zi auto wait for OMZP::rsync
+
+# ssh: secure shell
+# https://www.openssh.com
+mkdir -p "${HOME}/.ssh" "${XDG_CACHE_HOME}"/ssh
+chmod 0700 "${HOME}/.ssh"
+
+link ssh/config .ssh/config
+chmod 0600 "${HOME}/.ssh/config"
+
+# https://1password.community/discussion/comment/660153/#Comment_660153
+if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
+    export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+else
+    zi auto silent for OMZP::ssh-agent
+fi
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
