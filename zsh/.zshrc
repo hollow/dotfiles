@@ -500,6 +500,8 @@ link ncduignore .ncduignore
 
 # mise: dev tools, env vars, task runner
 # https://github.com/jdx/mise
+export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+
 :mise-load() {
     local _mise_cmd_not_found
     eval "$(mise activate zsh)"
@@ -562,6 +564,10 @@ export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
 }
 
 zi auto has"ruby" for ruby
+
+# sops: editor of encrypted files (age, gpg, cloud KMS)
+# https://github.com/getsops/sops
+export SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
 
 # sqlite: database engine
 # https://sqlite.org
