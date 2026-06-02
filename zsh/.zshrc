@@ -575,7 +575,6 @@ export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 
 # ssh: secure shell
 # https://www.openssh.com
-alias ssu="sshlive -o RequestTTY=force -o RemoteCommand='sudo -i'"
 
 mkdir -p "${HOME}/.ssh" "${XDG_CACHE_HOME}"/ssh
 chmod 0700 "${HOME}/.ssh"
