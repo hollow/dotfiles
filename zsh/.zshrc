@@ -81,6 +81,8 @@ alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 zup() {
     local oldpwd="${PWD}"
     :brew-update && \
+    :tmux-update && \
+    :gcloud-update && \
     zi self-update && \
     zi update --all
     cd "${oldpwd}"
@@ -237,6 +239,28 @@ zi auto has"duf" wait for duf
 
 zi auto has"eza" wait for eza
 
+# gcloud: Google Cloud SDK
+# https://cloud.google.com/sdk
+:gcloud-update() {
+    gcloud components update || :
+}
+
+:gcloud-load() {
+    if has brew; then
+        export CLOUDSDK_HOME="/opt/homebrew/share/google-cloud-sdk"
+    else
+        export CLOUDSDK_HOME="/usr/lib64/google-cloud-sdk"
+    fi
+
+    if has "${CLOUDSDK_HOME}"; then
+        add path "${CLOUDSDK_HOME}/bin"
+        source "${CLOUDSDK_HOME}/completion.zsh.inc"
+        export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
+    fi
+}
+
+zi auto has"gcloud" wait1 for gcloud
+
 # ghostty
 add path "${GHOSTTY_BIN_DIR}"
 
@@ -324,6 +348,21 @@ if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock
 else
     zi auto silent for OMZP::ssh-agent
 fi
+
+# opentofu: open-source terraform fork, installed via mise
+# https://github.com/opentofu/opentofu
+export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
+mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+
+alias tf="tofu"
+alias tf-each=':each */terraform.mk(:h) do'
+alias tf-parallel=':parallel */terraform.mk(:h) do'
+
+:opentofu-load() {
+    complete -o nospace -C tofu tofu
+}
+
+zi auto with"mise" wait1 for opentofu
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux

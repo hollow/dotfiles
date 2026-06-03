@@ -1,0 +1,15 @@
+#!zsh
+
+local dirs=(${argv:1:((${argv[(Ie)do]}-1))})
+local cmd=(${argv:((${argv[(Ie)do]}+1))})
+
+for dir in ${dirs[@]}; do
+    echo -e "\n${dir:P}"
+    if [[ "${cmd[@]}" == "" ]]; then
+        pushd "${dir:P}"
+    else
+        pushd "${dir:P}" &>/dev/null
+        eval "${cmd[@]}"
+    fi
+    popd &>/dev/null
+done

@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+
+if (( $# == 0 )); then
+    tofu apply
+else
+    tofu apply "${@[@]/#/-target=}"
+fi

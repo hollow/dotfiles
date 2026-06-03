@@ -1,0 +1,8 @@
+#!zsh
+
+local dirs=(${argv:1:((${argv[(Ie)do]}-1))})
+local cmd=(${argv:((${argv[(Ie)do]}+1))})
+
+parallel --jobs 5 --color --tag \
+    "source ${ZDOTDIR}/.zshrc; pushd {} &>/dev/null; eval '${cmd[*]}'" \
+    ::: "${dirs[@]}"

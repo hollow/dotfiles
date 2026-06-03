@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+[[ $TRACE -eq 1 ]] && set -x
+
+git checkout-latest main
+git dmb -y

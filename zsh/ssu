@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+
+# connect to a live/rescue system and become root via sudo
+
+sshlive -o RequestTTY=force -o RemoteCommand='sudo -i' "$@"
