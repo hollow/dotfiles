@@ -210,6 +210,11 @@ zi auto has"op" wait for 1password-cli
 
 zi auto has"bat" wait for bat
 
+# claude: AI assistant by Anthropic
+# https://claude.ai
+export CLAUDE_CODE_NEW_INIT=1
+export ENABLE_CLAUDEAI_MCP_SERVERS=true
+
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
 :dircolors-load() {
