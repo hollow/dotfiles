@@ -468,38 +468,46 @@ multiple codebases.
 
 ### Python
 
-The Python setup favors a clean, isolated tooling environment while keeping the
-system free from ad‑hoc `pip install --user` clutter.
+The Python setup keeps a single, brew-owned system interpreter and pushes all
+version- and dependency-management into per-repository tooling, so the system
+Python is never clobbered by `pip`.
 
-- **Runtime Discovery**: `PYTHONHOME` is set dynamically to the newest Homebrew
-  installed Python (pattern `python@*`), and its `libexec/bin` directory is
-  added early to `PATH` to provide the correct `python`, `pip`, and venv tools.
+- **System interpreter (Homebrew):** `python3`/`pip` resolve to the
+  Homebrew-installed Python via `brew shellenv` on `PATH`. `PYTHONHOME` is
+  deliberately left unset so it never overrides a virtualenv.
 
-- **Interactive Startup**: `PYTHONSTARTUP` points to `python/startup.py` so
-  every REPL session loads personal helper code (history, quality‑of‑life
-  tweaks, etc.).
+- **System lockdown:** `pip/pip.conf` sets `require-virtualenv = True`, and the
+  shell exports `PIP_REQUIRE_VIRTUALENV=1`, `PIP_USER=0`, and
+  `PYTHONNOUSERSITE=1`. `pip install` outside a virtualenv is refused and no
+  per-user site clutter accumulates — only `brew` ever writes to the system
+  Python.
 
-- **Application Isolation via uv**: Python CLI tools are installed through
-  [uv](https://github.com/astral-sh/uv) (`uv tool install`), which creates
-  isolated virtual environments per tool under `UV_TOOL_DIR`
-  (`~/.cache/uv/tools`). Their entry‑point scripts land in `UV_TOOL_BIN_DIR`
-  (`~/.cache/uv/tools/bin`), which is added to `PATH` so every tool is
-  available without polluting the system Python.
+- **Per-repo versions (mise + uv):** a repository declares its Python version
+  (`.python-version` or `mise.toml` `[tools] python = "…"`). With
+  `python.uv_venv_auto = "create|source"` in `mise/config.toml`, mise
+  auto-creates and activates the repo's uv `.venv` for uv projects (those with a
+  `uv.lock`). Run `mise sync python --uv` manually to align mise's installed
+  interpreter with the project's. See the
+  [mise uv cookbook](https://mise.jdx.dev/mise-cookbook/python.html).
 
-- **Automatic Tool Refresh**: The `:uv-update` helper (called by `zup`) runs
-  `uv tool upgrade --all` to keep every uv‑managed tool at its latest
-  version. New tools are auto‑installed on first `zi update` via the
-  `z-a-auto` annex's `with"uv"` integration.
+- **CLI tools (uv/uvx):** standalone Python tools are run with `uvx` or
+  installed with `uv tool install`
+  ([uv tools](https://docs.astral.sh/uv/concepts/tools/)). Installed tools live
+  under `UV_TOOL_DIR` (`~/.cache/uv/tools`) with entry points in
+  `UV_TOOL_BIN_DIR` (`~/.cache/uv/bin`) on `PATH`. `:uv-update` (run by `zup`)
+  upgrades them all; new tools auto-install on `zi update` via the `z-a-auto`
+  annex's `with"uv"` integration.
 
-- **Tab Completion for Python CLIs**: `argcomplete` integration extends shell
-  completion for Python programs by adding its generated completion functions
-  to `fpath` and registering them after the packages are available. uv's own
-  completions are generated via `uv generate-shell-completion zsh` and cached
-  by the `z-a-eval` annex.
+- **Interactive startup:** `PYTHONSTARTUP` points to `python/startup.py` for
+  REPL history.
 
-- **Clean Separation of Caches/Data**: All Python‑related config, cache, and
-  data locations honor the XDG directory setup, keeping the home directory
-  tidy and making backup/cleanup operations safer.
+- **Argparse completion:** `argcomplete` is installed as a uv tool and registers
+  a zsh global completer (`activate-global-python-argcomplete`), so any
+  argparse program marked `PYTHON_ARGCOMPLETE_OK` gets tab completion;
+  individual tools (e.g. checkov) also register explicitly via
+  `register-python-argcomplete --shell zsh`.
+
+- **XDG-clean:** all Python config, cache, and data honor the XDG layout.
 
 ### Ansible
 
