@@ -1,0 +1,26 @@
+{
+  "[ignore]": {
+    "editor.formatOnSave": false
+  },
+  "catppuccin.italicKeywords": false,
+  "csv-preview.resizeColumns": "all",
+  "editor.fontFamily": "'MesloLGS Nerd Font', Menlo, Monaco, 'Courier New', monospace",
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
+  "editor.wordWrap": "on",
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "markdown.extension.toc.levels": "2..6",
+  "mise.checkForNewMiseVersion": false,
+  "redhat.telemetry.enabled": false,
+  "search.followSymlinks": false,
+  "search.showLineNumbers": true,
+  "terminal.integrated.initialHint": false,
+  "terminal.integrated.macOptionIsMeta": true,
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.stickyScroll.enabled": false,
+  "terminal.integrated.suggest.enabled": false,
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.iconTheme": "catppuccin-mocha"
+}

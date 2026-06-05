@@ -192,6 +192,20 @@ zstyle ':completion:*:git-checkout:*' sort false
 
 zi auto has"dscl" for brew
 
+# vscode: visual studio code editor
+# https://code.visualstudio.com
+:vscode-load() {
+    if ! has "${HOME}/Library/Application Support/Code/User"; then
+        return
+    fi
+
+    for i in settings keybindings mcp; do
+        link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
+    done
+}
+
+zi auto has"code" wait for vscode
+
 # 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-eval() {
