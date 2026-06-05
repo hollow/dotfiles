@@ -226,19 +226,15 @@ add path "${UV_TOOL_BIN_DIR}"
 
 zi auto has"uv" for uv
 
-# python/argcomplete: completion for python programs
+# python/argcomplete: tab completion for argparse-based programs, installed via uv
 # https://github.com/kislyuk/argcomplete#readme
-#:argcomplete-load() {
-#    local __argcomplete_brew_dir=("${HOMEBREW_PREFIX}"/Cellar/python-argcomplete/*(N,n,On[1]))
-#    if [[ -n "${__argcomplete_brew_dir}" ]]; then
-#        local __argcomplete_python_dir=(${__argcomplete_brew_dir}/libexec/lib/python*(N,n,On[1]))
-#        if [[ -n "${__argcomplete_python_dir}" ]]; then
-#            add fpath ${__argcomplete_python_dir}/site-packages/argcomplete/bash_completion.d
-#        fi
-#    fi
-#}
+# :argcomplete-eval emits the zsh global completer; the eval annex caches and
+# sources that output, and its `compdef -default-` call is replayed by zicdreplay.
+:argcomplete-eval() {
+    activate-global-python-argcomplete --dest=-
+}
 
-#zi auto has"register-python-argcomplete" for argcomplete
+zi auto with"uv" for argcomplete
 
 # vscode: visual studio code editor
 # https://code.visualstudio.com
@@ -324,7 +320,7 @@ EOF
 # checkov: static code analysis tool for Terraform & Co
 # https://github.com/bridgecrewio/checkov
 :checkov-eval() {
-    register-python-argcomplete checkov
+    register-python-argcomplete --shell zsh checkov
 }
 
 zi auto has"checkov" wait for checkov
