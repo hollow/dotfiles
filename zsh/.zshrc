@@ -222,8 +222,23 @@ zi auto has"uv" for uv
 
 # python/argcomplete: tab completion for argparse-based programs, installed via uv
 # https://github.com/kislyuk/argcomplete#readme
+
+# argcomplete's completers set `IFS=$'\013'` and leave it set when calling
+# `_describe`; that leaked IFS breaks fzf-tab's match capture (empty popup).
+# :argcomplete-fix-ifs rewrites the generated code to reset IFS for the
+# `_describe` call (the matches are already split by then), so completions
+# render under both fzf-tab and the native menu.
+:argcomplete-fix-ifs() {
+    local code="$(cat)"
+    print -r -- "${code//_describe /IFS=$' \t\n' _describe }"
+}
+
+:register-python-argcomplete() {
+    register-python-argcomplete --shell zsh "$@" | :argcomplete-fix-ifs
+}
+
 :argcomplete-eval() {
-    activate-global-python-argcomplete --dest=-
+    activate-global-python-argcomplete --dest=- | :argcomplete-fix-ifs
 }
 
 zi auto with"uv" for argcomplete
@@ -312,7 +327,7 @@ EOF
 # checkov: static code analysis tool for Terraform & Co
 # https://github.com/bridgecrewio/checkov
 :checkov-eval() {
-    register-python-argcomplete --shell zsh checkov
+    :register-python-argcomplete checkov
 }
 
 zi auto has"checkov" wait for checkov
