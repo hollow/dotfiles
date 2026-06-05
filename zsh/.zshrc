@@ -195,17 +195,16 @@ zi auto has"dscl" for brew
 
 # python: programming language
 # https://docs.python.org/3/
-#export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+# brew owns the system python (on PATH via `brew shellenv`). PYTHONHOME is
+# deliberately left unset so mise/uv-managed venvs are never overridden.
+# Per-repo python versions come from mise, per-repo venvs from uv.
+export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
 
-#:python-load() {
-#    local __python_brew_dir=("${HOMEBREW_PREFIX}"/opt/python@*(N,n,On[1]))
-#    if [[ -n "${__python_brew_dir}" ]]; then
-#        export PYTHONHOME="${__python_brew_dir}"
-#        add path "${PYTHONHOME}/libexec/bin"
-#    fi
-#}
-
-#zi auto has"python3" silent for OMZP::python
+# never let anything but `brew` write to the system python: confine pip to
+# virtualenvs and disable the per-user site (no ~/.local/lib/pythonX clutter).
+export PIP_REQUIRE_VIRTUALENV="1"
+export PIP_USER="0"
+export PYTHONNOUSERSITE="1"
 
 alias python-each=':each */python.mk(:h) do'
 alias python-parallel=':parallel */python.mk(:h) do'
