@@ -195,13 +195,7 @@ zi auto has"dscl" for brew
 
 # python: programming language
 # https://docs.python.org/3/
-# brew owns the system python (on PATH via `brew shellenv`). PYTHONHOME is
-# deliberately left unset so mise/uv-managed venvs are never overridden.
-# Per-repo python versions come from mise, per-repo venvs from uv.
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-
-# never let anything but `brew` write to the system python: confine pip to
-# virtualenvs and disable the per-user site (no ~/.local/lib/pythonX clutter).
 export PIP_REQUIRE_VIRTUALENV="1"
 export PIP_USER="0"
 export PYTHONNOUSERSITE="1"
@@ -228,8 +222,6 @@ zi auto has"uv" for uv
 
 # python/argcomplete: tab completion for argparse-based programs, installed via uv
 # https://github.com/kislyuk/argcomplete#readme
-# :argcomplete-eval emits the zsh global completer; the eval annex caches and
-# sources that output, and its `compdef -default-` call is replayed by zicdreplay.
 :argcomplete-eval() {
     activate-global-python-argcomplete --dest=-
 }
