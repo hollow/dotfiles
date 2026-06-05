@@ -3,7 +3,10 @@ import os
 import pathlib
 import readline
 
-history = os.path.join(os.getenv("XDG_DATA_HOME"), "python/history")
+history = os.path.join(
+    os.getenv("XDG_DATA_HOME") or os.path.expanduser("~/.local/share"),
+    "python/history",
+)
 
 readline.parse_and_bind("tab: complete")
 

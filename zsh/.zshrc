@@ -195,17 +195,10 @@ zi auto has"dscl" for brew
 
 # python: programming language
 # https://docs.python.org/3/
-#export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-
-#:python-load() {
-#    local __python_brew_dir=("${HOMEBREW_PREFIX}"/opt/python@*(N,n,On[1]))
-#    if [[ -n "${__python_brew_dir}" ]]; then
-#        export PYTHONHOME="${__python_brew_dir}"
-#        add path "${PYTHONHOME}/libexec/bin"
-#    fi
-#}
-
-#zi auto has"python3" silent for OMZP::python
+export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+export PIP_REQUIRE_VIRTUALENV="1"
+export PIP_USER="0"
+export PYTHONNOUSERSITE="1"
 
 alias python-each=':each */python.mk(:h) do'
 alias python-parallel=':parallel */python.mk(:h) do'
@@ -227,19 +220,28 @@ add path "${UV_TOOL_BIN_DIR}"
 
 zi auto has"uv" for uv
 
-# python/argcomplete: completion for python programs
+# python/argcomplete: tab completion for argparse-based programs, installed via uv
 # https://github.com/kislyuk/argcomplete#readme
-#:argcomplete-load() {
-#    local __argcomplete_brew_dir=("${HOMEBREW_PREFIX}"/Cellar/python-argcomplete/*(N,n,On[1]))
-#    if [[ -n "${__argcomplete_brew_dir}" ]]; then
-#        local __argcomplete_python_dir=(${__argcomplete_brew_dir}/libexec/lib/python*(N,n,On[1]))
-#        if [[ -n "${__argcomplete_python_dir}" ]]; then
-#            add fpath ${__argcomplete_python_dir}/site-packages/argcomplete/bash_completion.d
-#        fi
-#    fi
-#}
 
-#zi auto has"register-python-argcomplete" for argcomplete
+# argcomplete's completers set `IFS=$'\013'` and leave it set when calling
+# `_describe`; that leaked IFS breaks fzf-tab's match capture (empty popup).
+# :argcomplete-fix-ifs rewrites the generated code to reset IFS for the
+# `_describe` call (the matches are already split by then), so completions
+# render under both fzf-tab and the native menu.
+:argcomplete-fix-ifs() {
+    local code="$(cat)"
+    print -r -- "${code//_describe /IFS=$' \t\n' _describe }"
+}
+
+:register-python-argcomplete() {
+    register-python-argcomplete --shell zsh "$@" | :argcomplete-fix-ifs
+}
+
+:argcomplete-eval() {
+    activate-global-python-argcomplete --dest=- | :argcomplete-fix-ifs
+}
+
+zi auto with"uv" for argcomplete
 
 # vscode: visual studio code editor
 # https://code.visualstudio.com
@@ -325,7 +327,7 @@ EOF
 # checkov: static code analysis tool for Terraform & Co
 # https://github.com/bridgecrewio/checkov
 :checkov-eval() {
-    register-python-argcomplete checkov
+    :register-python-argcomplete checkov
 }
 
 zi auto has"checkov" wait for checkov
