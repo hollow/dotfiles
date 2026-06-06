@@ -1,0 +1,46 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-06-zsh-dotfiles-ring11.md",
+  "tasks": [
+    {
+      "id": 6,
+      "subject": "Task 1: Vendor python/startup.py and pip/pip.conf",
+      "status": "completed",
+      "description": "**Goal:** Add the two new Python config files (REPL startup with a crash-proof history, and the pip require-virtualenv lockdown), byte-identical to upstream `906b19e`.\n\n**Files:**\n- Create: `python/startup.py`\n- Create: `pip/pip.conf`\n\n**Acceptance Criteria:**\n- [ ] `python/startup.py` is byte-identical to `git show 906b19e:python/startup.py`.\n- [ ] `pip/pip.conf` is byte-identical to `git show 906b19e:pip/pip.conf`.\n- [ ] `python/startup.py` runs without error when `XDG_DATA_HOME` is unset and the history file is empty/missing.\n\n**Verify:** `diff <(git show 906b19e:python/startup.py) python/startup.py && diff <(git show 906b19e:pip/pip.conf) pip/pip.conf && echo OK` -> prints `OK`.\n\n**Steps:** create both files (startup.py: atexit/os/pathlib/readline, XDG fallback, try/except OSError on read+write; pip.conf: [global] require-virtualenv = True); verify byte-identity and that startup.py survives unset XDG_DATA_HOME; commit.\n\n```json:metadata\n{\"files\": [\"python/startup.py\", \"pip/pip.conf\"], \"verifyCommand\": \"diff <(git show 906b19e:python/startup.py) python/startup.py && diff <(git show 906b19e:pip/pip.conf) pip/pip.conf && echo OK\", \"acceptanceCriteria\": [\"python/startup.py byte-identical to upstream 906b19e\", \"pip/pip.conf byte-identical to upstream 906b19e\", \"startup.py runs with XDG_DATA_HOME unset and empty/missing history\"]}\n```"
+    },
+    {
+      "id": 7,
+      "subject": "Task 2: Enable mise per-repo uv venv auto-activation",
+      "status": "completed",
+      "description": "**Goal:** Append the `[settings]` block to `mise/config.toml` so mise auto-creates and sources a repo's uv `.venv`, leaving brew as the global default interpreter.\n\n**Files:**\n- Modify: `mise/config.toml`\n\n**Acceptance Criteria:**\n- [ ] `[settings]` table with `python.uv_venv_auto = \"create|source\"`.\n- [ ] No `python` entry under `[tools]`.\n- [ ] Byte-identical to `git show 906b19e:mise/config.toml`.\n\n**Verify:** `diff <(git show 906b19e:mise/config.toml) mise/config.toml && echo OK` -> prints `OK`.\n\n**Steps:** append a leading blank line + the [settings] block (3-line comment + python.uv_venv_auto) after `opentofu = \"latest\"`; verify byte-identity and no global python; commit.\n\n```json:metadata\n{\"files\": [\"mise/config.toml\"], \"verifyCommand\": \"diff <(git show 906b19e:mise/config.toml) mise/config.toml && echo OK\", \"acceptanceCriteria\": [\"[settings] python.uv_venv_auto = create|source present\", \"no global python under [tools]\", \"byte-identical to upstream 906b19e\"]}\n```"
+    },
+    {
+      "id": 8,
+      "subject": "Task 3: Add ruff + uv brews and Python VS Code extensions to Brewfile",
+      "status": "completed",
+      "description": "**Goal:** Add `brew \"ruff\"`, `brew \"uv\"`, and the 7 Python/uv VS Code extensions in alphabetically-sorted positions -- all byte-identical upstream lines; do NOT add `brew \"python\"`.\n\n**Files:**\n- Modify: `Brewfile`\n\n**Acceptance Criteria:**\n- [ ] `brew \"ruff\"` between `rsync` and `sops`; `brew \"uv\"` between `tmux` and `watch`.\n- [ ] `brew \"python\"` absent.\n- [ ] 7 vscode lines in sorted position: charliermarsh.ruff (after catppuccin-vsc-pack); ms-python.debugpy/isort/python/vscode-pylance/vscode-python-envs (after mkhl.shfmt); the0807.uv-toolkit (after tamasfe.even-better-toml).\n- [ ] Every added line exists in `git show 906b19e:Brewfile`.\n- [ ] `brew bundle list --file=./Brewfile --all` parses.\n\n**Verify:** `comm -23 <(git diff -- Brewfile | sed -n 's/^+//p' | grep -vE '^\\+\\+' | sort -u) <(git show 906b19e:Brewfile | sort -u)` -> empty.\n\n**Steps:** insert the 2 brews + 7 vscode lines at the sorted anchors; verify comm empty, no brew python, brew bundle parses; commit.\n\n```json:metadata\n{\"files\": [\"Brewfile\"], \"verifyCommand\": \"comm -23 <(git diff -- Brewfile | sed -n 's/^+//p' | grep -vE '^\\\\+\\\\+' | sort -u) <(git show 906b19e:Brewfile | sort -u)\", \"acceptanceCriteria\": [\"brew ruff between rsync and sops; brew uv between tmux and watch\", \"brew python absent\", \"7 python/uv vscode extensions in sorted positions\", \"every added line exists in upstream 906b19e Brewfile\", \"brew bundle list --all parses\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 4: Add the python -> uv -> argcomplete .zshrc section",
+      "status": "completed",
+      "blockedBy": [
+        6,
+        8
+      ],
+      "description": "**Goal:** Insert the contiguous `python -> uv -> argcomplete` block into `zsh/.zshrc`, between the `brew` and `vscode` blocks. The uv + argcomplete sub-blocks are byte-identical to upstream `906b19e`; the python core sub-block carries two fork deviations (no `python-each`/`python-parallel` aliases; the `opt/python/libexec/bin` PATH addition guarded by `has brew`, macOS/brew only).\n\n**Files:**\n- Modify: `zsh/.zshrc` (after `zi auto has\"dscl\" for brew`, before `# vscode: visual studio code editor`)\n\n**Acceptance Criteria:**\n- [ ] Block between brew and vscode blocks; uv + argcomplete sub-blocks byte-identical to upstream; python core matches the deviated form (no aliases; `add path` wrapped in `if has brew; then ... fi`).\n- [ ] `zsh -n zsh/.zshrc` passes.\n- [ ] Only fork-only non-blank lines vs upstream: the guard comment, `if has brew; then`, and the indented `add path .../opt/python/libexec/bin` (`fi` already exists upstream).\n- [ ] Fresh shell: PYTHONHOME unset; PYTHONSTARTUP/PIP_REQUIRE_VIRTUALENV=1/PYTHONNOUSERSITE=1 exported; python3 under HOMEBREW_PREFIX.\n\n**Verify:** `diff <(git show 906b19e:zsh/.zshrc | sed -n '/^# python\\/uv: an extremely fast/,/^zi auto with\"uv\" for argcomplete/p') <(sed -n '/^# python\\/uv: an extremely fast/,/^zi auto with\"uv\" for argcomplete/p' zsh/.zshrc) && echo OK` -> prints `OK`.\n\n**Steps:** insert the block (python core with `has brew`-guarded add path and no python-each/parallel aliases; uv + argcomplete byte-identical; no :checkov-eval) between the brew and vscode blocks; verify uv+argcomplete match upstream, zsh -n passes, only the 3 guard lines are fork-only, fresh-shell env; commit.\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"diff <(git show 906b19e:zsh/.zshrc | sed -n '/^# python\\\\/uv: an extremely fast/,/^zi auto with\\\"uv\\\" for argcomplete/p') <(sed -n '/^# python\\\\/uv: an extremely fast/,/^zi auto with\\\"uv\\\" for argcomplete/p' zsh/.zshrc) && echo OK\", \"acceptanceCriteria\": [\"uv + argcomplete sub-blocks byte-identical to upstream; python core deviates (no python-each/parallel; add path guarded by has brew)\", \"zsh -n passes\", \"only fork-only lines: guard comment, if has brew; then, indented add path (fi already exists upstream)\", \"fresh shell: PYTHONHOME unset, lockdown vars exported, python3 under HOMEBREW_PREFIX\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 5: End-to-end install + completion check",
+      "status": "completed",
+      "blockedBy": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "description": "**Goal:** Install the new packages and confirm the wired-up toolchain works in a fresh shell -- uv/uvx on PATH, pip refuses a non-venv install, unversioned python/pip resolve, and the argcomplete global completer is defined.\n\n**Files:** (none -- verification only)\n\n**Acceptance Criteria:**\n- [ ] `brew bundle install --file=./Brewfile` installs uv and ruff (and vscode extensions if `code` available) without error.\n- [ ] Fresh shell: `uvx --version` works; `register-python-argcomplete` under `${UV_TOOL_BIN_DIR}` (~/.cache/uv/bin).\n- [ ] `_python_argcomplete_global` defined in a fresh interactive shell.\n- [ ] `pip install --dry-run requests` outside a virtualenv refused.\n- [ ] `command -v python` and `command -v pip` under `${HOMEBREW_PREFIX}/opt/python/libexec/bin`.\n\n**Verify:** `zsh -ic 'command -v uvx >/dev/null && echo uvx-ok; command -v register-python-argcomplete; print \"glob=${+functions[_python_argcomplete_global]}\"; command -v python; command -v pip'` -> uvx-ok, ~/.cache/uv/bin path, glob=1, python/pip under opt/python/libexec/bin.\n\n**Steps:** run brew bundle install; confirm pip refuses non-venv install; confirm uvx/argcomplete/glob/python shims in a fresh shell (open one more shell if glob=0); no commit (discard any lock file).\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"zsh -ic 'command -v uvx >/dev/null && echo uvx-ok; command -v register-python-argcomplete; print \\\"glob=${+functions[_python_argcomplete_global]}\\\"; command -v python; command -v pip'\", \"acceptanceCriteria\": [\"brew bundle install adds uv + ruff without error\", \"uvx works and register-python-argcomplete under ~/.cache/uv/bin\", \"_python_argcomplete_global defined in fresh shell\", \"pip install outside venv refused\", \"python/pip resolve under opt/python/libexec/bin\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-06"
+}

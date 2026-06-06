@@ -1,2 +1,8 @@
 [tools]
 opentofu = "latest"
+
+[settings]
+# uv owns per-repo virtualenvs: in a uv project (uv.lock present) mise auto-creates
+# and sources the .venv. Per-repo python versions are declared per project
+# (.python-version or [tools] python = "..."); brew stays the global default.
+python.uv_venv_auto = "create|source"

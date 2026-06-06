@@ -192,6 +192,58 @@ zstyle ':completion:*:git-checkout:*' sort false
 
 zi auto has"dscl" for brew
 
+# python: programming language
+# https://docs.python.org/3/
+export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+export PIP_REQUIRE_VIRTUALENV="1"
+export PIP_USER="0"
+export PYTHONNOUSERSITE="1"
+
+# expose brew's unversioned python/pip shims on PATH (macOS/brew only)
+if has brew; then
+    add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
+fi
+
+# python/uv: an extremely fast Python package manager
+# https://github.com/astral-sh/uv
+export UV_TOOL_DIR="${XDG_CACHE_HOME}/uv/tools"
+export UV_TOOL_BIN_DIR="${XDG_CACHE_HOME}/uv/bin"
+
+add path "${UV_TOOL_BIN_DIR}"
+
+:uv-update() {
+    uv tool upgrade --all
+}
+
+:uv-eval() {
+    uv generate-shell-completion zsh
+}
+
+zi auto has"uv" for uv
+
+# python/argcomplete: tab completion for argparse-based programs, installed via uv
+# https://github.com/kislyuk/argcomplete#readme
+
+# argcomplete's completers set `IFS=$'\013'` and leave it set when calling
+# `_describe`; that leaked IFS breaks fzf-tab's match capture (empty popup).
+# :argcomplete-fix-ifs rewrites the generated code to reset IFS for the
+# `_describe` call (the matches are already split by then), so completions
+# render under both fzf-tab and the native menu.
+:argcomplete-fix-ifs() {
+    local code="$(cat)"
+    print -r -- "${code//_describe /IFS=$' \t\n' _describe }"
+}
+
+:register-python-argcomplete() {
+    register-python-argcomplete --shell zsh "$@" | :argcomplete-fix-ifs
+}
+
+:argcomplete-eval() {
+    activate-global-python-argcomplete --dest=- | :argcomplete-fix-ifs
+}
+
+zi auto with"uv" for argcomplete
+
 # vscode: visual studio code editor
 # https://code.visualstudio.com
 :vscode-load() {
