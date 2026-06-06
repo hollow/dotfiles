@@ -81,6 +81,7 @@ alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 zup() {
     local oldpwd="${PWD}"
     :brew-update && \
+    :uv-update && \
     :tmux-update && \
     :gcloud-update && \
     zi self-update && \
@@ -102,12 +103,9 @@ zi id-as for "${ZDOTDIR}/z-a-auto"
 
 # ohmyzsh: community driven zsh framework
 # https://github.com/ohmyzsh/ohmyzsh
-COMPLETION_WAITING_DOTS="true"
 zi for \
-    OMZL::completion.zsh \
     OMZL::directories.zsh \
     OMZL::functions.zsh \
-    OMZL::grep.zsh \
     OMZL::history.zsh \
     OMZL::key-bindings.zsh \
     OMZL::spectrum.zsh \
@@ -123,32 +121,6 @@ alias .....="cd ../../../.."
 HISTSIZE=2000000000 SAVEHIST=1000000000
 HISTFILE="${ZSH_DATA_DIR}/history"
 link "${HISTFILE}" .zsh_history
-
-# use approximate completion with error correction
-# https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Control-Functions
-zstyle ':completion:*' completer _complete _correct _approximate
-zstyle ':completion:*:match:*' original only
-zstyle -e ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3>7?7:($#PREFIX+$#SUFFIX)/3))numeric)'
-
-# set descriptions format to enable group support
-zstyle ':completion:*:descriptions' format '%d'
-zstyle ':completion:*:messages' format '%d'
-zstyle ':completion:*:warnings' format 'No matches for: %d'
-zstyle ':completion:*:corrections' format '%d (errors: %e)'
-
-# improve make autocompletion
-# https://unix.stackexchange.com/questions/657256/autocompletion-of-makefile-with-makro-in-zsh-not-correct-works-in-bash
-zstyle ':completion::complete:make:*:targets' call-command true
-
-# ignore completion functions for commands we don’t have
-zstyle ':completion:*:functions' ignored-patterns '_*'
-
-# ignore completion for git ORIG_HEAD
-# https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete#comment99936479_14325591
-zstyle ':completion:*:*:git*:*' ignored-patterns '*ORIG_HEAD'
-
-# disable sort when completing `git checkout`
-zstyle ':completion:*:git-checkout:*' sort false
 
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
@@ -284,7 +256,11 @@ export ENABLE_CLAUDEAI_MCP_SERVERS=true
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
 :dircolors-load() {
-    zstyle ":completion:*:default" list-colors "${(s.:.)LS_COLORS}"
+    # colorize completion candidates (filenames, dirs, …) in every context, not
+    # just the `default` tag — fzf-tab reads list-colors to color its menu. Set
+    # here rather than in the completion block because LS_COLORS is populated by
+    # :dircolors-eval, which runs when this plugin loads.
+    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 }
 
 :dircolors-eval() {
@@ -309,6 +285,17 @@ zi auto has"duf" wait for duf
 }
 
 zi auto has"eza" wait for eza
+
+# fzf
+# https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
+export FZF_DEFAULT_OPTS=" \
+    --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
+    --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
+    --color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8 \
+    --color=selected-bg:#45475A \
+    --color=border:#6C7086,label:#CDD6F4"
+
+zi auto has"fzf" wait for fzf
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
@@ -482,10 +469,93 @@ if has starship; then
     unset RPROMPT
 fi
 
-# zsh/f-sy-h: feature-rich syntax highlighting for ZSH
+# zsh-completions: extra completion functions. Loads before compinit so they
+# land in fpath, then its atload runs compinit once — replaying the compdefs
+# queued by every completion plugin above — before fzf-tab and the widget
+# wrappers below.
+# https://github.com/zsh-users/zsh-completions
+zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
+    atload"zicompinit; zicdreplay" wait for zsh-users/zsh-completions
+
+# fzf-tab: replace the completion menu with fzf. Must load after compinit (above)
+# and before the widget-wrapping plugins (autosuggestions, F-Sy-H) below.
+# https://github.com/Aloxaf/fzf-tab
+zi auto has"fzf" wait for Aloxaf/fzf-tab
+
+# preview directory content with eza when completing cd. =always forces color and
+# icons even though the preview is piped (eza auto-disables both off a TTY); icons
+# need a Nerd Font, which the terminal already uses.
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group --color=always --icons=always $realpath'
+
+# zsh/completion
+zmodload -i zsh/complist            # list-colors support + native menu
+unsetopt flowcontrol                # reclaim ^S/^Q from terminal flow control
+setopt complete_in_word             # allow completing with the cursor mid-word
+setopt always_to_end                # ...and jump the cursor to the word end afterwards
+
+# fzf-tab's recommended `menu no`, and intentionally NO menu_complete: zsh inserts
+# the longest common prefix on the first TAB (the auto-insert we want) and fzf-tab's
+# menu opens once there's nothing more to insert. With case-sensitive matching
+# (below) a prefix like `CL` resolves to one match and just completes, so the old
+# `CL`→`CLaude` two-tab annoyance is gone. (`setopt menu_complete` would force the
+# menu onto the first TAB everywhere but never auto-insert a common prefix.)
+zstyle ':completion:*' menu no
+
+# case-sensitive matching, keeping partial-word (r:) and substring (l:/r:) matchers.
+# Dropping the leading `m:{...}={...}` case-fold makes e.g. `CL` match only
+# CLAUDE.md (not claude_desktop_config.json), so it completes directly — the
+# ambiguity behind the old `CL`→`CLaude` two-tab problem can't arise.
+zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
+
+# completer chain: exact, then spelling correction, then fuzzy/approximate with an
+# error budget that scales with word length. fzf filters the candidate list itself,
+# but _correct/_approximate also repair typos in the typed prefix, which fzf can't.
+# https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Control-Functions
+zstyle ':completion:*' completer _complete _correct _approximate
+zstyle -e ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3>7?7:($#PREFIX+$#SUFFIX)/3))numeric)'
+
+# candidates
+zstyle ':completion:*' special-dirs true        # offer the `.` and `..` directories
+zstyle ':completion:*' use-cache yes            # cache results for completers that support it
+zstyle ':completion:*' cache-path "${ZSH_CACHE_DIR}"
+
+# `cd`: real subdirs, then the dir stack, then $cdpath — and never guess named dirs
+zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
+
+# process lists (kill, etc.) via macOS ps, with the PID/owner colorized
+zstyle ':completion:*:*:*:*:processes' command 'ps -u $USERNAME -o pid,user,comm -w -w'
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+
+# hide macOS service accounts (_spotlight, _mdnsresponder, …) from `users`
+# completion, but still show one if it is the only match
+zstyle ':completion:*:*:*:*:users' ignored-patterns '_*'
+zstyle '*' single-ignored show
+
+# don't complete zsh's own completion/widget functions as function names
+zstyle ':completion:*:functions' ignored-patterns '_*'
+
+# git: never offer ORIG_HEAD as a ref, and keep checkout's native branch order
+# https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete#comment99936479_14325591
+zstyle ':completion:*:*:git*:*' ignored-patterns '*ORIG_HEAD'
+zstyle ':completion:*:git-checkout:*' sort false
+
+# make: invoke the makefile so macro-defined targets are completed too
+# https://unix.stackexchange.com/questions/657256/autocompletion-of-makefile-with-makro-in-zsh-not-correct-works-in-bash
+zstyle ':completion::complete:make:*:targets' call-command true
+
+# group matches by type; fzf-tab reads this format for its group headers (no color
+# escapes here — fzf-tab strips them). The rest style zsh's status lines.
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*:corrections' format '%d (errors: %e)'
+
+# bash-style `complete -C` programmable completion (consul, nomad, tofu use it)
+autoload -U +X bashcompinit && bashcompinit
+
+# zsh/f-sy-h: feature-rich syntax highlighting for ZSH (loads last, after fzf-tab)
 # https://github.com/z-shell/F-Sy-H
-zi auto atinit"zicompinit; zicdreplay" \
-    wait for z-shell/F-Sy-H
+zi auto wait for z-shell/F-Sy-H
 
 # zsh/autosuggestions: fish-like autosuggestions for zsh
 # https://github.com/zsh-users/zsh-autosuggestions
@@ -495,8 +565,3 @@ zi auto atload"_zsh_autosuggest_start" \
 # zsh/autopair: automatically close quotes, brackets and other delimiters
 # https://github.com/hlissner/zsh-autopair
 zi auto wait for hlissner/zsh-autopair
-
-# zsh/completions: initialize completion system
-# https://github.com/zsh-users/zsh-completions
-zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
-    wait for zsh-users/zsh-completions
