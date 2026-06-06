@@ -255,6 +255,7 @@ alias ai="ansible-inventory"
 alias ap="ansible-playbook"
 
 # ansible/ara: ARA Records Ansible
+# https://github.com/ansible-community/ara
 export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
 export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
 export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
@@ -352,7 +353,8 @@ zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
 
 zi auto has"direnv" for direnv/direnv
 
-# docker:
+# docker: develop, ship, and run containers
+# https://www.docker.com
 add fpath "${HOME}/.docker/completions"
 
 # duf: better `df` alternative
@@ -373,7 +375,8 @@ zi auto has"duf" wait for duf
 
 zi auto has"eza" wait for eza
 
-# fzf
+# fzf: command-line fuzzy finder
+# https://github.com/junegunn/fzf
 # https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
 export FZF_DEFAULT_OPTS=" \
     --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
@@ -406,7 +409,8 @@ zi auto has"fzf" wait for fzf
 
 zi auto has"gcloud" wait1 for gcloud
 
-# ghostty
+# ghostty: fast, native, GPU-accelerated terminal emulator
+# https://ghostty.org
 add path "${GHOSTTY_BIN_DIR}"
 
 # git: distributed version control system
@@ -434,7 +438,8 @@ alias grh="git reset HEAD"
 alias gsp="git show -p"
 alias s="git st ."
 
-# glamour/glow
+# glamour/glow: terminal markdown rendering
+# https://github.com/charmbracelet/glow
 export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
 export GLOW_STYLE="${GLAMOUR_STYLE}"
 
@@ -469,6 +474,7 @@ zi auto wait for OMZP::colored-man-pages
 link ncduignore .ncduignore
 
 # node: JavaScript runtime
+# https://nodejs.org
 alias node-each=':each */nodejs.mk(:h) do'
 alias node-parallel=':parallel */nodejs.mk(:h) do'
 
@@ -505,7 +511,8 @@ zi auto with"mise" wait1 for opentofu
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
-# postgresql:
+# postgresql: object-relational database
+# https://www.postgresql.org
 :postgresql-load() {
     local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(N,n,On[1]))
     if [[ -n "${__postgresql_brew_dir}" ]]; then
@@ -585,12 +592,12 @@ zi make as"program" for bahamas10/sshp
 
 zi auto has"tmux" silent for OMZP::tmux
 
-# tmux/xpanes:
+# tmux/xpanes: run commands across synchronized tmux panes
 # https://github.com/greymd/tmux-xpanes
 zi auto has"tmux" wait for greymd/tmux-xpanes
 
-# vi improved
-# https://github.com/vim/vim
+# vim: vi improved, via neovim
+# https://neovim.io
 zi auto has"nvim" for neovim
 alias vim=nvim
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
@@ -622,7 +629,7 @@ alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 # misc other aliases
 alias X="TERM=xterm-256color ssh -t 10.0.0.11 \"/usr/local/bin/zsh -i -c T\""
 
-# reminds you to use existing aliases for commands you just typed
+# zsh-you-should-use: reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
 if has tput; then
     zi auto wait for MichaelAquilina/zsh-you-should-use
