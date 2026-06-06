@@ -1,10 +1,5 @@
 [tools]
-bun = "latest"
-markdownlint-cli2 = "latest"
-node = "24.14.1"
 opentofu = "latest"
-prettier = "latest"
-yarn = "latest"
 
 [settings]
 # uv owns per-repo virtualenvs: in a uv project (uv.lock present) mise auto-creates
