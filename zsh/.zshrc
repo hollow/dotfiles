@@ -164,6 +164,17 @@ link "${HISTFILE}" .zsh_history
 
 zi auto has"dscl" for brew
 
+# mise: dev tools, env vars, task runner
+# https://github.com/jdx/mise
+export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+
+:mise-load() {
+    local _mise_cmd_not_found
+    eval "$(mise activate zsh)"
+}
+
+zi auto has"mise" for jdx/mise
+
 # python: programming language
 # https://docs.python.org/3/
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
@@ -171,7 +182,10 @@ export PIP_REQUIRE_VIRTUALENV="1"
 export PIP_USER="0"
 export PYTHONNOUSERSITE="1"
 
-add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
+# expose brew's unversioned python/pip shims on PATH (macOS/brew only)
+if has brew; then
+    add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
+fi
 
 alias python-each=':each */python.mk(:h) do'
 alias python-parallel=':parallel */python.mk(:h) do'
@@ -216,20 +230,6 @@ zi auto has"uv" for uv
 
 zi auto with"uv" for argcomplete
 
-# vscode: visual studio code editor
-# https://code.visualstudio.com
-:vscode-load() {
-    if ! has "${HOME}/Library/Application Support/Code/User"; then
-        return
-    fi
-
-    for i in settings keybindings mcp; do
-        link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
-    done
-}
-
-zi auto has"code" wait for vscode
-
 # 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-eval() {
@@ -258,6 +258,7 @@ alias ai="ansible-inventory"
 alias ap="ansible-playbook"
 
 # ansible/ara: ARA Records Ansible
+# https://github.com/ansible-community/ara
 export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
 export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
 export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
@@ -355,7 +356,8 @@ zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
 
 zi auto has"direnv" for direnv/direnv
 
-# docker:
+# docker: develop, ship, and run containers
+# https://www.docker.com
 add fpath "${HOME}/.docker/completions"
 
 # duf: better `df` alternative
@@ -369,13 +371,15 @@ zi auto has"duf" wait for duf
 # eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
 :eza-load() {
+    export EZA_ICONS_AUTO=1
     alias l="eza --all --long --group"
     alias lR="l -R"
 }
 
 zi auto has"eza" wait for eza
 
-# fzf
+# fzf: command-line fuzzy finder
+# https://github.com/junegunn/fzf
 # https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
 export FZF_DEFAULT_OPTS=" \
     --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
@@ -408,7 +412,8 @@ zi auto has"fzf" wait for fzf
 
 zi auto has"gcloud" wait1 for gcloud
 
-# ghostty
+# ghostty: fast, native, GPU-accelerated terminal emulator
+# https://ghostty.org
 add path "${GHOSTTY_BIN_DIR}"
 
 # git: distributed version control system
@@ -436,6 +441,11 @@ alias grh="git reset HEAD"
 alias gsp="git show -p"
 alias s="git st ."
 
+# glamour/glow: terminal markdown rendering
+# https://github.com/charmbracelet/glow
+export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
+export GLOW_STYLE="${GLAMOUR_STYLE}"
+
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GPG_TTY="${TTY}"
@@ -452,10 +462,6 @@ zi auto has"go" for golang
 alias go-each=':each */go.mk(:h) do'
 alias go-parallel=':parallel */go.mk(:h:a) do'
 
-# glamour/glow
-export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
-export GLOW_STYLE="${GLAMOUR_STYLE}"
-
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
@@ -470,16 +476,10 @@ zi auto wait for OMZP::colored-man-pages
 # https://dev.yorhel.nl/ncdu
 link ncduignore .ncduignore
 
-# mise: dev tools, env vars, task runner
-# https://github.com/jdx/mise
-export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
-
-:mise-load() {
-    local _mise_cmd_not_found
-    eval "$(mise activate zsh)"
-}
-
-zi auto has"mise" for jdx/mise
+# node: JavaScript runtime
+# https://nodejs.org
+alias node-each=':each */nodejs.mk(:h) do'
+alias node-parallel=':parallel */nodejs.mk(:h) do'
 
 # nomad: workload orchestrator
 # https://github.com/hashicorp/nomad
@@ -489,21 +489,33 @@ zi auto has"mise" for jdx/mise
 
 zi auto has"nomad" wait1 for nomad
 
-# node: JavaScript runtime
-alias node-each=':each */nodejs.mk(:h) do'
-alias node-parallel=':parallel */nodejs.mk(:h) do'
-
 # npm: node package manager
 # https://github.com/npm/cli
 export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
 add path "${XDG_DATA_HOME}"/npm/bin
+
+# opentofu: open-source terraform fork, installed via mise
+# https://github.com/opentofu/opentofu
+export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
+mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+
+alias tf="tofu"
+alias tf-each=':each */terraform.mk(:h) do'
+alias tf-parallel=':parallel */terraform.mk(:h) do'
+
+:opentofu-load() {
+    complete -o nospace -C tofu tofu
+}
+
+zi auto with"mise" wait1 for opentofu
 
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
 mkdir -p ${PARALLEL_HOME}
 
-# postgresql:
+# postgresql: object-relational database
+# https://www.postgresql.org
 :postgresql-load() {
     local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(N,n,On[1]))
     if [[ -n "${__postgresql_brew_dir}" ]]; then
@@ -565,21 +577,6 @@ fi
 # https://github.com/bahamas10/sshp
 zi make as"program" for bahamas10/sshp
 
-# opentofu: open-source terraform fork, installed via mise
-# https://github.com/opentofu/opentofu
-export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
-mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-
-alias tf="tofu"
-alias tf-each=':each */terraform.mk(:h) do'
-alias tf-parallel=':parallel */terraform.mk(:h) do'
-
-:opentofu-load() {
-    complete -o nospace -C tofu tofu
-}
-
-zi auto with"mise" wait1 for opentofu
-
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
 :tmux-load() {
@@ -598,16 +595,30 @@ zi auto with"mise" wait1 for opentofu
 
 zi auto has"tmux" silent for OMZP::tmux
 
-# tmux/xpanes:
+# tmux/xpanes: run commands across synchronized tmux panes
 # https://github.com/greymd/tmux-xpanes
 zi auto has"tmux" wait for greymd/tmux-xpanes
 
-# vi improved
-# https://github.com/vim/vim
+# vim: vi improved, via neovim
+# https://neovim.io
 zi auto has"nvim" for neovim
 alias vim=nvim
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[nvim]}"
+
+# vscode: visual studio code editor
+# https://code.visualstudio.com
+:vscode-load() {
+    if ! has "${HOME}/Library/Application Support/Code/User"; then
+        return
+    fi
+
+    for i in settings keybindings mcp; do
+        link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
+    done
+}
+
+zi auto has"code" wait for vscode
 
 # wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/
@@ -621,7 +632,7 @@ alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
 # misc other aliases
 alias X="TERM=xterm-256color ssh -t 10.0.0.11 \"/usr/local/bin/zsh -i -c T\""
 
-# reminds you to use existing aliases for commands you just typed
+# zsh-you-should-use: reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
 if has tput; then
     zi auto wait for MichaelAquilina/zsh-you-should-use
