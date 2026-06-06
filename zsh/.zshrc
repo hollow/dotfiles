@@ -200,6 +200,9 @@ export PIP_REQUIRE_VIRTUALENV="1"
 export PIP_USER="0"
 export PYTHONNOUSERSITE="1"
 
+alias python="python3"
+alias pip="pip3"
+
 alias python-each=':each */python.mk(:h) do'
 alias python-parallel=':parallel */python.mk(:h) do'
 
