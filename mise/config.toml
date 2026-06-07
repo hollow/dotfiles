@@ -1,5 +1,4 @@
 [tools]
-opentofu = "latest"
 
 [settings]
 # uv owns per-repo virtualenvs: in a uv project (uv.lock present) mise auto-creates

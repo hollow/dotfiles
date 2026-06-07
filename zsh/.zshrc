@@ -621,6 +621,13 @@ export EDITOR="${commands[nvim]}"
 	for i in settings keybindings mcp; do
 		link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
 	done
+
+	# manual shell integration for vscode's integrated terminal (command
+	# decorations, sticky scroll, command navigation). guarded to vscode only,
+	# and runs via turbo after the synchronous starship init below so it wraps
+	# the starship prompt rather than being clobbered by it.
+	# https://code.visualstudio.com/docs/terminal/shell-integration
+	[[ "${TERM_PROGRAM}" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 }
 
 zi auto has"code" wait for vscode
