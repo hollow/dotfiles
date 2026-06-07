@@ -250,8 +250,10 @@ export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
 
 # ansible: simple IT automation
 # https://github.com/ansible/ansible
+# ANSIBLE_HOME is the base for collections, roles, plugins and the galaxy token
+# (all data); tmp/cp go to runtime and the galaxy cache to cache instead.
+export ANSIBLE_HOME="${XDG_DATA_HOME}/ansible"
 export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible"
-export ANSIBLE_GALAXY_TOKEN_PATH="${XDG_DATA_HOME}/ansible/galaxy_token"
 export ANSIBLE_LOCAL_TEMP="${XDG_RUNTIME_DIR}/ansible/tmp"
 export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
 
