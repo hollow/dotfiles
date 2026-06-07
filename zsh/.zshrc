@@ -15,6 +15,12 @@ ulimit -n $((1024 * 1024))
 autoload -Uz select-word-style
 select-word-style shell
 
+# create a directory only when missing, so a warm shell forks no external mkdir
+# here (each fork is ~8ms on macOS; a cold shell still does the work once). the
+# optional second arg is the mode, applied atomically at creation for dirs that
+# must not be group/world-accessible
+mkdirp() { [[ -d $1 ]] || mkdir -p ${2:+-m$2} $1; }
+
 # system path
 typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
 
@@ -26,12 +32,11 @@ export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 export XDG_RUNTIME_DIR="${HOME}/.local/run"
 
-mkdir -p "${XDG_CONFIG_HOME}"
-mkdir -p "${XDG_CACHE_HOME}"
-mkdir -p "${XDG_DATA_HOME}"
-mkdir -p "${XDG_STATE_HOME}"
-mkdir -p "${XDG_RUNTIME_DIR}"
-chmod 0700 "${XDG_RUNTIME_DIR}"
+mkdirp "${XDG_CONFIG_HOME}"
+mkdirp "${XDG_CACHE_HOME}"
+mkdirp "${XDG_DATA_HOME}"
+mkdirp "${XDG_STATE_HOME}"
+mkdirp "${XDG_RUNTIME_DIR}" 0700
 
 # shell paths
 # https://zsh.sourceforge.io/Intro/intro_3.html
@@ -39,8 +44,9 @@ ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
 
-mkdir -p "${ZSH_CACHE_DIR}"{,/completions}
-mkdir -p "${ZSH_DATA_DIR}"
+mkdirp "${ZSH_DATA_DIR}"
+mkdirp "${ZSH_CACHE_DIR}"
+mkdirp "${ZSH_CACHE_DIR}/completions"
 
 # shell functions
 typeset -TUx FPATH fpath=(
@@ -56,9 +62,14 @@ path+=("${ZDOTDIR}")
 # autoload all regular files in ZDOTDIR
 autoload -Uz ${ZDOTDIR}/*(.N:t)
 
-# add homebrew path as early as possible
+# add homebrew as early as possible. inlined from `brew shellenv zsh` to avoid
+# forking brew (a ~50ms bash script) on every startup
 if has /opt/homebrew/bin/brew; then
-	eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+	export HOMEBREW_PREFIX="/opt/homebrew"
+	export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+	export HOMEBREW_REPOSITORY="/opt/homebrew"
+	add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+	add path "${HOMEBREW_PREFIX}/bin" "${HOMEBREW_PREFIX}/sbin"
 fi
 
 # add local bin to path
@@ -178,7 +189,7 @@ export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
 	eval "$(mise activate zsh)"
 }
 
-zi auto has"mise" for mise
+zi auto has"mise" wait1 for mise
 
 # python: programming language
 # https://docs.python.org/3/
@@ -299,11 +310,9 @@ zi auto has"bat" wait1 for bat
 # boto: AWS SDK for Python
 # https://github.com/boto/boto3
 export BOTO_CONFIG="${XDG_DATA_HOME}/boto"
-cat >"${BOTO_CONFIG}" <<EOF
-[GSUtil]
+print -r -- "[GSUtil]
 state_dir = ${XDG_DATA_HOME}/gsutil
-parallel_composite_upload_threshold = 150M
-EOF
+parallel_composite_upload_threshold = 150M" >"${BOTO_CONFIG}"
 
 # checkov: static code analysis tool for Terraform & Co
 # https://github.com/bridgecrewio/checkov
@@ -317,8 +326,12 @@ zi auto has"checkov" wait1 for checkov
 # https://claude.ai
 export CLAUDE_CODE_NEW_INIT=1
 export ENABLE_CLAUDEAI_MCP_SERVERS=true
-cp "${HOME}/Library/Application Support/Claude/claude_desktop_config.json" \
-	"${HOME}/.claude/claude_desktop_config.json"
+
+() {
+	local src="${HOME}/Library/Application Support/Claude/claude_desktop_config.json"
+	local dst="${HOME}/.claude/claude_desktop_config.json"
+	[[ -e ${src} && ${src} -nt ${dst} ]] && cp "${src}" "${dst}"
+}
 
 # colima: container runtimes on macOS with minimal setup
 # https://github.com/abiosoft/colima
@@ -332,13 +345,17 @@ alias colima="env -u XDG_CONFIG_HOME colima"
 # colima has no option to relocate its heavy VM/instance state (_lima) and
 # profile store (_store), so keep them in data (not the repo'd config dir) via
 # symlinks resolved for both the CLI and the launchd service.
-mkdir -p "${XDG_DATA_HOME}/colima/_lima"
-ln -nfs "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
-mkdir -p "${XDG_DATA_HOME}/colima/_store"
-ln -nfs "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
+mkdirp "${XDG_DATA_HOME}/colima/_lima"
+mkdirp "${XDG_DATA_HOME}/colima/_store"
+link "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
+link "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
 
 :colima-load() {
-	brew services start colima >/dev/null
+	# `brew services start` forks brew + launchctl and takes ~900ms; running it
+	# synchronously here froze the first prompt's input for ~1s while this plugin
+	# loaded in turbo. it's idempotent (the launchd service persists once started),
+	# so fire-and-forget in the background and let the shell stay responsive.
+	brew services start colima &>/dev/null &|
 }
 
 zi auto has"colima" wait1 for colima
@@ -422,8 +439,8 @@ zi auto has"fzf" wait1 for fzf
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
-mkdir -p "${XDG_DATA_HOME}/gcloud"
-ln -nfs "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
+mkdirp "${XDG_DATA_HOME}/gcloud"
+link "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
 
 :gcloud-update() {
 	gcloud components update --quiet || :
@@ -483,9 +500,7 @@ export GLOW_STYLE="${GLAMOUR_STYLE}"
 # https://gnupg.org/
 export GPG_TTY="${TTY}"
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
-mkdir -p "${GNUPGHOME}"
-chmod 0700 "${GNUPGHOME}"
-zi auto wait1 for OMZP::gpg-agent
+mkdirp "${GNUPGHOME}" 0700
 
 # go: programming language
 # https://www.golang.org
@@ -499,7 +514,7 @@ alias go-parallel=':parallel */go.mk(:h:a) do'
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
-mkdir -p "$(dirname "${LESSHISTFILE}")"
+mkdirp "${LESSHISTFILE:h}"
 
 # man: unix documentation system
 # https://www.nongnu.org/man-db/
@@ -512,7 +527,7 @@ link ncduignore .ncduignore
 # node/npm: JavaScript runtime
 # https://nodejs.org
 export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
-mkdir -p "${XDG_DATA_HOME}/node"
+mkdirp "${XDG_DATA_HOME}/node"
 link npm/npmrc .npmrc
 
 alias node-each=':each */nodejs.mk(:h) do'
@@ -529,7 +544,7 @@ zi auto has"nomad" wait1 for nomad
 # opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
 export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
-mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+mkdirp "${TF_PLUGIN_CACHE_DIR}"
 
 alias tf="tofu"
 alias tf-each=':each */terraform.mk(:h) do'
@@ -544,7 +559,7 @@ zi auto has"tofu" wait1 for opentofu
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
 export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
-mkdir -p ${PARALLEL_HOME}
+mkdirp ${PARALLEL_HOME}
 
 # postgresql: object-relational database
 # https://www.postgresql.org
@@ -591,18 +606,24 @@ export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
 
 # ssh: secure shell
 # https://www.openssh.com
-
-mkdir -p "${HOME}/.ssh" "${XDG_CACHE_HOME}"/ssh
-chmod 0700 "${HOME}/.ssh"
-
+mkdirp "${XDG_CACHE_HOME}/ssh"
+mkdirp "${HOME}/.ssh" 0700
 link ssh/config .ssh/config
-chmod 0600 "${HOME}/.ssh/config"
+
+# ssh rejects a group/world-writable config; enforce 0600 without forking chmod
+# on every startup — only when the mode has actually drifted
+() {
+	local -a st
+	zmodload -F zsh/stat b:zstat
+	zstat -A st +mode -- "${HOME}/.ssh/config" 2>/dev/null &&
+		(((st[1] & 8#777) != 8#600)) && chmod 0600 "${HOME}/.ssh/config"
+}
 
 # https://1password.community/discussion/comment/660153/#Comment_660153
 if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
 	export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 else
-	zi auto silent for OMZP::ssh-agent
+	zi auto silent wait1 for OMZP::ssh-agent
 fi
 
 # sshp: Parallel SSH Executor
@@ -648,13 +669,6 @@ export EDITOR="${commands[nvim]}"
 	for i in settings keybindings mcp; do
 		link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
 	done
-
-	# manual shell integration for vscode's integrated terminal (command
-	# decorations, sticky scroll, command navigation). guarded to vscode only,
-	# and runs via turbo after the synchronous starship init below so it wraps
-	# the starship prompt rather than being clobbered by it.
-	# https://code.visualstudio.com/docs/terminal/shell-integration
-	[[ "${TERM_PROGRAM}" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 }
 
 zi auto has"code" wait1 for vscode
