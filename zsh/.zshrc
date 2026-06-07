@@ -184,7 +184,9 @@ zi auto has"dscl" for brew
 
 # mise: dev tools, env vars, task runner
 # https://github.com/jdx/mise
-export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+:mise-init() {
+	export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+}
 
 :mise-load() {
 	local _mise_cmd_not_found
@@ -216,10 +218,12 @@ zi auto has"python3" for python
 
 # python/uv: an extremely fast Python package manager
 # https://github.com/astral-sh/uv
-export UV_TOOL_DIR="${XDG_CACHE_HOME}/uv/tools"
-export UV_TOOL_BIN_DIR="${XDG_CACHE_HOME}/uv/bin"
+:uv-init() {
+	export UV_TOOL_DIR="${XDG_CACHE_HOME}/uv/tools"
+	export UV_TOOL_BIN_DIR="${XDG_CACHE_HOME}/uv/bin"
 
-add path "${UV_TOOL_BIN_DIR}"
+	add path "${UV_TOOL_BIN_DIR}"
+}
 
 :uv-update() {
 	uv tool upgrade --all
@@ -309,7 +313,10 @@ zi auto has"atuin" wait1 for atuin
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
-export SHOW_AWS_PROMPT=false
+:aws-init() {
+	export SHOW_AWS_PROMPT=false
+}
+
 zi auto has"aws" wait1 for OMZP::aws
 
 # bat: cat(1) clone with wings
@@ -386,10 +393,12 @@ zi auto has"consul" wait1 for consul
 
 # copier: repository template framework
 # https://copier.readthedocs.io/en/stable/
-zi auto has"copier" wait1 for copier
+:copier-load() {
+	alias copier-each=':each */.copier-answers.yml(:h) do'
+	alias copier-parallel=':parallel */.copier-answers.yml(:h) do'
+}
 
-alias copier-each=':each */.copier-answers.yml(:h) do'
-alias copier-parallel=':parallel */.copier-answers.yml(:h) do'
+zi auto has"copier" wait1 for copier
 
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
@@ -448,12 +457,14 @@ zi auto has"eza" wait1 for eza
 # fzf: command-line fuzzy finder
 # https://github.com/junegunn/fzf
 # https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
-export FZF_DEFAULT_OPTS=" \
-    --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
-    --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
-    --color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8 \
-    --color=selected-bg:#45475A \
-    --color=border:#6C7086,label:#CDD6F4"
+:fzf-init() {
+	export FZF_DEFAULT_OPTS=" \
+	    --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
+	    --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
+	    --color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8 \
+	    --color=selected-bg:#45475A \
+	    --color=border:#6C7086,label:#CDD6F4"
+}
 
 zi auto has"fzf" wait1 for fzf
 
@@ -532,11 +543,17 @@ zi auto has"gpg" wait1 for gnupg
 
 # go: programming language
 # https://www.golang.org
-export GOPATH="${XDG_CACHE_HOME}/go"
-add path "${GOPATH}/bin"
-zi auto has"go" for golang
-alias go-each=':each */go.mk(:h) do'
-alias go-parallel=':parallel */go.mk(:h:a) do'
+:go-init() {
+	export GOPATH="${XDG_CACHE_HOME}/go"
+	add path "${GOPATH}/bin"
+}
+
+:go-load() {
+	alias go-each=':each */go.mk(:h) do'
+	alias go-parallel=':parallel */go.mk(:h:a) do'
+}
+
+zi auto has"go" for go
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
@@ -626,13 +643,13 @@ zi auto wait1 for OMZP::rsync
 
 # ruby: programming language
 # https://www.ruby-lang.org
-export GEM_HOME="${XDG_CACHE_HOME}"/gem
-export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
-export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
-export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
-export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
+:ruby-init() {
+	export GEM_HOME="${XDG_CACHE_HOME}"/gem
+	export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
+	export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
+	export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
+	export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
 
-:ruby-load() {
 	local __ruby_brew_dir=("${HOMEBREW_PREFIX}"/opt/ruby@*(N,n,On[1]))
 	if [[ -n "${__ruby_brew_dir}" ]]; then
 		export RUBYHOME="${__ruby_brew_dir}"
