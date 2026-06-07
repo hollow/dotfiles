@@ -372,9 +372,9 @@ zi auto id-as"dircolors" wait1 for trapd00r/LS_COLORS
 
 zi auto has"direnv" for direnv/direnv
 
-# docker: develop, ship, and run containers
-# https://www.docker.com
-add fpath "${HOME}/.docker/completions"
+# docker: container runtime CLI
+# https://github.com/docker/cli
+link docker .docker
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
