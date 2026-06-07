@@ -1,1 +1,21 @@
-[]
+// Place your key bindings in this file to override the defaults
+[
+  {
+    "key": "cmd+[IntlBackslash]",
+    "command": "workbench.action.terminal.toggleTerminal"
+  },
+  {
+    "key": "alt+[IntlBackslash]",
+    "command": "workbench.action.terminal.new",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "cmd+enter",
+    "command": "workbench.action.toggleMaximizedPanel",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "shift+cmd+r",
+    "command": "workbench.action.openRecent"
+  }
+]
