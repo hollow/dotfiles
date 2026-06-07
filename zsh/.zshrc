@@ -156,7 +156,9 @@ link "${HISTFILE}" .zsh_history
 	add path "${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin"
 	add path "${HOMEBREW_PREFIX}/opt/make/libexec/gnubin"
 	add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+}
 
+:brew-load() {
 	alias bbd="brew bundle dump -f"
 	alias bz="brew uninstall --zap"
 }
