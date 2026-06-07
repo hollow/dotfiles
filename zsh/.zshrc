@@ -345,17 +345,18 @@ zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
 
 alias ga="git add --all"
 alias gap="git add --patch"
+alias gba="git branch -a"
 alias gcl="git checkout-latest main"
-alias gcm="git co \$(git main-branch)"
 alias gd="git diff"
 alias gdc="git diff --cached"
 alias gdm="git diff origin/\$(git main-branch)"
-alias gf="git fetch --prune"
+alias gf="git fetch"
 alias gl="git lg"
 alias gp="git pull"
-alias gpr="git pull --rebase --autostash"
 alias grh="git reset HEAD"
+alias gsm="git switch \$(git main-branch)"
 alias gsp="git show -p"
+alias gss="git stash show -p"
 alias s="git st ."
 
 # glamour/glow: terminal markdown rendering
