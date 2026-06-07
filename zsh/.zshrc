@@ -178,7 +178,7 @@ export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
 	eval "$(mise activate zsh)"
 }
 
-zi auto has"mise" for jdx/mise
+zi auto has"mise" for mise
 
 # python: programming language
 # https://docs.python.org/3/
@@ -242,7 +242,7 @@ zi auto with"uv" for argcomplete
 	op completion zsh
 }
 
-zi auto has"op" wait for 1password-cli
+zi auto has"op" wait1 for 1password-cli
 
 # android: development kit
 # https://developer.android.com/studio/command-line/variables
@@ -278,12 +278,12 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 	atuin init zsh --disable-up-arrow
 }
 
-zi auto has"atuin" wait for atuin
+zi auto has"atuin" wait1 for atuin
 
 # aws: Amazon Web Services CLI
 # https://aws.amazon.com/cli/
 export SHOW_AWS_PROMPT=false
-zi auto has"aws" wait for OMZP::aws
+zi auto has"aws" wait1 for OMZP::aws
 
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
@@ -292,7 +292,7 @@ zi auto has"aws" wait for OMZP::aws
 	export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 }
 
-zi auto has"bat" wait for bat
+zi auto has"bat" wait1 for bat
 
 # boto: AWS SDK for Python
 # https://github.com/boto/boto3
@@ -309,7 +309,7 @@ EOF
 	:register-python-argcomplete checkov
 }
 
-zi auto has"checkov" wait for checkov
+zi auto has"checkov" wait1 for checkov
 
 # claude: AI assistant by Anthropic
 # https://claude.ai
@@ -317,6 +317,17 @@ export CLAUDE_CODE_NEW_INIT=1
 export ENABLE_CLAUDEAI_MCP_SERVERS=true
 cp "${HOME}/Library/Application Support/Claude/claude_desktop_config.json" \
 	"${HOME}/.claude/claude_desktop_config.json"
+
+# colima: container runtimes on macOS with minimal setup
+# https://github.com/abiosoft/colima
+alias colima="env -u XDG_CONFIG_HOME colima"
+link colima .colima
+
+:colima-load() {
+	brew services start colima >/dev/null
+}
+
+zi auto has"colima" wait1 for colima
 
 # consul: distributed, highly available service discovery
 # https://github.com/hashicorp/consul
@@ -328,7 +339,7 @@ zi auto has"consul" wait1 for consul
 
 # copier: repository template framework
 # https://copier.readthedocs.io/en/stable/
-zi auto has"copier" wait for copier
+zi auto has"copier" wait1 for copier
 
 alias copier-each=':each */.copier-answers.yml(:h) do'
 alias copier-parallel=':parallel */.copier-answers.yml(:h) do'
@@ -347,7 +358,7 @@ alias copier-parallel=':parallel */.copier-answers.yml(:h) do'
 	dircolors -b LS_COLORS
 }
 
-zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
+zi auto id-as"dircolors" wait1 for trapd00r/LS_COLORS
 
 # direnv: change environment based on the current directory
 # https://github.com/direnv/direnv
@@ -371,7 +382,7 @@ add fpath "${HOME}/.docker/completions"
 	alias df=duf
 }
 
-zi auto has"duf" wait for duf
+zi auto has"duf" wait1 for duf
 
 # eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
@@ -381,7 +392,7 @@ zi auto has"duf" wait for duf
 	alias lR="l -R"
 }
 
-zi auto has"eza" wait for eza
+zi auto has"eza" wait1 for eza
 
 # fzf: command-line fuzzy finder
 # https://github.com/junegunn/fzf
@@ -393,7 +404,7 @@ export FZF_DEFAULT_OPTS=" \
     --color=selected-bg:#45475A \
     --color=border:#6C7086,label:#CDD6F4"
 
-zi auto has"fzf" wait for fzf
+zi auto has"fzf" wait1 for fzf
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
@@ -423,7 +434,7 @@ add path "${GHOSTTY_BIN_DIR}"
 
 # git: distributed version control system
 # https://github.com/git/git
-zi auto id-as"git" as"completion" blockf mv"git->_git" wait for \
+zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
 	https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
 
 alias git-each=':each */.git(:h) do'
@@ -457,7 +468,7 @@ export GPG_TTY="${TTY}"
 export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 mkdir -p "${GNUPGHOME}"
 chmod 0700 "${GNUPGHOME}"
-zi auto wait for OMZP::gpg-agent
+zi auto wait1 for OMZP::gpg-agent
 
 # go: programming language
 # https://www.golang.org
@@ -475,7 +486,7 @@ mkdir -p "$(dirname "${LESSHISTFILE}")"
 
 # man: unix documentation system
 # https://www.nongnu.org/man-db/
-zi auto wait for OMZP::colored-man-pages
+zi auto wait1 for OMZP::colored-man-pages
 
 # ncdu: disk usage analyzer
 # https://dev.yorhel.nl/ncdu
@@ -512,7 +523,7 @@ alias tf-parallel=':parallel */terraform.mk(:h) do'
 	complete -o nospace -C tofu tofu
 }
 
-zi auto with"mise" wait1 for opentofu
+zi auto has"tofu" wait1 for opentofu
 
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
@@ -534,7 +545,7 @@ zi auto has"psql" for postgresql
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
-zi auto wait for OMZP::rsync
+zi auto wait1 for OMZP::rsync
 
 # ruby: programming language
 # https://www.ruby-lang.org
@@ -602,7 +613,7 @@ zi auto has"tmux" silent for OMZP::tmux
 
 # tmux/xpanes: run commands across synchronized tmux panes
 # https://github.com/greymd/tmux-xpanes
-zi auto has"tmux" wait for greymd/tmux-xpanes
+zi auto has"tmux" wait1 for greymd/tmux-xpanes
 
 # vim: vi improved, via neovim
 # https://neovim.io
@@ -630,7 +641,7 @@ export EDITOR="${commands[nvim]}"
 	[[ "${TERM_PROGRAM}" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 }
 
-zi auto has"code" wait for vscode
+zi auto has"code" wait1 for vscode
 
 # wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/
@@ -647,7 +658,7 @@ alias X="TERM=xterm-256color ssh -t 10.0.0.11 \"/usr/local/bin/zsh -i -c T\""
 # zsh-you-should-use: reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
 if has tput; then
-	zi auto wait for MichaelAquilina/zsh-you-should-use
+	zi auto wait1 for MichaelAquilina/zsh-you-should-use
 	YSU_MESSAGE_POSITION="after"
 fi
 
@@ -760,7 +771,7 @@ zi auto wait for hlissner/zsh-autopair
 
 # zsh-bench: benchmark zsh startup and interactive lag
 # https://github.com/romkatv/zsh-bench
-zi as"program" wait for romkatv/zsh-bench
+zi as"program" wait1 for romkatv/zsh-bench
 
 # Load .envrc after shell initialization if present
 if [[ -e .envrc ]]; then
