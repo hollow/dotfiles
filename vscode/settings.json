@@ -20,6 +20,7 @@
   "terminal.integrated.initialHint": false,
   "terminal.integrated.scrollback": 10000,
   "terminal.integrated.shellIntegration.decorationsEnabled": "never",
+  "terminal.integrated.stickyScroll.enabled": false,
   "terminal.integrated.suggest.enabled": false,
   "workbench.colorTheme": "Catppuccin Mocha",
   "workbench.iconTheme": "catppuccin-mocha"

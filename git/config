@@ -3,12 +3,14 @@
 	amend = ci --amend --reuse-message=HEAD
 	b = !git --no-pager log --decorate --format="%D" -1
 	ci = commit
-	co = checkout
+	cleanup = !git up && git dmb -y
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	ls = ls-tree -r HEAD
 	st = status --short
 	stat = diff --stat
+	sw = switch
 	tags = tag -l
+	up = !git switch $(git main-branch) && git pull
 	w = !git --no-pager show -s --pretty='tformat:%h %ad %s' --date=short
 
 [advice]
@@ -20,21 +22,95 @@
 [color]
 	ui = true
 
+[commit]
+	verbose = true
+
+[core]
+	pager = delta
+
+[delta]
+	features = catppuccin-mocha
+	navigate = true
+	line-numbers = true
+	hyperlinks = true
+
+[delta "catppuccin-mocha"]
+	blame-palette = "#1e1e2e #181825 #11111b #313244 #45475a"
+	commit-decoration-style = "#6c7086" bold box ul
+	dark = true
+	file-decoration-style = "#6c7086"
+	file-style = "#cdd6f4"
+	hunk-header-decoration-style = "#6c7086" box ul
+	hunk-header-file-style = bold
+	hunk-header-line-number-style = bold "#a6adc8"
+	hunk-header-style = file line-number syntax
+	line-numbers-left-style = "#6c7086"
+	line-numbers-minus-style = bold "#f38ba8"
+	line-numbers-plus-style = bold "#a6e3a1"
+	line-numbers-right-style = "#6c7086"
+	line-numbers-zero-style = "#6c7086"
+	minus-emph-style = bold syntax "#694559"
+	minus-style = syntax "#493447"
+	plus-emph-style = bold syntax "#4e6356"
+	plus-style = syntax "#394545"
+	map-styles = \
+		bold purple => syntax "#5b4e74", \
+		bold blue => syntax "#445375", \
+		bold cyan => syntax "#446170", \
+		bold yellow => syntax "#6b635b"
+	syntax-theme = Catppuccin Mocha
+
 [diff]
+	algorithm = histogram
+	colorMoved = zebra
 	renames = copies
+
+[fetch]
+	all = true
+	prune = true
+	pruneTags = true
+	recurseSubmodules = yes
+	writeCommitGraph = true
+
+[gpg "ssh"]
+	allowedSignersFile = ~/.config/git/allowed_signers
+
+[help]
+	autocorrect = prompt
 
 [init]
 	defaultBranch = main
 
+[interactive]
+	diffFilter = delta --color-only
+
+[merge]
+	conflictStyle = zdiff3
+
 [pull]
-	ff = only
+	rebase = true
 
 [push]
-	followTags = true
 	autoSetupRemote = true
+	followTags = true
+
+[rebase]
+	autoStash = true
+	updateRefs = true
 
 [rerere]
+	autoUpdate = true
 	enabled = true
+
+[submodule]
+	recurse = true
+
+[tag]
+	gpgSign = true
+	sort = -version:refname
+
+[transfer]
+	fsckObjects = true
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
