@@ -189,7 +189,7 @@ export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
 	eval "$(mise activate zsh)"
 }
 
-zi auto has"mise" wait1 for mise
+zi auto has"mise" for mise
 
 # python: programming language
 # https://docs.python.org/3/
