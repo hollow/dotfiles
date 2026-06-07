@@ -358,22 +358,24 @@ zi auto has"claude" wait1 for claude
 
 # colima: container runtimes on macOS with minimal setup
 # https://github.com/abiosoft/colima
-link colima .colima
+:colima-init() {
+	link colima .colima
 
-# unset XDG_CONFIG_HOME so the CLI uses ~/.colima like the brew launchd service
-# does (it has no XDG env), keeping both pointed at the same home; this also
-# silences colima's XDG warning.
-alias colima="env -u XDG_CONFIG_HOME colima"
-
-# colima has no option to relocate its heavy VM/instance state (_lima) and
-# profile store (_store), so keep them in data (not the repo'd config dir) via
-# symlinks resolved for both the CLI and the launchd service.
-mkdirp "${XDG_DATA_HOME}/colima/_lima"
-mkdirp "${XDG_DATA_HOME}/colima/_store"
-link "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
-link "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
+	# colima has no option to relocate its heavy VM/instance state (_lima) and
+	# profile store (_store), so keep them in data (not the repo'd config dir) via
+	# symlinks resolved for both the CLI and the launchd service.
+	mkdirp "${XDG_DATA_HOME}/colima/_lima"
+	mkdirp "${XDG_DATA_HOME}/colima/_store"
+	link "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
+	link "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
+}
 
 :colima-load() {
+	# unset XDG_CONFIG_HOME so the CLI uses ~/.colima like the brew launchd service
+	# does (it has no XDG env), keeping both pointed at the same home; this also
+	# silences colima's XDG warning.
+	alias colima="env -u XDG_CONFIG_HOME colima"
+
 	# `brew services start` forks brew + launchctl and takes ~900ms; running it
 	# synchronously here froze the first prompt's input for ~1s while this plugin
 	# loaded in turbo. it's idempotent (the launchd service persists once started),
@@ -470,8 +472,10 @@ zi auto has"fzf" wait1 for fzf
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
-mkdirp "${XDG_DATA_HOME}/gcloud"
-link "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
+:gcloud-init() {
+	mkdirp "${XDG_DATA_HOME}/gcloud"
+	link "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
+}
 
 :gcloud-update() {
 	gcloud components update --quiet || :
@@ -602,14 +606,16 @@ zi auto has"nomad" wait1 for nomad
 
 # opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
-export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
-mkdirp "${TF_PLUGIN_CACHE_DIR}"
-
-alias tf="tofu"
-alias tf-each=':each */terraform.mk(:h) do'
-alias tf-parallel=':parallel */terraform.mk(:h) do'
+:opentofu-init() {
+	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
+	mkdirp "${TF_PLUGIN_CACHE_DIR}"
+}
 
 :opentofu-load() {
+	alias tf="tofu"
+	alias tf-each=':each */terraform.mk(:h) do'
+	alias tf-parallel=':parallel */terraform.mk(:h) do'
+
 	complete -o nospace -C tofu tofu
 }
 
@@ -725,10 +731,16 @@ zi auto has"tmux" wait1 for greymd/tmux-xpanes
 
 # vim: vi improved, via neovim
 # https://neovim.io
+:neovim-init() {
+	export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
+	export EDITOR="${commands[nvim]}"
+}
+
+:neovim-load() {
+	alias vim=nvim
+}
+
 zi auto has"nvim" for neovim
-alias vim=nvim
-export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
-export EDITOR="${commands[nvim]}"
 
 # vscode: visual studio code editor
 # https://code.visualstudio.com
