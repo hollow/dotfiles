@@ -1,3 +1,5 @@
-prefix=${XDG_CACHE_HOME}/npm
-cache=${XDG_CACHE_HOME}/npm
-init-module=${XDG_CONFIG_HOME}/npm/config/npm-init.js
+; npm has no XDG support and is often spawned without our shell env (GUI apps,
+; pre-commit, npx-based MCP servers). ~/.npmrc is symlinked to this file so npm
+; always finds it, and ${HOME} (unlike ${XDG_*}) is set in every context.
+cache=${HOME}/.cache/npm
+logs-dir=${HOME}/.local/state/npm/logs

@@ -492,8 +492,12 @@ zi auto wait1 for OMZP::colored-man-pages
 # https://dev.yorhel.nl/ncdu
 link ncduignore .ncduignore
 
-# node: JavaScript runtime
+# node/npm: JavaScript runtime
 # https://nodejs.org
+export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
+mkdir -p "${XDG_DATA_HOME}/node"
+link npm/npmrc .npmrc
+
 alias node-each=':each */nodejs.mk(:h) do'
 alias node-parallel=':parallel */nodejs.mk(:h) do'
 
@@ -504,11 +508,6 @@ alias node-parallel=':parallel */nodejs.mk(:h) do'
 }
 
 zi auto has"nomad" wait1 for nomad
-
-# npm: node package manager
-# https://github.com/npm/cli
-export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME}/npm/npmrc"
-add path "${XDG_DATA_HOME}"/npm/bin
 
 # opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
