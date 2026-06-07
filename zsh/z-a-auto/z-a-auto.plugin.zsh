@@ -122,13 +122,15 @@
     :za-auto-null-handler \
     "with''"
 
+# Install the tool (uv/mise) before z-a-eval's recache hook (atclone/atpull-50)
+# so eval hooks like :argcomplete-eval find the freshly installed command.
 @zi-register-annex "z-a-auto" \
-    hook:atclone-50 \
+    hook:atclone-30 \
     :za-auto-update \
     :za-auto-null-handler
 
 @zi-register-annex "z-a-auto" \
-    hook:atpull-50 \
+    hook:atpull-30 \
     :za-auto-update \
     :za-auto-null-handler
 
