@@ -9,7 +9,7 @@ export COLORTERM="truecolor"
 setopt extendedglob
 
 # set resource limits
-ulimit -n $((1024*1024))
+ulimit -n $((1024 * 1024))
 
 # words are complete shell command arguments
 autoload -Uz select-word-style
@@ -44,9 +44,9 @@ mkdir -p "${ZSH_DATA_DIR}"
 
 # shell functions
 typeset -TUx FPATH fpath=(
-    ${ZDOTDIR}
-    ${ZSH_CACHE_DIR}/completions
-    ${fpath[@]}
+	${ZDOTDIR}
+	${ZSH_CACHE_DIR}/completions
+	${fpath[@]}
 )
 
 # append ZDOTDIR so `git foo` and subprocess lookups can find user scripts,
@@ -58,7 +58,7 @@ autoload -Uz ${ZDOTDIR}/*(.N:t)
 
 # add homebrew path as early as possible
 if has /opt/homebrew/bin/brew; then
-    eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+	eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 fi
 
 # add local bin to path
@@ -79,14 +79,19 @@ alias zre="exec zsh"
 alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 
 zup() {
-    local oldpwd="${PWD}"
-    :brew-update && \
-    :uv-update && \
-    :tmux-update && \
-    :gcloud-update && \
-    zi self-update && \
-    zi update --all
-    cd "${oldpwd}"
+	set -e
+	local oldpwd="${PWD}"
+
+	:brew-update
+	:uv-update
+	:tmux-update
+	:gcloud-update
+
+	zi self-update
+	zi update --all
+
+	cd "${oldpwd}"
+	exec zsh
 }
 
 # zinit/default: set global default ice
@@ -104,12 +109,12 @@ zi id-as for "${ZDOTDIR}/z-a-auto"
 # ohmyzsh: community driven zsh framework
 # https://github.com/ohmyzsh/ohmyzsh
 zi for \
-    OMZL::directories.zsh \
-    OMZL::functions.zsh \
-    OMZL::history.zsh \
-    OMZL::key-bindings.zsh \
-    OMZL::spectrum.zsh \
-    OMZL::termsupport.zsh
+	OMZL::directories.zsh \
+	OMZL::functions.zsh \
+	OMZL::history.zsh \
+	OMZL::key-bindings.zsh \
+	OMZL::spectrum.zsh \
+	OMZL::termsupport.zsh
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -125,41 +130,41 @@ link "${HISTFILE}" .zsh_history
 # brew: the missing package manager
 # https://github.com/Homebrew/brew
 :brew-init() {
-    export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
-    export HOMEBREW_BUNDLE_NO_LOCK=1
-    export HOMEBREW_AUTO_UPDATE_SECS=86400
-    export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
-    export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
+	export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
+	export HOMEBREW_BUNDLE_NO_LOCK=1
+	export HOMEBREW_AUTO_UPDATE_SECS=86400
+	export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
+	export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
 
-    add path "${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin"
-    add path "${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin"
-    add path "${HOMEBREW_PREFIX}/opt/gawk/libexec/gnubin"
-    add path "${HOMEBREW_PREFIX}/opt/gnu-sed/libexec/gnubin"
-    add path "${HOMEBREW_PREFIX}/opt/gnu-tar/libexec/gnubin"
-    add path "${HOMEBREW_PREFIX}/opt/gnu-time/libexec/gnubin"
-    add path "${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin"
-    add path "${HOMEBREW_PREFIX}/opt/make/libexec/gnubin"
-    add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+	add path "${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin"
+	add path "${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin"
+	add path "${HOMEBREW_PREFIX}/opt/gawk/libexec/gnubin"
+	add path "${HOMEBREW_PREFIX}/opt/gnu-sed/libexec/gnubin"
+	add path "${HOMEBREW_PREFIX}/opt/gnu-tar/libexec/gnubin"
+	add path "${HOMEBREW_PREFIX}/opt/gnu-time/libexec/gnubin"
+	add path "${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin"
+	add path "${HOMEBREW_PREFIX}/opt/make/libexec/gnubin"
+	add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
 
-    alias bbd="brew bundle dump -f"
-    alias bz="brew uninstall --zap"
+	alias bbd="brew bundle dump -f"
+	alias bz="brew uninstall --zap"
 }
 
 :brew-update() {
-    if ! has brew; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-        :brew-init
-    else
-        brew bundle dump -f
-    fi
+	if ! has brew; then
+		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+		eval "$(/opt/homebrew/bin/brew shellenv)"
+		:brew-init
+	else
+		brew bundle dump -f
+	fi
 
-    brew update
-    brew upgrade
-    brew bundle install
-    brew autoremove
-    brew cleanup -s --prune=all
-    chmod go-w "${HOMEBREW_PREFIX}/share"
+	brew update
+	brew upgrade
+	brew bundle install
+	brew autoremove
+	brew cleanup -s --prune=all
+	chmod go-w "${HOMEBREW_PREFIX}/share"
 }
 
 zi auto has"dscl" for brew
@@ -169,8 +174,8 @@ zi auto has"dscl" for brew
 export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
 
 :mise-load() {
-    local _mise_cmd_not_found
-    eval "$(mise activate zsh)"
+	local _mise_cmd_not_found
+	eval "$(mise activate zsh)"
 }
 
 zi auto has"mise" for jdx/mise
@@ -184,7 +189,7 @@ export PYTHONNOUSERSITE="1"
 
 # expose brew's unversioned python/pip shims on PATH (macOS/brew only)
 if has brew; then
-    add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
+	add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
 fi
 
 alias python-each=':each */python.mk(:h) do'
@@ -198,11 +203,11 @@ export UV_TOOL_BIN_DIR="${XDG_CACHE_HOME}/uv/bin"
 add path "${UV_TOOL_BIN_DIR}"
 
 :uv-update() {
-    uv tool upgrade --all
+	uv tool upgrade --all
 }
 
 :uv-eval() {
-    uv generate-shell-completion zsh
+	uv generate-shell-completion zsh
 }
 
 zi auto has"uv" for uv
@@ -216,16 +221,16 @@ zi auto has"uv" for uv
 # `_describe` call (the matches are already split by then), so completions
 # render under both fzf-tab and the native menu.
 :argcomplete-fix-ifs() {
-    local code="$(cat)"
-    print -r -- "${code//_describe /IFS=$' \t\n' _describe }"
+	local code="$(cat)"
+	print -r -- "${code//_describe /IFS=$' \t\n' _describe }"
 }
 
 :register-python-argcomplete() {
-    register-python-argcomplete --shell zsh "$@" | :argcomplete-fix-ifs
+	register-python-argcomplete --shell zsh "$@" | :argcomplete-fix-ifs
 }
 
 :argcomplete-eval() {
-    activate-global-python-argcomplete --dest=- | :argcomplete-fix-ifs
+	activate-global-python-argcomplete --dest=- | :argcomplete-fix-ifs
 }
 
 zi auto with"uv" for argcomplete
@@ -233,8 +238,8 @@ zi auto with"uv" for argcomplete
 # 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-eval() {
-    chmod 0700 "${XDG_CONFIG_HOME}/op"
-    op completion zsh
+	chmod 0700 "${XDG_CONFIG_HOME}/op"
+	op completion zsh
 }
 
 zi auto has"op" wait for 1password-cli
@@ -266,11 +271,11 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 # atuin: magical shell history with optional sync
 # https://github.com/atuinsh/atuin
 :atuin-load() {
-    alias a="atuin"
+	alias a="atuin"
 }
 
 :atuin-eval() {
-    atuin init zsh --disable-up-arrow
+	atuin init zsh --disable-up-arrow
 }
 
 zi auto has"atuin" wait for atuin
@@ -283,8 +288,8 @@ zi auto has"aws" wait for OMZP::aws
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 :bat-load() {
-    export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
-    export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
+	export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
+	export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 }
 
 zi auto has"bat" wait for bat
@@ -292,7 +297,7 @@ zi auto has"bat" wait for bat
 # boto: AWS SDK for Python
 # https://github.com/boto/boto3
 export BOTO_CONFIG="${XDG_DATA_HOME}/boto"
-cat > "${BOTO_CONFIG}" <<EOF
+cat >"${BOTO_CONFIG}" <<EOF
 [GSUtil]
 state_dir = ${XDG_DATA_HOME}/gsutil
 parallel_composite_upload_threshold = 150M
@@ -301,7 +306,7 @@ EOF
 # checkov: static code analysis tool for Terraform & Co
 # https://github.com/bridgecrewio/checkov
 :checkov-eval() {
-    :register-python-argcomplete checkov
+	:register-python-argcomplete checkov
 }
 
 zi auto has"checkov" wait for checkov
@@ -311,12 +316,12 @@ zi auto has"checkov" wait for checkov
 export CLAUDE_CODE_NEW_INIT=1
 export ENABLE_CLAUDEAI_MCP_SERVERS=true
 cp "${HOME}/Library/Application Support/Claude/claude_desktop_config.json" \
-    "${HOME}/.claude/claude_desktop_config.json"
+	"${HOME}/.claude/claude_desktop_config.json"
 
 # consul: distributed, highly available service discovery
 # https://github.com/hashicorp/consul
 :consul-load() {
-    complete -o nospace -C consul consul
+	complete -o nospace -C consul consul
 }
 
 zi auto has"consul" wait1 for consul
@@ -331,15 +336,15 @@ alias copier-parallel=':parallel */.copier-answers.yml(:h) do'
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
 :dircolors-load() {
-    # colorize completion candidates (filenames, dirs, …) in every context, not
-    # just the `default` tag — fzf-tab reads list-colors to color its menu. Set
-    # here rather than in the completion block because LS_COLORS is populated by
-    # :dircolors-eval, which runs when this plugin loads.
-    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+	# colorize completion candidates (filenames, dirs, …) in every context, not
+	# just the `default` tag — fzf-tab reads list-colors to color its menu. Set
+	# here rather than in the completion block because LS_COLORS is populated by
+	# :dircolors-eval, which runs when this plugin loads.
+	zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 }
 
 :dircolors-eval() {
-    dircolors -b LS_COLORS
+	dircolors -b LS_COLORS
 }
 
 zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
@@ -347,11 +352,11 @@ zi auto id-as"dircolors" wait for trapd00r/LS_COLORS
 # direnv: change environment based on the current directory
 # https://github.com/direnv/direnv
 :direnv-load() {
-    alias da="direnv allow"
+	alias da="direnv allow"
 }
 
 :direnv-eval() {
-    direnv hook zsh
+	direnv hook zsh
 }
 
 zi auto has"direnv" for direnv/direnv
@@ -363,7 +368,7 @@ add fpath "${HOME}/.docker/completions"
 # duf: better `df` alternative
 # https://github.com/muesli/duf
 :duf-load() {
-    alias df=duf
+	alias df=duf
 }
 
 zi auto has"duf" wait for duf
@@ -371,9 +376,9 @@ zi auto has"duf" wait for duf
 # eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
 :eza-load() {
-    export EZA_ICONS_AUTO=1
-    alias l="eza --all --long --group"
-    alias lR="l -R"
+	export EZA_ICONS_AUTO=1
+	alias l="eza --all --long --group"
+	alias lR="l -R"
 }
 
 zi auto has"eza" wait for eza
@@ -393,21 +398,21 @@ zi auto has"fzf" wait for fzf
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 :gcloud-update() {
-    gcloud components update || :
+	gcloud components update --quiet || :
 }
 
 :gcloud-load() {
-    if has brew; then
-        export CLOUDSDK_HOME="/opt/homebrew/share/google-cloud-sdk"
-    else
-        export CLOUDSDK_HOME="/usr/lib64/google-cloud-sdk"
-    fi
+	if has brew; then
+		export CLOUDSDK_HOME="/opt/homebrew/share/google-cloud-sdk"
+	else
+		export CLOUDSDK_HOME="/usr/lib64/google-cloud-sdk"
+	fi
 
-    if has "${CLOUDSDK_HOME}"; then
-        add path "${CLOUDSDK_HOME}/bin"
-        source "${CLOUDSDK_HOME}/completion.zsh.inc"
-        export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
-    fi
+	if has "${CLOUDSDK_HOME}"; then
+		add path "${CLOUDSDK_HOME}/bin"
+		source "${CLOUDSDK_HOME}/completion.zsh.inc"
+		export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
+	fi
 }
 
 zi auto has"gcloud" wait1 for gcloud
@@ -419,7 +424,7 @@ add path "${GHOSTTY_BIN_DIR}"
 # git: distributed version control system
 # https://github.com/git/git
 zi auto id-as"git" as"completion" blockf mv"git->_git" wait for \
-    https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
+	https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
 
 alias git-each=':each */.git(:h) do'
 alias git-parallel=':parallel */.git(:h) do'
@@ -484,7 +489,7 @@ alias node-parallel=':parallel */nodejs.mk(:h) do'
 # nomad: workload orchestrator
 # https://github.com/hashicorp/nomad
 :nomad-load() {
-    complete -o nospace -C nomad nomad
+	complete -o nospace -C nomad nomad
 }
 
 zi auto has"nomad" wait1 for nomad
@@ -504,7 +509,7 @@ alias tf-each=':each */terraform.mk(:h) do'
 alias tf-parallel=':parallel */terraform.mk(:h) do'
 
 :opentofu-load() {
-    complete -o nospace -C tofu tofu
+	complete -o nospace -C tofu tofu
 }
 
 zi auto with"mise" wait1 for opentofu
@@ -517,12 +522,12 @@ mkdir -p ${PARALLEL_HOME}
 # postgresql: object-relational database
 # https://www.postgresql.org
 :postgresql-load() {
-    local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(N,n,On[1]))
-    if [[ -n "${__postgresql_brew_dir}" ]]; then
-        add path "${__postgresql_brew_dir}/bin"
-        add ldflags "-L${__postgresql_brew_dir}/lib"
-        add cppflags "-I${__postgresql_brew_dir}/include"
-    fi
+	local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(N,n,On[1]))
+	if [[ -n "${__postgresql_brew_dir}" ]]; then
+		add path "${__postgresql_brew_dir}/bin"
+		add ldflags "-L${__postgresql_brew_dir}/lib"
+		add cppflags "-I${__postgresql_brew_dir}/include"
+	fi
 }
 
 zi auto has"psql" for postgresql
@@ -540,11 +545,11 @@ export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
 export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
 
 :ruby-load() {
-    local __ruby_brew_dir=("${HOMEBREW_PREFIX}"/opt/ruby@*(N,n,On[1]))
-    if [[ -n "${__ruby_brew_dir}" ]]; then
-        export RUBYHOME="${__ruby_brew_dir}"
-        add path "${RUBYHOME}/bin"
-    fi
+	local __ruby_brew_dir=("${HOMEBREW_PREFIX}"/opt/ruby@*(N,n,On[1]))
+	if [[ -n "${__ruby_brew_dir}" ]]; then
+		export RUBYHOME="${__ruby_brew_dir}"
+		add path "${RUBYHOME}/bin"
+	fi
 }
 
 zi auto has"ruby" for ruby
@@ -568,9 +573,9 @@ chmod 0600 "${HOME}/.ssh/config"
 
 # https://1password.community/discussion/comment/660153/#Comment_660153
 if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
-    export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+	export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 else
-    zi auto silent for OMZP::ssh-agent
+	zi auto silent for OMZP::ssh-agent
 fi
 
 # sshp: Parallel SSH Executor
@@ -580,17 +585,17 @@ zi make as"program" for bahamas10/sshp
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
 :tmux-load() {
-    export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
-    export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
-    export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
-    export ZSH_TMUX_FIXTERM="false"
-    alias T=tmux
+	export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
+	export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
+	export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
+	export ZSH_TMUX_FIXTERM="false"
+	alias T=tmux
 }
 
 :tmux-update() {
-    :tmux-load
-    clone tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
-    ${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
+	:tmux-load
+	clone tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
+	${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
 }
 
 zi auto has"tmux" silent for OMZP::tmux
@@ -609,13 +614,13 @@ export EDITOR="${commands[nvim]}"
 # vscode: visual studio code editor
 # https://code.visualstudio.com
 :vscode-load() {
-    if ! has "${HOME}/Library/Application Support/Code/User"; then
-        return
-    fi
+	if ! has "${HOME}/Library/Application Support/Code/User"; then
+		return
+	fi
 
-    for i in settings keybindings mcp; do
-        link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
-    done
+	for i in settings keybindings mcp; do
+		link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
+	done
 }
 
 zi auto has"code" wait for vscode
@@ -635,18 +640,18 @@ alias X="TERM=xterm-256color ssh -t 10.0.0.11 \"/usr/local/bin/zsh -i -c T\""
 # zsh-you-should-use: reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
 if has tput; then
-    zi auto wait for MichaelAquilina/zsh-you-should-use
-    YSU_MESSAGE_POSITION="after"
+	zi auto wait for MichaelAquilina/zsh-you-should-use
+	YSU_MESSAGE_POSITION="after"
 fi
 
 # starship: minimal, blazing-fast, customizable prompt
 # https://starship.rs
 if has starship; then
-    eval "$(starship init zsh)"
-    # `starship init zsh` sets both PROMPT and RPROMPT, so the starship binary
-    # is spawned twice per prompt redraw (~40ms each). The right prompt is
-    # empty by default — drop RPROMPT to halve command_lag.
-    unset RPROMPT
+	eval "$(starship init zsh)"
+	# `starship init zsh` sets both PROMPT and RPROMPT, so the starship binary
+	# is spawned twice per prompt redraw (~40ms each). The right prompt is
+	# empty by default — drop RPROMPT to halve command_lag.
+	unset RPROMPT
 fi
 
 # zsh-completions: extra completion functions. Loads before compinit so they
@@ -655,7 +660,7 @@ fi
 # wrappers below.
 # https://github.com/zsh-users/zsh-completions
 zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
-    atload"zicompinit; zicdreplay" wait for zsh-users/zsh-completions
+	atload"zicompinit; zicdreplay" wait for zsh-users/zsh-completions
 
 # fzf-tab: replace the completion menu with fzf. Must load after compinit (above)
 # and before the widget-wrapping plugins (autosuggestions, F-Sy-H) below.
@@ -668,10 +673,10 @@ zi auto has"fzf" wait for Aloxaf/fzf-tab
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --all --long --group --color=always --icons=always $realpath'
 
 # zsh/completion
-zmodload -i zsh/complist            # list-colors support + native menu
-unsetopt flowcontrol                # reclaim ^S/^Q from terminal flow control
-setopt complete_in_word             # allow completing with the cursor mid-word
-setopt always_to_end                # ...and jump the cursor to the word end afterwards
+zmodload -i zsh/complist # list-colors support + native menu
+unsetopt flowcontrol     # reclaim ^S/^Q from terminal flow control
+setopt complete_in_word  # allow completing with the cursor mid-word
+setopt always_to_end     # ...and jump the cursor to the word end afterwards
 
 # fzf-tab's recommended `menu no`, and intentionally NO menu_complete: zsh inserts
 # the longest common prefix on the first TAB (the auto-insert we want) and fzf-tab's
@@ -695,8 +700,8 @@ zstyle ':completion:*' completer _complete _correct _approximate
 zstyle -e ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3>7?7:($#PREFIX+$#SUFFIX)/3))numeric)'
 
 # candidates
-zstyle ':completion:*' special-dirs true        # offer the `.` and `..` directories
-zstyle ':completion:*' use-cache yes            # cache results for completers that support it
+zstyle ':completion:*' special-dirs true # offer the `.` and `..` directories
+zstyle ':completion:*' use-cache yes     # cache results for completers that support it
 zstyle ':completion:*' cache-path "${ZSH_CACHE_DIR}"
 
 # `cd`: real subdirs, then the dir stack, then $cdpath — and never guess named dirs
@@ -740,7 +745,7 @@ zi auto wait for z-shell/F-Sy-H
 # zsh/autosuggestions: fish-like autosuggestions for zsh
 # https://github.com/zsh-users/zsh-autosuggestions
 zi auto atload"_zsh_autosuggest_start" \
-    wait for zsh-users/zsh-autosuggestions
+	wait for zsh-users/zsh-autosuggestions
 
 # zsh/autopair: automatically close quotes, brackets and other delimiters
 # https://github.com/hlissner/zsh-autopair
@@ -752,5 +757,5 @@ zi as"program" wait for romkatv/zsh-bench
 
 # Load .envrc after shell initialization if present
 if [[ -e .envrc ]]; then
-    pushd "${HOME}" &>/dev/null && popd
+	pushd "${HOME}" &>/dev/null && popd
 fi
