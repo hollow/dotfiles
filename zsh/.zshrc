@@ -322,8 +322,18 @@ cp "${HOME}/Library/Application Support/Claude/claude_desktop_config.json" \
 
 # colima: container runtimes on macOS with minimal setup
 # https://github.com/abiosoft/colima
-alias colima="env -u XDG_CONFIG_HOME colima"
 link colima .colima
+
+# unset XDG_CONFIG_HOME so the CLI uses ~/.colima like the brew launchd service
+# does (it has no XDG env), keeping both pointed at the same home; this also
+# silences colima's XDG warning.
+alias colima="env -u XDG_CONFIG_HOME colima"
+
+# colima has no option to relocate _lima, so keep the heavy VM disk/instance
+# state in data (not the repo'd config dir) via a symlink resolved for both the
+# CLI and the launchd service.
+mkdir -p "${XDG_DATA_HOME}/colima/_lima"
+ln -nfs "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
 
 :colima-load() {
 	brew services start colima >/dev/null
