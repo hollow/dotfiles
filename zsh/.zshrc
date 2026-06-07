@@ -195,18 +195,24 @@ zi auto has"mise" for mise
 
 # python: programming language
 # https://docs.python.org/3/
-export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-export PIP_REQUIRE_VIRTUALENV="1"
-export PIP_USER="0"
-export PYTHONNOUSERSITE="1"
+:python-init() {
+	export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+	export PIP_REQUIRE_VIRTUALENV="1"
+	export PIP_USER="0"
+	export PYTHONNOUSERSITE="1"
 
-# expose brew's unversioned python/pip shims on PATH (macOS/brew only)
-if has brew; then
-	add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
-fi
+	# expose brew's unversioned python/pip shims on PATH (macOS/brew only)
+	if has brew; then
+		add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
+	fi
+}
 
-alias python-each=':each */python.mk(:h) do'
-alias python-parallel=':parallel */python.mk(:h) do'
+:python-load() {
+	alias python-each=':each */python.mk(:h) do'
+	alias python-parallel=':parallel */python.mk(:h) do'
+}
+
+zi auto has"python3" for python
 
 # python/uv: an extremely fast Python package manager
 # https://github.com/astral-sh/uv
@@ -265,17 +271,23 @@ export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
 # https://github.com/ansible/ansible
 # ANSIBLE_HOME is the base for collections, roles, plugins and the galaxy token
 # (all data); tmp/cp go to runtime and the galaxy cache to cache instead.
-export ANSIBLE_HOME="${XDG_DATA_HOME}/ansible"
-export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible"
-export ANSIBLE_LOCAL_TEMP="${XDG_RUNTIME_DIR}/ansible/tmp"
-export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
+:ansible-init() {
+	export ANSIBLE_HOME="${XDG_DATA_HOME}/ansible"
+	export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible"
+	export ANSIBLE_LOCAL_TEMP="${XDG_RUNTIME_DIR}/ansible/tmp"
+	export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
+}
 
-alias ansible-each=':each */ansible.mk(:h) do'
-alias ansible-parallel=':parallel */ansible.mk(:h) do'
+:ansible-load() {
+	alias ansible-each=':each */ansible.mk(:h) do'
+	alias ansible-parallel=':parallel */ansible.mk(:h) do'
 
-alias ad="ansible-doc"
-alias ai="ansible-inventory"
-alias ap="ansible-playbook"
+	alias ad="ansible-doc"
+	alias ai="ansible-inventory"
+	alias ap="ansible-playbook"
+}
+
+zi auto has"ansible" wait1 for ansible
 
 # ansible/ara: ARA Records Ansible
 # https://github.com/ansible-community/ara
@@ -528,9 +540,13 @@ alias go-parallel=':parallel */go.mk(:h:a) do'
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
-export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
-export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
-mkdirp "${LESSHISTFILE:h}"
+:less-init() {
+	export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
+	export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
+	mkdirp "${LESSHISTFILE:h}"
+}
+
+zi auto has"less" for less
 
 # man: unix documentation system
 # https://www.nongnu.org/man-db/
@@ -546,12 +562,18 @@ zi auto has"ncdu" wait1 for ncdu
 
 # node/npm: JavaScript runtime
 # https://nodejs.org
-export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
-mkdirp "${XDG_DATA_HOME}/node"
-link npm/npmrc .npmrc
+:node-init() {
+	export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
+	mkdirp "${XDG_DATA_HOME}/node"
+	link npm/npmrc .npmrc
+}
 
-alias node-each=':each */nodejs.mk(:h) do'
-alias node-parallel=':parallel */nodejs.mk(:h) do'
+:node-load() {
+	alias node-each=':each */nodejs.mk(:h) do'
+	alias node-parallel=':parallel */nodejs.mk(:h) do'
+}
+
+zi auto has"node" wait1 for node
 
 # nomad: workload orchestrator
 # https://github.com/hashicorp/nomad
@@ -707,12 +729,23 @@ zi auto has"code" wait1 for vscode
 
 # wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/
-export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
-alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
+:wget-init() {
+	export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
+}
+
+:wget-load() {
+	alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
+}
+
+zi auto has"wget" wait1 for wget
 
 # youtube: download audio
 # https://github.com/yt-dlp/yt-dlp
-alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
+:youtube-load() {
+	alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
+}
+
+zi auto has"yt-dlp" wait1 for youtube
 
 # misc other aliases
 alias X="TERM=xterm-256color ssh -t 10.0.0.11 \"/usr/local/bin/zsh -i -c T\""
