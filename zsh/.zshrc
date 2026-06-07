@@ -387,6 +387,12 @@ zi auto wait1 for OMZP::colored-man-pages
 # https://dev.yorhel.nl/ncdu
 link ncduignore .ncduignore
 
+# node/npm: JavaScript runtime
+# https://nodejs.org
+export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
+mkdir -p "${XDG_DATA_HOME}/node"
+link npm/npmrc .npmrc
+
 # opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
 export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
