@@ -264,11 +264,13 @@ link colima .colima
 # silences colima's XDG warning.
 alias colima="env -u XDG_CONFIG_HOME colima"
 
-# colima has no option to relocate _lima, so keep the heavy VM disk/instance
-# state in data (not the repo'd config dir) via a symlink resolved for both the
-# CLI and the launchd service.
+# colima has no option to relocate its heavy VM/instance state (_lima) and
+# profile store (_store), so keep them in data (not the repo'd config dir) via
+# symlinks resolved for both the CLI and the launchd service.
 mkdir -p "${XDG_DATA_HOME}/colima/_lima"
 ln -nfs "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
+mkdir -p "${XDG_DATA_HOME}/colima/_store"
+ln -nfs "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
 
 :colima-load() {
 	brew services start colima >/dev/null
@@ -328,6 +330,9 @@ zi auto has"fzf" wait1 for fzf
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
+mkdir -p "${XDG_DATA_HOME}/gcloud"
+ln -nfs "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
+
 :gcloud-update() {
 	gcloud components update --quiet || :
 }
