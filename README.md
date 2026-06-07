@@ -86,8 +86,8 @@ enhancing shell performance and functionality.
     (up to 7 character errors based on input length)
   - **Formatted Messages**: Styled descriptions, warnings, and error counts for
     clearer feedback during completion
-  - **Customized Sorting**: Disables alphabetical sorting for `git checkout` to
-    preserve recency-based branch ordering
+  - **Customized Sorting**: Disables alphabetical sorting for `git switch` and
+    `git checkout` to preserve recency-based branch ordering
   - **Fish-like Autosuggestions**: As you type, the shell displays greyed-out
     suggestions from command history that can be accepted with the right arrow
     key, dramatically speeding up command recall
@@ -385,8 +385,8 @@ sensible defaults, and extensive shell integration for GitHub operations.
   - `gap`: Stage changes interactively (patch mode)
   - `ci`: Commit staged changes
   - `amend`: Amend the last commit without changing the message
-  - `co`: Checkout branches or files
-  - `gcm`: Checkout the main branch (detects `main` or `master`)
+  - `sw`: Switch branches
+  - `gsm`: Switch to the main branch (detects `main` or `master`)
   - `gd`: Show unstaged changes
   - `gdc`: Show staged changes (diff cached)
   - `gdm`: Diff against the main branch

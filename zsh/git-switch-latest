@@ -12,11 +12,13 @@ else
     latest="$(git latest)"
 fi
 
-git checkout --quiet "${latest}"
-
 if [[ "${latest}" == "${main}" ]]; then
+    git switch --quiet "${latest}"
     git branch --quiet --set-upstream-to="origin/${latest}"
     git pull --quiet --rebase --autostash
+else
+    # latest is a tag; switch needs --detach to leave the branch
+    git switch --quiet --detach "${latest}"
 fi
 
 git-cleanup

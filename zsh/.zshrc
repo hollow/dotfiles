@@ -443,7 +443,6 @@ alias git-parallel=':parallel */.git(:h) do'
 alias ga="git add --all"
 alias gap="git add --patch"
 alias gba="git branch -a"
-alias gcl="git checkout-latest main"
 alias gd="git diff"
 alias gdc="git diff --cached"
 alias gdm="git diff origin/\$(git main-branch)"
@@ -451,6 +450,7 @@ alias gf="git fetch"
 alias gl="git lg"
 alias gp="git pull"
 alias grh="git reset HEAD"
+alias gsl="git switch-latest main"
 alias gsm="git switch \$(git main-branch)"
 alias gsp="git show -p"
 alias gss="git stash show -p"
@@ -736,10 +736,11 @@ zstyle '*' single-ignored show
 # don't complete zsh's own completion/widget functions as function names
 zstyle ':completion:*:functions' ignored-patterns '_*'
 
-# git: never offer ORIG_HEAD as a ref, and keep checkout's native branch order
+# git: never offer ORIG_HEAD as a ref, and keep switch/checkout's native branch order
 # https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete#comment99936479_14325591
 zstyle ':completion:*:*:git*:*' ignored-patterns '*ORIG_HEAD'
 zstyle ':completion:*:git-checkout:*' sort false
+zstyle ':completion:*:git-switch:*' sort false
 
 # make: invoke the makefile so macro-defined targets are completed too
 # https://unix.stackexchange.com/questions/657256/autocompletion-of-makefile-with-makro-in-zsh-not-correct-works-in-bash

@@ -2,4 +2,4 @@
 emulate -L zsh
 [[ $TRACE -eq 1 ]] && set -x
 
-git submodule foreach git-checkout-latest
+git submodule foreach git-switch-latest

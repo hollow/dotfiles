@@ -13,5 +13,5 @@ fi
 if [[ ! -e "${repo_path}/.noclone" ]]; then
     cd "${repo_path}"
     git cleanup
-    git checkout-latest main
+    git switch-latest main
 fi
