@@ -164,6 +164,17 @@ link "${HISTFILE}" .zsh_history
 
 zi auto has"dscl" for brew
 
+# mise: dev tools, env vars, task runner
+# https://github.com/jdx/mise
+export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+
+:mise-load() {
+    local _mise_cmd_not_found
+    eval "$(mise activate zsh)"
+}
+
+zi auto has"mise" for jdx/mise
+
 # python: programming language
 # https://docs.python.org/3/
 export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
@@ -216,20 +227,6 @@ zi auto has"uv" for uv
 
 zi auto with"uv" for argcomplete
 
-# vscode: visual studio code editor
-# https://code.visualstudio.com
-:vscode-load() {
-    if ! has "${HOME}/Library/Application Support/Code/User"; then
-        return
-    fi
-
-    for i in settings keybindings mcp; do
-        link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
-    done
-}
-
-zi auto has"code" wait for vscode
-
 # 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-eval() {
@@ -280,13 +277,15 @@ zi auto has"duf" wait for duf
 # eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
 :eza-load() {
+    export EZA_ICONS_AUTO=1
     alias l="eza --all --long --group"
     alias lR="l -R"
 }
 
 zi auto has"eza" wait for eza
 
-# fzf
+# fzf: command-line fuzzy finder
+# https://github.com/junegunn/fzf
 # https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
 export FZF_DEFAULT_OPTS=" \
     --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
@@ -319,7 +318,8 @@ zi auto has"fzf" wait for fzf
 
 zi auto has"gcloud" wait1 for gcloud
 
-# ghostty
+# ghostty: fast, native, GPU-accelerated terminal emulator
+# https://ghostty.org
 add path "${GHOSTTY_BIN_DIR}"
 
 # git: distributed version control system
@@ -342,6 +342,11 @@ alias grh="git reset HEAD"
 alias gsp="git show -p"
 alias s="git st ."
 
+# glamour/glow: terminal markdown rendering
+# https://github.com/charmbracelet/glow
+export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
+export GLOW_STYLE="${GLAMOUR_STYLE}"
+
 # gnupg: GNU privacy guard
 # https://gnupg.org/
 export GPG_TTY="${TTY}"
@@ -349,10 +354,6 @@ export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
 mkdir -p "${GNUPGHOME}"
 chmod 0700 "${GNUPGHOME}"
 zi auto wait for OMZP::gpg-agent
-
-# glamour/glow
-export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
-export GLOW_STYLE="${GLAMOUR_STYLE}"
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
@@ -368,16 +369,20 @@ zi auto wait for OMZP::colored-man-pages
 # https://dev.yorhel.nl/ncdu
 link ncduignore .ncduignore
 
-# mise: dev tools, env vars, task runner
-# https://github.com/jdx/mise
-export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+# opentofu: open-source terraform fork, installed via mise
+# https://github.com/opentofu/opentofu
+export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
+mkdir -p "${TF_PLUGIN_CACHE_DIR}"
 
-:mise-load() {
-    local _mise_cmd_not_found
-    eval "$(mise activate zsh)"
+alias tf="tofu"
+alias tf-each=':each */terraform.mk(:h) do'
+alias tf-parallel=':parallel */terraform.mk(:h) do'
+
+:opentofu-load() {
+    complete -o nospace -C tofu tofu
 }
 
-zi auto has"mise" for jdx/mise
+zi auto with"mise" wait1 for opentofu
 
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
@@ -407,21 +412,6 @@ else
     zi auto silent for OMZP::ssh-agent
 fi
 
-# opentofu: open-source terraform fork, installed via mise
-# https://github.com/opentofu/opentofu
-export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
-mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-
-alias tf="tofu"
-alias tf-each=':each */terraform.mk(:h) do'
-alias tf-parallel=':parallel */terraform.mk(:h) do'
-
-:opentofu-load() {
-    complete -o nospace -C tofu tofu
-}
-
-zi auto with"mise" wait1 for opentofu
-
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
 :tmux-load() {
@@ -440,19 +430,33 @@ zi auto with"mise" wait1 for opentofu
 
 zi auto has"tmux" silent for OMZP::tmux
 
-# vi improved
-# https://github.com/vim/vim
+# vim: vi improved, via neovim
+# https://neovim.io
 zi auto has"nvim" for neovim
 alias vim=nvim
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export EDITOR="${commands[nvim]}"
+
+# vscode: visual studio code editor
+# https://code.visualstudio.com
+:vscode-load() {
+    if ! has "${HOME}/Library/Application Support/Code/User"; then
+        return
+    fi
+
+    for i in settings keybindings mcp; do
+        link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
+    done
+}
+
+zi auto has"code" wait for vscode
 
 # wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/
 export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
 alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
 
-# reminds you to use existing aliases for commands you just typed
+# zsh-you-should-use: reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
 if has tput; then
     zi auto wait for MichaelAquilina/zsh-you-should-use
