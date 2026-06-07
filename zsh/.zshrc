@@ -282,6 +282,10 @@ zi auto has"colima" wait1 for colima
 
 zi auto id-as"dircolors" wait1 for trapd00r/LS_COLORS
 
+# docker: container runtime CLI
+# https://github.com/docker/cli
+link docker .docker
+
 # duf: better `df` alternative
 # https://github.com/muesli/duf
 :duf-load() {
