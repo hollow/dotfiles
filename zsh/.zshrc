@@ -326,14 +326,16 @@ zi auto has"checkov" wait1 for checkov
 
 # claude: AI assistant by Anthropic
 # https://claude.ai
-export CLAUDE_CODE_NEW_INIT=1
-export ENABLE_CLAUDEAI_MCP_SERVERS=true
+:claude-init() {
+	export CLAUDE_CODE_NEW_INIT=1
+	export ENABLE_CLAUDEAI_MCP_SERVERS=true
 
-() {
 	local src="${HOME}/Library/Application Support/Claude/claude_desktop_config.json"
 	local dst="${HOME}/.claude/claude_desktop_config.json"
 	[[ -e ${src} && ${src} -nt ${dst} ]] && cp "${src}" "${dst}"
 }
+
+zi auto has"claude" wait1 for claude
 
 # colima: container runtimes on macOS with minimal setup
 # https://github.com/abiosoft/colima
@@ -407,7 +409,11 @@ zi auto has"direnv" for direnv/direnv
 
 # docker: container runtime CLI
 # https://github.com/docker/cli
-link docker .docker
+:docker-init() {
+	link docker .docker
+}
+
+zi auto has"docker" wait1 for docker
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
@@ -495,14 +501,22 @@ alias s="git st ."
 
 # glamour/glow: terminal markdown rendering
 # https://github.com/charmbracelet/glow
-export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
-export GLOW_STYLE="${GLAMOUR_STYLE}"
+:glow-init() {
+	export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
+	export GLOW_STYLE="${GLAMOUR_STYLE}"
+}
+
+zi auto has"glow" wait1 for glow
 
 # gnupg: GNU privacy guard
 # https://gnupg.org/
-export GPG_TTY="${TTY}"
-export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
-mkdirp "${GNUPGHOME}" 0700
+:gnupg-init() {
+	export GPG_TTY="${TTY}"
+	export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
+	mkdirp "${GNUPGHOME}" 0700
+}
+
+zi auto has"gpg" wait1 for gnupg
 
 # go: programming language
 # https://www.golang.org
@@ -524,7 +538,11 @@ zi auto wait1 for OMZP::colored-man-pages
 
 # ncdu: disk usage analyzer
 # https://dev.yorhel.nl/ncdu
-link ncduignore .ncduignore
+:ncdu-init() {
+	link ncduignore .ncduignore
+}
+
+zi auto has"ncdu" wait1 for ncdu
 
 # node/npm: JavaScript runtime
 # https://nodejs.org
@@ -560,8 +578,12 @@ zi auto has"tofu" wait1 for opentofu
 
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
-export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
-mkdirp ${PARALLEL_HOME}
+:parallel-init() {
+	export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
+	mkdirp ${PARALLEL_HOME}
+}
+
+zi auto has"parallel" wait1 for parallel
 
 # postgresql: object-relational database
 # https://www.postgresql.org
@@ -600,11 +622,19 @@ zi auto has"ruby" for ruby
 
 # sops: editor of encrypted files (age, gpg, cloud KMS)
 # https://github.com/getsops/sops
-export SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+:sops-init() {
+	export SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+}
+
+zi auto has"sops" wait1 for sops
 
 # sqlite: database engine
 # https://sqlite.org
-export SQLITE_HISTORY=${XDG_DATA_HOME}/sqlite/history
+:sqlite-init() {
+	export SQLITE_HISTORY="${XDG_DATA_HOME}/sqlite/history"
+}
+
+zi auto has"sqlite3" wait1 for sqlite
 
 # ssh: secure shell
 # https://www.openssh.com
