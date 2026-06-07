@@ -1,9 +1,11 @@
-#!zsh
+#!/usr/bin/env zsh
+emulate -L zsh
+[[ $TRACE -eq 1 ]] && set -x
 
 autoload -Uz uri-parse
 
-local repo_url="$1"
-local repo_path="$2"
+typeset repo_url="$1"
+typeset repo_path="$2"
 
 if [[ -z "${repo_url}" ]]; then
     print -P "usage: %N <url> [<path>]"
@@ -24,6 +26,8 @@ if [[ ! -e "${repo_path}" ]]; then
     git clone "${repo_url}" "${repo_path}" || return
 fi
 
+# only cd when invoked as a command/interactively, not when
+# sourced from another file (e.g. during shell startup)
 if ! (( zsh_eval_context[(I)file] )); then
-    cd "${repo_path}"
+    cd "${repo_path}" || return
 fi

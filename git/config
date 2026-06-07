@@ -3,12 +3,14 @@
 	amend = ci --amend --reuse-message=HEAD
 	b = !git --no-pager log --decorate --format="%D" -1
 	ci = commit
+	cleanup = !git up && git dmb -y
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	ls = ls-tree -r HEAD
 	st = status --short
 	stat = diff --stat
 	sw = switch
 	tags = tag -l
+	up = !git switch $(git main-branch) && git pull
 	w = !git --no-pager show -s --pretty='tformat:%h %ad %s' --date=short
 
 [advice]
@@ -64,7 +66,10 @@
 	renames = copies
 
 [fetch]
+	all = true
 	prune = true
+	pruneTags = true
+	recurseSubmodules = yes
 	writeCommitGraph = true
 
 [gpg "ssh"]
@@ -96,6 +101,9 @@
 [rerere]
 	autoUpdate = true
 	enabled = true
+
+[submodule]
+	recurse = true
 
 [tag]
 	gpgSign = true
