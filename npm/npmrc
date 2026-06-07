@@ -1,0 +1,5 @@
+; npm has no XDG support and is often spawned without our shell env (GUI apps,
+; pre-commit, npx-based MCP servers). ~/.npmrc is symlinked to this file so npm
+; always finds it, and ${HOME} (unlike ${XDG_*}) is set in every context.
+cache=${HOME}/.cache/npm
+logs-dir=${HOME}/.local/state/npm/logs

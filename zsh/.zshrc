@@ -257,8 +257,20 @@ export ENABLE_CLAUDEAI_MCP_SERVERS=true
 
 # colima: container runtimes on macOS with minimal setup
 # https://github.com/abiosoft/colima
-alias colima="env -u XDG_CONFIG_HOME colima"
 link colima .colima
+
+# unset XDG_CONFIG_HOME so the CLI uses ~/.colima like the brew launchd service
+# does (it has no XDG env), keeping both pointed at the same home; this also
+# silences colima's XDG warning.
+alias colima="env -u XDG_CONFIG_HOME colima"
+
+# colima has no option to relocate its heavy VM/instance state (_lima) and
+# profile store (_store), so keep them in data (not the repo'd config dir) via
+# symlinks resolved for both the CLI and the launchd service.
+mkdir -p "${XDG_DATA_HOME}/colima/_lima"
+ln -nfs "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
+mkdir -p "${XDG_DATA_HOME}/colima/_store"
+ln -nfs "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
 
 :colima-load() {
 	brew services start colima >/dev/null
@@ -281,6 +293,10 @@ zi auto has"colima" wait1 for colima
 }
 
 zi auto id-as"dircolors" wait1 for trapd00r/LS_COLORS
+
+# docker: container runtime CLI
+# https://github.com/docker/cli
+link docker .docker
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
@@ -314,6 +330,9 @@ zi auto has"fzf" wait1 for fzf
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
+mkdir -p "${XDG_DATA_HOME}/gcloud"
+ln -nfs "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
+
 :gcloud-update() {
 	gcloud components update --quiet || :
 }
@@ -386,6 +405,12 @@ zi auto wait1 for OMZP::colored-man-pages
 # ncdu: disk usage analyzer
 # https://dev.yorhel.nl/ncdu
 link ncduignore .ncduignore
+
+# node/npm: JavaScript runtime
+# https://nodejs.org
+export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
+mkdir -p "${XDG_DATA_HOME}/node"
+link npm/npmrc .npmrc
 
 # opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
