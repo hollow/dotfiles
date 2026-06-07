@@ -321,7 +321,7 @@ zi auto has"aws" wait1 for OMZP::aws
 
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
-:bat-load() {
+:bat-init() {
 	export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
 	export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 }
@@ -448,8 +448,11 @@ zi auto has"duf" wait1 for duf
 
 # eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
-:eza-load() {
+:eza-init() {
 	export EZA_ICONS_AUTO=1
+}
+
+:eza-load() {
 	alias l="eza --all --long --group"
 	alias lR="l -R"
 }
@@ -632,7 +635,7 @@ zi auto has"parallel" wait1 for parallel
 
 # postgresql: object-relational database
 # https://www.postgresql.org
-:postgresql-load() {
+:postgresql-init() {
 	local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(N,n,On[1]))
 	if [[ -n "${__postgresql_brew_dir}" ]]; then
 		add path "${__postgresql_brew_dir}/bin"
@@ -709,16 +712,19 @@ zi make as"program" for bahamas10/sshp
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
-:tmux-load() {
+:tmux-init() {
 	export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
 	export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
 	export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
 	export ZSH_TMUX_FIXTERM="false"
+}
+
+:tmux-load() {
 	alias T=tmux
 }
 
 :tmux-update() {
-	:tmux-load
+	:tmux-init
 	clone tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
 	${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
 }
@@ -744,7 +750,7 @@ zi auto has"nvim" for neovim
 
 # vscode: visual studio code editor
 # https://code.visualstudio.com
-:vscode-load() {
+:vscode-init() {
 	if ! has "${HOME}/Library/Application Support/Code/User"; then
 		return
 	fi
