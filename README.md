@@ -392,8 +392,7 @@ sensible defaults, and extensive shell integration for GitHub operations.
   - `gdm`: Diff against the main branch
   - `gf`: Fetch with automatic pruning of deleted remote branches
   - `gl`: Pretty-formatted log graph with colors
-  - `gp`: Pull changes
-  - `gpr`: Pull with rebase and auto-stash
+  - `gp`: Pull changes (rebases with auto-stash by default, via `pull.rebase`)
   - `grh`: Unstage all changes
   - `s`: Compact status (current directory only)
 
