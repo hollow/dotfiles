@@ -1,30 +1,37 @@
-# force locale to english
+# region init: shell environment, paths and base directories
+# force a UTF-8 english locale so tools emit and expect unicode correctly
 export LANG="en_US.UTF-8"
 export LC_CTYPE=${LANG}
 
-# enforce truecolor support
+# advertise 24-bit color so terminal apps enable truecolor output
 export COLORTERM="truecolor"
 
-# shell options
+# enable extended globbing (negation, glob flags) used by patterns below
 setopt extendedglob
 
-# set resource limits
+# raise the open-file limit for watchers, fzf and large completions
 ulimit -n $((1024 * 1024))
 
-# words are complete shell command arguments
+# make word-wise editing (^W, Alt-B/F) operate on whole shell words
 autoload -Uz select-word-style
 select-word-style shell
 
-# create a directory only when missing, so a warm shell forks no external mkdir
-# here (each fork is ~8ms on macOS; a cold shell still does the work once). the
-# optional second arg is the mode, applied atomically at creation for dirs that
-# must not be group/world-accessible
-mkdirp() { [[ -d $1 ]] || mkdir -p ${2:+-m$2} $1; }
-
-# system path
+# base system PATH as a deduped, exported array; later sections prepend to it
 typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
 
-# user paths
+# homebrew, inlined from `brew shellenv zsh` to avoid forking brew (~50ms) per shell
+if [[ -x /opt/homebrew/bin/brew ]]; then
+	export HOMEBREW_PREFIX="/opt/homebrew"
+	export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+	export HOMEBREW_REPOSITORY="/opt/homebrew"
+	path=("${HOMEBREW_PREFIX}/bin" "${HOMEBREW_PREFIX}/sbin" ${path[@]})
+fi
+
+# LDFLAGS/CPPFLAGS as tied arrays so tool sections can append -L/-I entries
+typeset -TUx LDFLAGS ldflags ":"
+typeset -TUx CPPFLAGS cppflags ":"
+
+# xdg base directories
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${HOME}/.cache"
@@ -32,26 +39,17 @@ export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 export XDG_RUNTIME_DIR="${HOME}/.local/run"
 
-mkdirp "${XDG_CONFIG_HOME}"
-mkdirp "${XDG_CACHE_HOME}"
-mkdirp "${XDG_DATA_HOME}"
-mkdirp "${XDG_STATE_HOME}"
-mkdirp "${XDG_RUNTIME_DIR}" 0700
-
-# shell paths
+# zsh directories (ZDOTDIR selects which startup files load)
 # https://zsh.sourceforge.io/Intro/intro_3.html
 ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
 
-mkdirp "${ZSH_DATA_DIR}"
-mkdirp "${ZSH_CACHE_DIR}"
-mkdirp "${ZSH_CACHE_DIR}/completions"
-
-# shell functions
+# fpath: where zsh finds autoloadable functions and completions
 typeset -TUx FPATH fpath=(
 	${ZDOTDIR}
 	${ZSH_CACHE_DIR}/completions
+	${HOMEBREW_PREFIX}/share/zsh/site-functions
 	${fpath[@]}
 )
 
@@ -59,25 +57,19 @@ typeset -TUx FPATH fpath=(
 # but `command foo` still resolves to system binaries first
 path+=("${ZDOTDIR}")
 
-# autoload all regular files in ZDOTDIR
+# autoload all regular files in ZDOTDIR (mkdirp, add, has, link, …)
 autoload -Uz ${ZDOTDIR}/*(.N:t)
 
-# add homebrew as early as possible. inlined from `brew shellenv zsh` to avoid
-# forking brew (a ~50ms bash script) on every startup
-if has /opt/homebrew/bin/brew; then
-	export HOMEBREW_PREFIX="/opt/homebrew"
-	export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
-	export HOMEBREW_REPOSITORY="/opt/homebrew"
-	add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
-	add path "${HOMEBREW_PREFIX}/bin" "${HOMEBREW_PREFIX}/sbin"
-fi
-
-# add local bin to path
-add path "${HOME}/.local/bin"
-
-# compiler flags
-typeset -TUx LDFLAGS ldflags ":"
-typeset -TUx CPPFLAGS cppflags ":"
+# create base directories now that mkdirp is autoloaded
+mkdirp "${XDG_CONFIG_HOME}"
+mkdirp "${XDG_CACHE_HOME}"
+mkdirp "${XDG_DATA_HOME}"
+mkdirp "${XDG_STATE_HOME}"
+mkdirp "${XDG_RUNTIME_DIR}" 0700
+mkdirp "${ZSH_DATA_DIR}"
+mkdirp "${ZSH_CACHE_DIR}"
+mkdirp "${ZSH_CACHE_DIR}/completions"
+# endregion
 
 # region zi: Flexible and fast ZSH plugin manager
 # https://github.com/z-shell/zi
@@ -966,6 +958,9 @@ zi auto wait for hlissner/zsh-autopair
 # https://github.com/romkatv/zsh-bench
 zi as"program" wait1 for romkatv/zsh-bench
 # endregion
+
+# add local bin last so user binaries take precedence over tool/brew paths
+add path "${HOME}/.local/bin"
 
 # Load .envrc after shell initialization if present
 if [[ -e .envrc ]]; then

@@ -1,0 +1,7 @@
+#!zsh
+
+# create a directory only when missing, so a warm shell forks no external mkdir
+# here (each fork is ~8ms on macOS; a cold shell still does the work once). the
+# optional second arg is the mode, applied atomically at creation for dirs that
+# must not be group/world-accessible
+[[ -d $1 ]] || mkdir -p ${2:+-m$2} $1
