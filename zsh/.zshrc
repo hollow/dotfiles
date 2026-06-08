@@ -62,9 +62,14 @@ path+=("${ZDOTDIR}")
 # autoload all regular files in ZDOTDIR
 autoload -Uz ${ZDOTDIR}/*(.N:t)
 
-# add homebrew path as early as possible
+# add homebrew as early as possible. inlined from `brew shellenv zsh` to avoid
+# forking brew (a ~50ms bash script) on every startup
 if has /opt/homebrew/bin/brew; then
-	eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+	export HOMEBREW_PREFIX="/opt/homebrew"
+	export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+	export HOMEBREW_REPOSITORY="/opt/homebrew"
+	add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+	add path "${HOMEBREW_PREFIX}/bin" "${HOMEBREW_PREFIX}/sbin"
 fi
 
 # add local bin to path
@@ -284,9 +289,9 @@ zi auto has"claude" wait1 for claude
 	# profile store (_store), so keep them in data (not the repo'd config dir) via
 	# symlinks resolved for both the CLI and the launchd service.
 	mkdirp "${XDG_DATA_HOME}/colima/_lima"
-	ln -nfs "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
 	mkdirp "${XDG_DATA_HOME}/colima/_store"
-	ln -nfs "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
+	link "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
+	link "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
 }
 
 :colima-load() {
@@ -295,7 +300,11 @@ zi auto has"claude" wait1 for claude
 	# silences colima's XDG warning.
 	alias colima="env -u XDG_CONFIG_HOME colima"
 
-	brew services start colima >/dev/null
+	# `brew services start` forks brew + launchctl and takes ~900ms; running it
+	# synchronously here froze the first prompt's input for ~1s while this plugin
+	# loaded in turbo. it's idempotent (the launchd service persists once started),
+	# so fire-and-forget in the background and let the shell stay responsive.
+	brew services start colima &>/dev/null &|
 }
 
 zi auto has"colima" wait1 for colima
@@ -363,7 +372,7 @@ zi auto has"fzf" wait1 for fzf
 # https://cloud.google.com/sdk
 :gcloud-init() {
 	mkdirp "${XDG_DATA_HOME}/gcloud"
-	ln -nfs "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
+	link "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
 }
 
 :gcloud-update() {
@@ -480,9 +489,6 @@ zi auto has"node" wait1 for node
 
 zi auto has"tofu" wait1 for opentofu
 
-alias tf-each=':each */terraform.mk(:h) do'
-alias tf-parallel=':parallel */terraform.mk(:h) do'
-
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
 :parallel-init() {
@@ -508,15 +514,22 @@ zi auto has"sops" wait1 for sops
 # https://www.openssh.com
 mkdirp "${XDG_CACHE_HOME}/ssh"
 mkdirp "${HOME}/.ssh" 0700
-
 link ssh/config .ssh/config
-chmod 0600 "${HOME}/.ssh/config"
+
+# ssh rejects a group/world-writable config; enforce 0600 without forking chmod
+# on every startup — only when the mode has actually drifted
+() {
+	local -a st
+	zmodload -F zsh/stat b:zstat
+	zstat -A st +mode -- "${HOME}/.ssh/config" 2>/dev/null &&
+		(((st[1] & 8#777) != 8#600)) && chmod 0600 "${HOME}/.ssh/config"
+}
 
 # https://1password.community/discussion/comment/660153/#Comment_660153
 if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
 	export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 else
-	zi auto silent for OMZP::ssh-agent
+	zi auto silent wait1 for OMZP::ssh-agent
 fi
 
 # tmux: a terminal multiplexer
@@ -563,13 +576,6 @@ zi auto has"nvim" for neovim
 	for i in settings keybindings mcp; do
 		link "vscode/${i}.json" "Library/Application Support/Code/User/${i}.json"
 	done
-
-	# manual shell integration for vscode's integrated terminal (command
-	# decorations, sticky scroll, command navigation). guarded to vscode only,
-	# and runs via turbo after the synchronous starship init below so it wraps
-	# the starship prompt rather than being clobbered by it.
-	# https://code.visualstudio.com/docs/terminal/shell-integration
-	[[ "${TERM_PROGRAM}" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 }
 
 zi auto has"code" wait1 for vscode
