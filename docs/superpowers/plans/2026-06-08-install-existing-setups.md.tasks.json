@@ -1,0 +1,26 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-08-install-existing-setups.md",
+  "tasks": [
+    {
+      "id": 7,
+      "subject": "Task 1: confirm/is_remerge_remote helpers + test harness",
+      "status": "completed",
+      "description": "**Goal:** Add the two leaf helper functions and the library source-guard to install.sh, and create a test harness that can source the script and unit-test is_remerge_remote.\n\n**Files:**\n- Modify: install.sh (insert confirm + is_remerge_remote + DOTFILES_INSTALL_LIB guard between err() and os=\"$(uname -s)\")\n- Create: tests/install_test.sh\n\n**Acceptance Criteria:**\n- is_remerge_remote accepts https, https-.git, git@-ssh, ssh:// forms; rejects forks/other repos.\n- confirm returns non-zero when /dev/tty unavailable.\n- DOTFILES_INSTALL_LIB=1 . ./install.sh defines functions without running the installer.\n- shellcheck install.sh tests/install_test.sh clean.\n- sh tests/install_test.sh exits 0, prints ALL PASS (6 passed).\n\n**Verify:** shellcheck install.sh tests/install_test.sh && sh tests/install_test.sh\n\n```json:metadata\n{\"files\": [\"install.sh\", \"tests/install_test.sh\"], \"verifyCommand\": \"shellcheck install.sh tests/install_test.sh && sh tests/install_test.sh\", \"acceptanceCriteria\": [\"is_remerge_remote accepts all 4 remerge URL forms and rejects forks\", \"confirm returns non-zero with no /dev/tty\", \"sourcing with DOTFILES_INSTALL_LIB=1 does not run the installer\", \"shellcheck clean\", \"sh tests/install_test.sh prints ALL PASS\"]}\n```"
+    },
+    {
+      "id": 8,
+      "subject": "Task 2: place_dotfiles/restore_dotfiles/ensure_main_branch + scenario tests",
+      "status": "completed",
+      "blockedBy": [7],
+      "description": "**Goal:** Add the placement decision flow and the shared git restore based restore step, and test every scenario.\n\n**Files:**\n- Modify: install.sh (insert ensure_main_branch, restore_dotfiles, place_dotfiles just before the DOTFILES_INSTALL_LIB guard)\n- Modify: tests/install_test.sh (append place_dotfiles scenario tests before the summary)\n\n**Acceptance Criteria:**\n- Empty/absent dir -> git clone, no prompt.\n- Non-empty dir without .git -> adopted; conflicting untracked overwritten, non-repo untracked preserved.\n- Foreign repo + confirm yes -> origin re-pointed and restored; non-repo untracked preserved.\n- Foreign repo + confirm no -> exits non-zero, origin unchanged.\n- Already-remerge + local tracked edit + confirm yes -> edit discarded.\n- Already-remerge clean -> short-circuit, exit 0.\n- shellcheck clean; sh tests/install_test.sh -> 12 passed, ALL PASS.\n\n**Verify:** shellcheck install.sh tests/install_test.sh && sh tests/install_test.sh\n\n```json:metadata\n{\"files\": [\"install.sh\", \"tests/install_test.sh\"], \"verifyCommand\": \"shellcheck install.sh tests/install_test.sh && sh tests/install_test.sh\", \"acceptanceCriteria\": [\"clone into empty dir, no prompt\", \"adopt non-git dir: conflict overwritten, extras preserved\", \"foreign repo confirmed: re-point + restore + keep extras\", \"foreign repo declined: aborts, origin untouched\", \"already-remerge dirty: edit discarded\", \"already-remerge clean: short-circuit\", \"shellcheck clean and 12 tests pass\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 3: wire place_dotfiles into the installer + verify",
+      "status": "completed",
+      "blockedBy": [8],
+      "description": "**Goal:** Replace the old inline step-2 block in install.sh's main flow with a single place_dotfiles call, and confirm the whole script parses, lints, and passes the test suite.\n\n**Files:**\n- Modify: install.sh (replace the step-2 if/elif/else block with place_dotfiles \"$CONFIG_DIR\" \"$REPO_URL\")\n\n**Acceptance Criteria:**\n- Old step-2 block replaced by place_dotfiles \"$CONFIG_DIR\" \"$REPO_URL\".\n- sh -n install.sh parses; shellcheck install.sh clean.\n- sh tests/install_test.sh still prints ALL PASS (12 passed).\n- Steps 3 (symlink), git-identity seeding, 4 (zsh handoff) unchanged.\n- No checkout -B or pull --ff-only remain.\n\n**Verify:** sh -n install.sh && shellcheck install.sh tests/install_test.sh && sh tests/install_test.sh\n\n```json:metadata\n{\"files\": [\"install.sh\"], \"verifyCommand\": \"sh -n install.sh && shellcheck install.sh tests/install_test.sh && sh tests/install_test.sh\", \"acceptanceCriteria\": [\"step-2 block replaced by place_dotfiles call\", \"sh -n parses and shellcheck clean\", \"12 tests pass\", \"no checkout -B or pull --ff-only remain\", \"steps 3/identity/4 unchanged\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-08T00:03:00Z"
+}
