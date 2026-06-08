@@ -648,11 +648,10 @@ zi auto has"parallel" wait1 for parallel
 # postgresql: object-relational database
 # https://www.postgresql.org
 :postgresql-init() {
-	local __postgresql_brew_dir=("${HOMEBREW_PREFIX}"/opt/postgresql@*(N,n,On[1]))
-	if [[ -n "${__postgresql_brew_dir}" ]]; then
-		add path "${__postgresql_brew_dir}/bin"
-		add ldflags "-L${__postgresql_brew_dir}/lib"
-		add cppflags "-I${__postgresql_brew_dir}/include"
+	if has brew; then
+		add path "${HOMEBREW_PREFIX}/opt/postgres/bin"
+		add ldflags "-L${HOMEBREW_PREFIX}/opt/postgres/lib"
+		add cppflags "-I${HOMEBREW_PREFIX}/opt/postgres/include"
 	fi
 }
 
