@@ -444,8 +444,8 @@ zi auto has"eza" wait1 for eza
 
 # fzf: command-line fuzzy finder
 # https://github.com/junegunn/fzf
-# https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
 :fzf-init() {
+	# https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
 	export FZF_DEFAULT_OPTS=" \
 	    --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
 	    --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
@@ -489,29 +489,29 @@ add path "${GHOSTTY_BIN_DIR}"
 
 # git: distributed version control system
 # https://github.com/git/git
+:git-load() {
+	alias ga="git add --all"
+	alias gap="git add --patch"
+	alias gba="git branch -a"
+	alias gcl="git cleanup"
+	alias gd="git diff"
+	alias gdc="git diff --cached"
+	alias gdm="git diff origin/\$(git main-branch)"
+	alias gf="git fetch"
+	alias gl="git lg"
+	alias gp="git pull"
+	alias grh="git reset HEAD"
+	alias gsm="git switch \$(git main-branch)"
+	alias gsp="git show -p"
+	alias gss="git stash show -p"
+	alias gup="git up"
+	alias s="git st ."
+}
+
 zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
 	https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
 
-# git is always present, so its aliases stay inline (synchronous) rather than in
-# a deferred :git-load hook — lazy-loading a guaranteed-present tool buys nothing
-alias ga="git add --all"
-alias gap="git add --patch"
-alias gba="git branch -a"
-alias gcl="git cleanup"
-alias gd="git diff"
-alias gdc="git diff --cached"
-alias gdm="git diff origin/\$(git main-branch)"
-alias gf="git fetch"
-alias gl="git lg"
-alias gp="git pull"
-alias grh="git reset HEAD"
-alias gsm="git switch \$(git main-branch)"
-alias gsp="git show -p"
-alias gss="git stash show -p"
-alias gup="git up"
-alias s="git st ."
-
-# glamour/glow: terminal markdown rendering
+# glow: terminal markdown rendering
 # https://github.com/charmbracelet/glow
 :glow-init() {
 	export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
