@@ -4,22 +4,23 @@
     {
       "id": 7,
       "subject": "Task 1: Build the top language group in .zshrc (add go + ruby, relocate node)",
-      "status": "pending",
+      "status": "completed",
       "description": "**Goal:** Make the fork's top language section read `python -> uv -> argcomplete -> go -> node -> ruby -> 1password`, byte-identical to upstream `93b9788`: insert the go/node/ruby blocks after the argcomplete block, and remove the now-duplicate node block from its old alphabetical slot (between ncdu and opentofu).\n\n**Files:**\n- Modify: `zsh/.zshrc`\n\n**Acceptance Criteria:**\n- [ ] go/node/ruby in order between `zi auto with\"uv\" for argcomplete` and `# 1password`, byte-identical to 93b9788\n- [ ] ruby uses `if has brew; then add path \"${HOMEBREW_PREFIX}/opt/ruby/bin\"; fi` (no opt/ruby@* glob, no RUBYHOME)\n- [ ] old node block removed (ncdu immediately followed by opentofu)\n- [ ] :node-init appears exactly once\n- [ ] zsh -n zsh/.zshrc passes\n\n**Verify:** diff the argcomplete->1password span against `git show 93b9788:zsh/.zshrc`, grep -c ':node-init' == 1, old slot clear, zsh -n passes -> OK\n\n**Steps:** 1) insert go/node/ruby group after argcomplete; 2) remove old node block (ncdu/opentofu anchors); 3) run Verify; 4) commit `feat(zsh): group go, node, ruby into top language section (IT-8323)`.\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"diff <(git show 93b9788:zsh/.zshrc | sed -n '/^zi auto with\\\"uv\\\" for argcomplete$/,/^zi auto has\\\"op\\\" wait1 for 1password-cli$/p') <(sed -n '/^zi auto with\\\"uv\\\" for argcomplete$/,/^zi auto has\\\"op\\\" wait1 for 1password-cli$/p' zsh/.zshrc) && [ \\\"$(grep -c ':node-init' zsh/.zshrc)\\\" = 1 ] && zsh -n zsh/.zshrc && echo OK\", \"acceptanceCriteria\": [\"go/node/ruby in order between argcomplete and 1password, byte-identical to 93b9788\", \"ruby uses has-brew opt/ruby/bin detection, no RUBYHOME/opt-ruby@* glob\", \"old node block removed (ncdu -> opentofu)\", \":node-init appears exactly once\", \"zsh -n passes\"]}\n```"
     },
     {
       "id": 8,
       "subject": "Task 2: Add brew \"go\" and brew \"node\" to the Brewfile",
-      "status": "pending",
+      "status": "completed",
       "description": "**Goal:** Add the two new brews this ring installs, each byte-identical to upstream's line, in the fork's own alphabetical order. No `brew \"ruby\"` (ruby stays opportunistic, matching upstream).\n\n**Files:**\n- Modify: `Brewfile`\n\n**Acceptance Criteria:**\n- [ ] brew \"go\" between brew \"gnupg\" and brew \"graphviz\"\n- [ ] brew \"node\" between brew \"nmap\" and brew \"ocrmypdf\"\n- [ ] both lines byte-identical to upstream (absent from fork-only diff)\n- [ ] no brew \"ruby\" line\n- [ ] brew bundle list --file=./Brewfile --all parses\n\n**Verify:** grep -nE '\\\"(go|node|ruby)\\\"' Brewfile shows go+node only; comm -13 of upstream vs fork has no go/node; brew bundle list --all parses.\n\n**Steps:** 1) insert brew \"go\" (gnupg->graphviz); 2) insert brew \"node\" (nmap->ocrmypdf); 3) run Verify; 4) commit `build(brewfile): add go and node (IT-8323)`.\n\n```json:metadata\n{\"files\": [\"Brewfile\"], \"verifyCommand\": \"grep -nE '\\\"(go|node|ruby)\\\"' Brewfile; comm -13 <(git show 93b9788:Brewfile | sort) <(sort Brewfile) | grep -E '\\\"(go|node)\\\"' && echo FAIL || echo OK; brew bundle list --file=./Brewfile --all >/dev/null && echo PARSES\", \"acceptanceCriteria\": [\"brew go between gnupg and graphviz\", \"brew node between nmap and ocrmypdf\", \"both byte-identical to upstream\", \"no brew ruby\", \"brew bundle list --all parses\"]}\n```"
     },
     {
       "id": 9,
       "subject": "Task 3: Install go + node and run end-to-end byte-identity + smoke check",
-      "status": "pending",
+      "status": "completed",
       "blockedBy": [7, 8],
+      "status_note": "go (go1.26.4) and node (v26.0.0) already installed; full brew bundle install skipped as redundant. Byte-identity + zsh -n + interactive smoke verified.",
       "description": "**Goal:** Install go and node and confirm the ported slice is correct — top language group byte-identical to upstream 93b9788, file parses, both binaries on PATH, best-effort interactive behavior.\n\n**Files:** _(none — verification only)_\n\n**Acceptance Criteria:**\n- [ ] brew bundle install installs go + node without error\n- [ ] argcomplete->1password span diffs clean against 93b9788 and zsh -n passes\n- [ ] command -v go and command -v node both resolve\n- [ ] best-effort interactive check recorded (live-config caveat)\n\n**Verify:** diff span vs 93b9788 && zsh -n && command -v go && command -v node -> OK\n\n**Steps:** 1) brew bundle install; 2) re-run byte-identity diff + zsh -n; 3) go version / node --version + record interactive smoke (live ~/.config tracks hollow@main = 93b9788); 4) no commit.\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"diff <(git show 93b9788:zsh/.zshrc | sed -n '/^zi auto with\\\"uv\\\" for argcomplete$/,/^zi auto has\\\"op\\\" wait1 for 1password-cli$/p') <(sed -n '/^zi auto with\\\"uv\\\" for argcomplete$/,/^zi auto has\\\"op\\\" wait1 for 1password-cli$/p' zsh/.zshrc) && zsh -n zsh/.zshrc && command -v go >/dev/null && command -v node >/dev/null && echo OK\", \"acceptanceCriteria\": [\"brew bundle install installs go + node\", \"byte-identity diff clean + zsh -n passes\", \"go and node on PATH\", \"best-effort interactive smoke recorded\"]}\n```"
     }
   ],
-  "lastUpdated": "2026-06-08"
+  "lastUpdated": "2026-06-08T00:00:00Z"
 }
