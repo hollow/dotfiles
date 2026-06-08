@@ -848,7 +848,7 @@ if has starship; then
 fi
 # endregion
 
-# region zsh-completions: extra completion functions. Loads before compinit so they
+# region zsh/completion: extra completion functions. Loads before compinit so they
 # land in fpath, then its atload runs compinit once — replaying the compdefs
 # queued by every completion plugin above — before fzf-tab and the widget
 # wrappers below.
@@ -857,7 +857,7 @@ zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
 	atload"zicompinit; zicdreplay" wait for zsh-users/zsh-completions
 # endregion
 
-# region fzf-tab: replace the completion menu with fzf. Must load after compinit (above)
+# region zsh/completion: replace the completion menu with fzf-tab. Must load after compinit (above)
 # and before the widget-wrapping plugins (autosuggestions, F-Sy-H) below.
 # https://github.com/Aloxaf/fzf-tab
 zi auto has"fzf" wait for Aloxaf/fzf-tab
@@ -888,7 +888,7 @@ zstyle ':completion:*' menu no
 zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
 # endregion
 
-# region completer chain: exact, then spelling correction, then fuzzy/approximate with an
+# region zsh/completion: completer chain — exact, then spelling correction, then fuzzy/approximate with an
 # error budget that scales with word length. fzf filters the candidate list itself,
 # but _correct/_approximate also repair typos in the typed prefix, which fzf can't.
 # https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Control-Functions
@@ -916,14 +916,14 @@ zstyle '*' single-ignored show
 zstyle ':completion:*:functions' ignored-patterns '_*'
 # endregion
 
-# region git: never offer ORIG_HEAD as a ref, and keep switch/checkout's native branch order
+# region zsh/completion: git — never offer ORIG_HEAD as a ref, and keep switch/checkout's native branch order
 # https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete#comment99936479_14325591
 zstyle ':completion:*:*:git*:*' ignored-patterns '*ORIG_HEAD'
 zstyle ':completion:*:git-checkout:*' sort false
 zstyle ':completion:*:git-switch:*' sort false
 # endregion
 
-# region make: invoke the makefile so macro-defined targets are completed too
+# region zsh/completion: make — invoke the makefile so macro-defined targets are completed too
 # https://unix.stackexchange.com/questions/657256/autocompletion-of-makefile-with-makro-in-zsh-not-correct-works-in-bash
 zstyle ':completion::complete:make:*:targets' call-command true
 
