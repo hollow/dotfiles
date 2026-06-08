@@ -387,6 +387,14 @@ zi auto has"atuin" wait1 for atuin
 zi auto has"aws" wait1 for OMZP::aws
 # endregion
 
+# region aws/boto: AWS SDK for Python
+# https://github.com/boto/boto3
+export BOTO_CONFIG="${XDG_DATA_HOME}/boto"
+print -r -- "[GSUtil]
+state_dir = ${XDG_DATA_HOME}/gsutil
+parallel_composite_upload_threshold = 150M" >"${BOTO_CONFIG}"
+# endregion
+
 # region bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 :bat-init() {
@@ -395,14 +403,6 @@ zi auto has"aws" wait1 for OMZP::aws
 }
 
 zi auto has"bat" wait1 for bat
-# endregion
-
-# region boto: AWS SDK for Python
-# https://github.com/boto/boto3
-export BOTO_CONFIG="${XDG_DATA_HOME}/boto"
-print -r -- "[GSUtil]
-state_dir = ${XDG_DATA_HOME}/gsutil
-parallel_composite_upload_threshold = 150M" >"${BOTO_CONFIG}"
 # endregion
 
 # region checkov: static code analysis tool for Terraform & Co
