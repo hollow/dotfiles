@@ -509,8 +509,8 @@ add path "${GHOSTTY_BIN_DIR}"
 zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
 	https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
 
-# aliases stay inline (not in a :git-init/:git-load hook): an as"completion"
-# plugin does not fire the z-a-auto atinit/atload hooks, and git is always present
+# git is always present, so its aliases stay inline (synchronous) rather than in
+# a deferred :git-load hook — lazy-loading a guaranteed-present tool buys nothing
 alias git-each=':each */.git(:h) do'
 alias git-parallel=':parallel */.git(:h) do'
 
