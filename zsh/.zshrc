@@ -253,6 +253,42 @@ zi auto has"uv" for uv
 
 zi auto with"uv" for argcomplete
 
+# go: programming language
+# https://www.golang.org
+:go-init() {
+	export GOPATH="${XDG_CACHE_HOME}/go"
+	add path "${GOPATH}/bin"
+}
+
+zi auto has"go" for go
+
+# node/npm: JavaScript runtime
+# https://nodejs.org
+:node-init() {
+	export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
+	mkdirp "${XDG_DATA_HOME}/node"
+	link npm/npmrc .npmrc
+}
+
+zi auto has"node" wait1 for node
+
+# ruby: programming language
+# https://www.ruby-lang.org
+:ruby-init() {
+	export GEM_HOME="${XDG_CACHE_HOME}"/gem
+	export GEM_SPEC_CACHE="${XDG_CACHE_HOME}"/gem
+	export BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME}"/bundle
+	export BUNDLE_USER_CACHE="${XDG_CACHE_HOME}"/bundle
+	export BUNDLE_USER_PLUGIN="${XDG_DATA_HOME}"/bundle
+
+	# expose brew's ruby on PATH (macOS/brew only)
+	if has brew; then
+		add path "${HOMEBREW_PREFIX}/opt/ruby/bin"
+	fi
+}
+
+zi auto has"ruby" for ruby
+
 # 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-eval() {
@@ -463,16 +499,6 @@ zi auto wait1 for OMZP::colored-man-pages
 }
 
 zi auto has"ncdu" wait1 for ncdu
-
-# node/npm: JavaScript runtime
-# https://nodejs.org
-:node-init() {
-	export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
-	mkdirp "${XDG_DATA_HOME}/node"
-	link npm/npmrc .npmrc
-}
-
-zi auto has"node" wait1 for node
 
 # opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
