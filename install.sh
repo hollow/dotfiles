@@ -45,7 +45,6 @@ is_remerge_remote() {
     esac
 }
 
-
 # Point local main at origin/main and track it, without touching the working
 # tree. Plumbing only — deliberately avoids `git checkout`/`git switch`.
 # Precondition: the caller must have fetched origin/main first.
