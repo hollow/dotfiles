@@ -145,7 +145,9 @@ link "${HISTFILE}" .zsh_history
 	add path "${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin"
 	add path "${HOMEBREW_PREFIX}/opt/make/libexec/gnubin"
 	add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
+}
 
+:brew-load() {
 	alias bbd="brew bundle dump -f"
 	alias bz="brew uninstall --zap"
 }
@@ -171,7 +173,9 @@ zi auto has"dscl" for brew
 
 # mise: dev tools, env vars, task runner
 # https://github.com/jdx/mise
-export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+:mise-init() {
+	export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+}
 
 :mise-load() {
 	local _mise_cmd_not_found
@@ -182,22 +186,28 @@ zi auto has"mise" for mise
 
 # python: programming language
 # https://docs.python.org/3/
-export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
-export PIP_REQUIRE_VIRTUALENV="1"
-export PIP_USER="0"
-export PYTHONNOUSERSITE="1"
+:python-init() {
+	export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
+	export PIP_REQUIRE_VIRTUALENV="1"
+	export PIP_USER="0"
+	export PYTHONNOUSERSITE="1"
 
-# expose brew's unversioned python/pip shims on PATH (macOS/brew only)
-if has brew; then
-	add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
-fi
+	# expose brew's unversioned python/pip shims on PATH (macOS/brew only)
+	if has brew; then
+		add path "${HOMEBREW_PREFIX}/opt/python/libexec/bin"
+	fi
+}
+
+zi auto has"python3" for python
 
 # python/uv: an extremely fast Python package manager
 # https://github.com/astral-sh/uv
-export UV_TOOL_DIR="${XDG_CACHE_HOME}/uv/tools"
-export UV_TOOL_BIN_DIR="${XDG_CACHE_HOME}/uv/bin"
+:uv-init() {
+	export UV_TOOL_DIR="${XDG_CACHE_HOME}/uv/tools"
+	export UV_TOOL_BIN_DIR="${XDG_CACHE_HOME}/uv/bin"
 
-add path "${UV_TOOL_BIN_DIR}"
+	add path "${UV_TOOL_BIN_DIR}"
+}
 
 :uv-update() {
 	uv tool upgrade --all
@@ -243,7 +253,7 @@ zi auto has"op" wait1 for 1password-cli
 
 # bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
-:bat-load() {
+:bat-init() {
 	export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
 	export MANPAGER="sh -c 'col -bx | bat -l man'" MANROFFOPT="-c"
 }
@@ -252,27 +262,33 @@ zi auto has"bat" wait1 for bat
 
 # claude: AI assistant by Anthropic
 # https://claude.ai
-export CLAUDE_CODE_NEW_INIT=1
-export ENABLE_CLAUDEAI_MCP_SERVERS=true
+:claude-init() {
+	export CLAUDE_CODE_NEW_INIT=1
+	export ENABLE_CLAUDEAI_MCP_SERVERS=true
+}
+
+zi auto has"claude" wait1 for claude
 
 # colima: container runtimes on macOS with minimal setup
 # https://github.com/abiosoft/colima
-link colima .colima
+:colima-init() {
+	link colima .colima
 
-# unset XDG_CONFIG_HOME so the CLI uses ~/.colima like the brew launchd service
-# does (it has no XDG env), keeping both pointed at the same home; this also
-# silences colima's XDG warning.
-alias colima="env -u XDG_CONFIG_HOME colima"
-
-# colima has no option to relocate its heavy VM/instance state (_lima) and
-# profile store (_store), so keep them in data (not the repo'd config dir) via
-# symlinks resolved for both the CLI and the launchd service.
-mkdir -p "${XDG_DATA_HOME}/colima/_lima"
-ln -nfs "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
-mkdir -p "${XDG_DATA_HOME}/colima/_store"
-ln -nfs "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
+	# colima has no option to relocate its heavy VM/instance state (_lima) and
+	# profile store (_store), so keep them in data (not the repo'd config dir) via
+	# symlinks resolved for both the CLI and the launchd service.
+	mkdir -p "${XDG_DATA_HOME}/colima/_lima"
+	ln -nfs "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
+	mkdir -p "${XDG_DATA_HOME}/colima/_store"
+	ln -nfs "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
+}
 
 :colima-load() {
+	# unset XDG_CONFIG_HOME so the CLI uses ~/.colima like the brew launchd service
+	# does (it has no XDG env), keeping both pointed at the same home; this also
+	# silences colima's XDG warning.
+	alias colima="env -u XDG_CONFIG_HOME colima"
+
 	brew services start colima >/dev/null
 }
 
@@ -296,7 +312,11 @@ zi auto id-as"dircolors" wait1 for trapd00r/LS_COLORS
 
 # docker: container runtime CLI
 # https://github.com/docker/cli
-link docker .docker
+:docker-init() {
+	link docker .docker
+}
+
+zi auto has"docker" wait1 for docker
 
 # duf: better `df` alternative
 # https://github.com/muesli/duf
@@ -308,8 +328,11 @@ zi auto has"duf" wait1 for duf
 
 # eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
-:eza-load() {
+:eza-init() {
 	export EZA_ICONS_AUTO=1
+}
+
+:eza-load() {
 	alias l="eza --all --long --group"
 	alias lR="l -R"
 }
@@ -318,20 +341,24 @@ zi auto has"eza" wait1 for eza
 
 # fzf: command-line fuzzy finder
 # https://github.com/junegunn/fzf
-# https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
-export FZF_DEFAULT_OPTS=" \
-    --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
-    --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
-    --color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8 \
-    --color=selected-bg:#45475A \
-    --color=border:#6C7086,label:#CDD6F4"
+:fzf-init() {
+	# https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
+	export FZF_DEFAULT_OPTS=" \
+	    --color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8 \
+	    --color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC \
+	    --color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8 \
+	    --color=selected-bg:#45475A \
+	    --color=border:#6C7086,label:#CDD6F4"
+}
 
 zi auto has"fzf" wait1 for fzf
 
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
-mkdir -p "${XDG_DATA_HOME}/gcloud"
-ln -nfs "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
+:gcloud-init() {
+	mkdir -p "${XDG_DATA_HOME}/gcloud"
+	ln -nfs "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
+}
 
 :gcloud-update() {
 	gcloud components update --quiet || :
@@ -359,44 +386,58 @@ add path "${GHOSTTY_BIN_DIR}"
 
 # git: distributed version control system
 # https://github.com/git/git
+:git-load() {
+	alias ga="git add --all"
+	alias gap="git add --patch"
+	alias gba="git branch -a"
+	alias gcl="git cleanup"
+	alias gd="git diff"
+	alias gdc="git diff --cached"
+	alias gdm="git diff origin/\$(git main-branch)"
+	alias gf="git fetch"
+	alias gl="git lg"
+	alias gp="git pull"
+	alias grh="git reset HEAD"
+	alias gsm="git switch \$(git main-branch)"
+	alias gsp="git show -p"
+	alias gss="git stash show -p"
+	alias gup="git up"
+	alias s="git st ."
+}
+
 zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
 	https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
 
-alias ga="git add --all"
-alias gap="git add --patch"
-alias gba="git branch -a"
-alias gcl="git cleanup"
-alias gd="git diff"
-alias gdc="git diff --cached"
-alias gdm="git diff origin/\$(git main-branch)"
-alias gf="git fetch"
-alias gl="git lg"
-alias gp="git pull"
-alias grh="git reset HEAD"
-alias gsm="git switch \$(git main-branch)"
-alias gsp="git show -p"
-alias gss="git stash show -p"
-alias gup="git up"
-alias s="git st ."
-
-# glamour/glow: terminal markdown rendering
+# glow: terminal markdown rendering
 # https://github.com/charmbracelet/glow
-export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
-export GLOW_STYLE="${GLAMOUR_STYLE}"
+:glow-init() {
+	export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
+	export GLOW_STYLE="${GLAMOUR_STYLE}"
+}
+
+zi auto has"glow" wait1 for glow
 
 # gnupg: GNU privacy guard
 # https://gnupg.org/
-export GPG_TTY="${TTY}"
-export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
-mkdir -p "${GNUPGHOME}"
-chmod 0700 "${GNUPGHOME}"
+:gnupg-init() {
+	export GPG_TTY="${TTY}"
+	export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
+	mkdir -p "${GNUPGHOME}"
+	chmod 0700 "${GNUPGHOME}"
+}
+
+zi auto has"gpg" wait1 for gnupg
 zi auto wait1 for OMZP::gpg-agent
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
-export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
-export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
-mkdir -p "$(dirname "${LESSHISTFILE}")"
+:less-init() {
+	export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
+	export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
+	mkdir -p "$(dirname "${LESSHISTFILE}")"
+}
+
+zi auto has"less" for less
 
 # man: unix documentation system
 # https://www.nongnu.org/man-db/
@@ -404,33 +445,48 @@ zi auto wait1 for OMZP::colored-man-pages
 
 # ncdu: disk usage analyzer
 # https://dev.yorhel.nl/ncdu
-link ncduignore .ncduignore
+:ncdu-init() {
+	link ncduignore .ncduignore
+}
+
+zi auto has"ncdu" wait1 for ncdu
 
 # node/npm: JavaScript runtime
 # https://nodejs.org
-export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
-mkdir -p "${XDG_DATA_HOME}/node"
-link npm/npmrc .npmrc
+:node-init() {
+	export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
+	mkdir -p "${XDG_DATA_HOME}/node"
+	link npm/npmrc .npmrc
+}
+
+zi auto has"node" wait1 for node
 
 # opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
-export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
-mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-
-alias tf="tofu"
-alias tf-each=':each */terraform.mk(:h) do'
-alias tf-parallel=':parallel */terraform.mk(:h) do'
+:opentofu-init() {
+	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
+	mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+}
 
 :opentofu-load() {
+	alias tf="tofu"
+
 	complete -o nospace -C tofu tofu
 }
 
 zi auto has"tofu" wait1 for opentofu
 
+alias tf-each=':each */terraform.mk(:h) do'
+alias tf-parallel=':parallel */terraform.mk(:h) do'
+
 # parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
-export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
-mkdir -p ${PARALLEL_HOME}
+:parallel-init() {
+	export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
+	mkdir -p ${PARALLEL_HOME}
+}
+
+zi auto has"parallel" wait1 for parallel
 
 # rsync: fast incremental file transfer
 # https://rsync.samba.org
@@ -438,7 +494,11 @@ zi auto wait1 for OMZP::rsync
 
 # sops: editor of encrypted files (age, gpg, cloud KMS)
 # https://github.com/getsops/sops
-export SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+:sops-init() {
+	export SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+}
+
+zi auto has"sops" wait1 for sops
 
 # ssh: secure shell
 # https://www.openssh.com
@@ -457,16 +517,19 @@ fi
 
 # tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
-:tmux-load() {
+:tmux-init() {
 	export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
 	export ZSH_TMUX_CONFIG="${XDG_CONFIG_HOME}/tmux/tmux.conf"
 	export ZSH_TMUX_DEFAULT_SESSION_NAME="default"
 	export ZSH_TMUX_FIXTERM="false"
+}
+
+:tmux-load() {
 	alias T=tmux
 }
 
 :tmux-update() {
-	:tmux-load
+	:tmux-init
 	clone tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
 	${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
 }
@@ -475,14 +538,20 @@ zi auto has"tmux" silent for OMZP::tmux
 
 # vim: vi improved, via neovim
 # https://neovim.io
+:neovim-init() {
+	export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
+	export EDITOR="${commands[nvim]}"
+}
+
+:neovim-load() {
+	alias vim=nvim
+}
+
 zi auto has"nvim" for neovim
-alias vim=nvim
-export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
-export EDITOR="${commands[nvim]}"
 
 # vscode: visual studio code editor
 # https://code.visualstudio.com
-:vscode-load() {
+:vscode-init() {
 	if ! has "${HOME}/Library/Application Support/Code/User"; then
 		return
 	fi
@@ -503,8 +572,15 @@ zi auto has"code" wait1 for vscode
 
 # wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/
-export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
-alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
+:wget-init() {
+	export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
+}
+
+:wget-load() {
+	alias wget="wget --hsts-file=\"${XDG_CACHE_HOME}/wget-hsts\""
+}
+
+zi auto has"wget" wait1 for wget
 
 # zsh-you-should-use: reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
