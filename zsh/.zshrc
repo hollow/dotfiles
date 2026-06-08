@@ -1,30 +1,37 @@
-# force locale to english
+# region init: shell environment, paths and base directories
+# force a UTF-8 english locale so tools emit and expect unicode correctly
 export LANG="en_US.UTF-8"
 export LC_CTYPE=${LANG}
 
-# enforce truecolor support
+# advertise 24-bit color so terminal apps enable truecolor output
 export COLORTERM="truecolor"
 
-# shell options
+# enable extended globbing (negation, glob flags) used by patterns below
 setopt extendedglob
 
-# set resource limits
+# raise the open-file limit for watchers, fzf and large completions
 ulimit -n $((1024 * 1024))
 
-# words are complete shell command arguments
+# make word-wise editing (^W, Alt-B/F) operate on whole shell words
 autoload -Uz select-word-style
 select-word-style shell
 
-# create a directory only when missing, so a warm shell forks no external mkdir
-# here (each fork is ~8ms on macOS; a cold shell still does the work once). the
-# optional second arg is the mode, applied atomically at creation for dirs that
-# must not be group/world-accessible
-mkdirp() { [[ -d $1 ]] || mkdir -p ${2:+-m$2} $1; }
-
-# system path
+# base system PATH as a deduped, exported array; later sections prepend to it
 typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
 
-# user paths
+# homebrew, inlined from `brew shellenv zsh` to avoid forking brew (~50ms) per shell
+if [[ -x /opt/homebrew/bin/brew ]]; then
+	export HOMEBREW_PREFIX="/opt/homebrew"
+	export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+	export HOMEBREW_REPOSITORY="/opt/homebrew"
+	path=("${HOMEBREW_PREFIX}/bin" "${HOMEBREW_PREFIX}/sbin" ${path[@]})
+fi
+
+# LDFLAGS/CPPFLAGS as tied arrays so tool sections can append -L/-I entries
+typeset -TUx LDFLAGS ldflags ":"
+typeset -TUx CPPFLAGS cppflags ":"
+
+# xdg base directories
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${HOME}/.cache"
@@ -32,26 +39,17 @@ export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 export XDG_RUNTIME_DIR="${HOME}/.local/run"
 
-mkdirp "${XDG_CONFIG_HOME}"
-mkdirp "${XDG_CACHE_HOME}"
-mkdirp "${XDG_DATA_HOME}"
-mkdirp "${XDG_STATE_HOME}"
-mkdirp "${XDG_RUNTIME_DIR}" 0700
-
-# shell paths
+# zsh directories (ZDOTDIR selects which startup files load)
 # https://zsh.sourceforge.io/Intro/intro_3.html
 ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
 
-mkdirp "${ZSH_DATA_DIR}"
-mkdirp "${ZSH_CACHE_DIR}"
-mkdirp "${ZSH_CACHE_DIR}/completions"
-
-# shell functions
+# fpath: where zsh finds autoloadable functions and completions
 typeset -TUx FPATH fpath=(
 	${ZDOTDIR}
 	${ZSH_CACHE_DIR}/completions
+	${HOMEBREW_PREFIX}/share/zsh/site-functions
 	${fpath[@]}
 )
 
@@ -59,27 +57,21 @@ typeset -TUx FPATH fpath=(
 # but `command foo` still resolves to system binaries first
 path+=("${ZDOTDIR}")
 
-# autoload all regular files in ZDOTDIR
+# autoload all regular files in ZDOTDIR (mkdirp, add, has, link, …)
 autoload -Uz ${ZDOTDIR}/*(.N:t)
 
-# add homebrew as early as possible. inlined from `brew shellenv zsh` to avoid
-# forking brew (a ~50ms bash script) on every startup
-if has /opt/homebrew/bin/brew; then
-	export HOMEBREW_PREFIX="/opt/homebrew"
-	export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
-	export HOMEBREW_REPOSITORY="/opt/homebrew"
-	add fpath "${HOMEBREW_PREFIX}/share/zsh/site-functions"
-	add path "${HOMEBREW_PREFIX}/bin" "${HOMEBREW_PREFIX}/sbin"
-fi
+# create base directories now that mkdirp is autoloaded
+mkdirp "${XDG_CONFIG_HOME}"
+mkdirp "${XDG_CACHE_HOME}"
+mkdirp "${XDG_DATA_HOME}"
+mkdirp "${XDG_STATE_HOME}"
+mkdirp "${XDG_RUNTIME_DIR}" 0700
+mkdirp "${ZSH_DATA_DIR}"
+mkdirp "${ZSH_CACHE_DIR}"
+mkdirp "${ZSH_CACHE_DIR}/completions"
+# endregion
 
-# add local bin to path
-add path "${HOME}/.local/bin"
-
-# compiler flags
-typeset -TUx LDFLAGS ldflags ":"
-typeset -TUx CPPFLAGS cppflags ":"
-
-# zi: Flexible and fast ZSH plugin manager
+# region zi: Flexible and fast ZSH plugin manager
 # https://github.com/z-shell/zi
 typeset -Ag ZI
 ZI[HOME_DIR]="${XDG_CACHE_HOME}/zi"
@@ -104,20 +96,24 @@ zup() {
 	cd "${oldpwd}"
 	exec zsh
 }
+# endregion
 
-# zinit/default: set global default ice
+# region zi/default: set global default ice
 # https://github.com/z-shell/z-a-default-ice
 zi id-as for z-shell/z-a-default-ice
 zi default-ice -q lucid light-mode
+# endregion
 
-# zinit/eval: creates a cache containing the output of a command
+# region zi/eval: creates a cache containing the output of a command
 # https://github.com/z-shell/z-a-eval
 zi id-as for z-shell/z-a-eval
+# endregion
 
-# zi/auto: load plugins with conventions
+# region zi/auto: load plugins with conventions
 zi id-as for "${ZDOTDIR}/z-a-auto"
+# endregion
 
-# ohmyzsh: community driven zsh framework
+# region ohmyzsh: community driven zsh framework
 # https://github.com/ohmyzsh/ohmyzsh
 zi for \
 	OMZL::directories.zsh \
@@ -131,14 +127,16 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
+# endregion
 
-# history configuration
+# region history configuration
 # https://zsh.sourceforge.io/Doc/Release/Options.html#History
 HISTSIZE=2000000000 SAVEHIST=1000000000
 HISTFILE="${ZSH_DATA_DIR}/history"
 link "${HISTFILE}" .zsh_history
+# endregion
 
-# brew: the missing package manager
+# region brew: the missing package manager
 # https://github.com/Homebrew/brew
 :brew-init() {
 	export HOMEBREW_BUNDLE_FILE="${XDG_CONFIG_HOME}/Brewfile"
@@ -181,8 +179,9 @@ link "${HISTFILE}" .zsh_history
 }
 
 zi auto has"dscl" for brew
+# endregion
 
-# mise: dev tools, env vars, task runner
+# region mise: dev tools, env vars, task runner
 # https://github.com/jdx/mise
 :mise-init() {
 	export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
@@ -194,8 +193,9 @@ zi auto has"dscl" for brew
 }
 
 zi auto has"mise" for mise
+# endregion
 
-# python: programming language
+# region python: programming language
 # https://docs.python.org/3/
 :python-init() {
 	export PYTHONSTARTUP="${XDG_CONFIG_HOME}/python/startup.py"
@@ -210,8 +210,9 @@ zi auto has"mise" for mise
 }
 
 zi auto has"python3" for python
+# endregion
 
-# python/uv: an extremely fast Python package manager
+# region python/uv: an extremely fast Python package manager
 # https://github.com/astral-sh/uv
 :uv-init() {
 	export UV_TOOL_DIR="${XDG_CACHE_HOME}/uv/tools"
@@ -229,8 +230,9 @@ zi auto has"python3" for python
 }
 
 zi auto has"uv" for uv
+# endregion
 
-# python/argcomplete: tab completion for argparse-based programs, installed via uv
+# region python/argcomplete: tab completion for argparse-based programs, installed via uv
 # https://github.com/kislyuk/argcomplete#readme
 
 # argcomplete's completers set `IFS=$'\013'` and leave it set when calling
@@ -252,8 +254,9 @@ zi auto has"uv" for uv
 }
 
 zi auto with"uv" for argcomplete
+# endregion
 
-# go: programming language
+# region go: programming language
 # https://www.golang.org
 :go-init() {
 	export GOPATH="${XDG_CACHE_HOME}/go"
@@ -261,18 +264,48 @@ zi auto with"uv" for argcomplete
 }
 
 zi auto has"go" for go
+# endregion
 
-# node/npm: JavaScript runtime
+# region js/node: JavaScript runtime
 # https://nodejs.org
 :node-init() {
 	export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
 	mkdirp "${XDG_DATA_HOME}/node"
-	link npm/npmrc .npmrc
 }
 
 zi auto has"node" wait1 for node
+# endregion
 
-# ruby: programming language
+# region js/npm: node package manager
+# https://docs.npmjs.com
+:npm-init() {
+	link npm/npmrc .npmrc
+}
+
+zi auto has"npm" wait1 for npm
+# endregion
+
+# region js/bun: all-in-one JavaScript runtime & toolkit
+# https://bun.sh
+:bun-init() {
+	export BUN_INSTALL="${XDG_DATA_HOME}/bun"
+	export BUN_INSTALL_CACHE_DIR="${XDG_CACHE_HOME}/bun"
+	add path "${BUN_INSTALL}/bin"
+}
+
+zi auto has"bun" wait1 for bun
+# endregion
+
+# region js/biome: formatter & linter for the web (JS/TS/JSON/CSS)
+# https://biomejs.dev
+:biome-eval() {
+	biome completions zsh
+}
+
+zi auto has"biome" for biome
+# endregion
+
+# region ruby: programming language
 # https://www.ruby-lang.org
 :ruby-init() {
 	export GEM_HOME="${XDG_CACHE_HOME}"/gem
@@ -288,8 +321,9 @@ zi auto has"node" wait1 for node
 }
 
 zi auto has"ruby" for ruby
+# endregion
 
-# 1password: remembers all your passwords for you
+# region 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-eval() {
 	chmod 0700 "${XDG_CONFIG_HOME}/op"
@@ -297,8 +331,9 @@ zi auto has"ruby" for ruby
 }
 
 zi auto has"op" wait1 for 1password-cli
+# endregion
 
-# bat: cat(1) clone with wings
+# region bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 :bat-init() {
 	export BAT_CONFIG_PATH="${XDG_CONFIG_HOME}"/bat/config BAT_PAGER="less"
@@ -306,8 +341,9 @@ zi auto has"op" wait1 for 1password-cli
 }
 
 zi auto has"bat" wait1 for bat
+# endregion
 
-# claude: AI assistant by Anthropic
+# region claude: AI assistant by Anthropic
 # https://claude.ai
 :claude-init() {
 	export CLAUDE_CODE_NEW_INIT=1
@@ -315,8 +351,9 @@ zi auto has"bat" wait1 for bat
 }
 
 zi auto has"claude" wait1 for claude
+# endregion
 
-# colima: container runtimes on macOS with minimal setup
+# region colima: container runtimes on macOS with minimal setup
 # https://github.com/abiosoft/colima
 :colima-init() {
 	link colima .colima
@@ -344,8 +381,9 @@ zi auto has"claude" wait1 for claude
 }
 
 zi auto has"colima" wait1 for colima
+# endregion
 
-# dircolors: setup colors for ls and friends
+# region dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
 :dircolors-load() {
 	# colorize completion candidates (filenames, dirs, …) in every context, not
@@ -360,24 +398,27 @@ zi auto has"colima" wait1 for colima
 }
 
 zi auto id-as"dircolors" wait1 for trapd00r/LS_COLORS
+# endregion
 
-# docker: container runtime CLI
+# region docker: container runtime CLI
 # https://github.com/docker/cli
 :docker-init() {
 	link docker .docker
 }
 
 zi auto has"docker" wait1 for docker
+# endregion
 
-# duf: better `df` alternative
+# region duf: better `df` alternative
 # https://github.com/muesli/duf
 :duf-load() {
 	alias df=duf
 }
 
 zi auto has"duf" wait1 for duf
+# endregion
 
-# eza: a modern replacement for ‘ls’.
+# region eza: a modern replacement for ‘ls’.
 # https://github.com/ogham/eza
 :eza-init() {
 	export EZA_ICONS_AUTO=1
@@ -389,8 +430,9 @@ zi auto has"duf" wait1 for duf
 }
 
 zi auto has"eza" wait1 for eza
+# endregion
 
-# fzf: command-line fuzzy finder
+# region fzf: command-line fuzzy finder
 # https://github.com/junegunn/fzf
 :fzf-init() {
 	# https://github.com/catppuccin/fzf/blob/main/themes/catppuccin-fzf-mocha.sh
@@ -403,8 +445,9 @@ zi auto has"eza" wait1 for eza
 }
 
 zi auto has"fzf" wait1 for fzf
+# endregion
 
-# gcloud: Google Cloud SDK
+# region gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 :gcloud-init() {
 	mkdirp "${XDG_DATA_HOME}/gcloud"
@@ -430,12 +473,14 @@ zi auto has"fzf" wait1 for fzf
 }
 
 zi auto has"gcloud" wait1 for gcloud
+# endregion
 
-# ghostty: fast, native, GPU-accelerated terminal emulator
+# region ghostty: fast, native, GPU-accelerated terminal emulator
 # https://ghostty.org
 add path "${GHOSTTY_BIN_DIR}"
+# endregion
 
-# git: distributed version control system
+# region git: distributed version control system
 # https://github.com/git/git
 :git-load() {
 	alias ga="git add --all"
@@ -458,8 +503,9 @@ add path "${GHOSTTY_BIN_DIR}"
 
 zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
 	https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
+# endregion
 
-# glow: terminal markdown rendering
+# region glow: terminal markdown rendering
 # https://github.com/charmbracelet/glow
 :glow-init() {
 	export GLAMOUR_STYLE="${HOME}/.config/glow/styles/catppuccin-mocha.json"
@@ -467,8 +513,9 @@ zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
 }
 
 zi auto has"glow" wait1 for glow
+# endregion
 
-# gnupg: GNU privacy guard
+# region gnupg: GNU privacy guard
 # https://gnupg.org/
 :gnupg-init() {
 	export GPG_TTY="${TTY}"
@@ -477,8 +524,9 @@ zi auto has"glow" wait1 for glow
 }
 
 zi auto has"gpg" wait1 for gnupg
+# endregion
 
-# less: pager configuration
+# region less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 :less-init() {
 	export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
@@ -487,20 +535,23 @@ zi auto has"gpg" wait1 for gnupg
 }
 
 zi auto has"less" for less
+# endregion
 
-# man: unix documentation system
+# region man: unix documentation system
 # https://www.nongnu.org/man-db/
 zi auto wait1 for OMZP::colored-man-pages
+# endregion
 
-# ncdu: disk usage analyzer
+# region ncdu: disk usage analyzer
 # https://dev.yorhel.nl/ncdu
 :ncdu-init() {
 	link ncduignore .ncduignore
 }
 
 zi auto has"ncdu" wait1 for ncdu
+# endregion
 
-# opentofu: open-source terraform fork, installed via mise
+# region opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
 :opentofu-init() {
 	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
@@ -514,8 +565,9 @@ zi auto has"ncdu" wait1 for ncdu
 }
 
 zi auto has"tofu" wait1 for opentofu
+# endregion
 
-# parallel: run commands in parallel
+# region parallel: run commands in parallel
 # https://www.gnu.org/software/parallel/
 :parallel-init() {
 	export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
@@ -523,42 +575,63 @@ zi auto has"tofu" wait1 for opentofu
 }
 
 zi auto has"parallel" wait1 for parallel
+# endregion
 
-# rsync: fast incremental file transfer
+# region postgresql: object-relational database
+# https://www.postgresql.org
+:postgresql-init() {
+	if has brew; then
+		add path "${HOMEBREW_PREFIX}/opt/postgres/bin"
+		add ldflags "-L${HOMEBREW_PREFIX}/opt/postgres/lib"
+		add cppflags "-I${HOMEBREW_PREFIX}/opt/postgres/include"
+	fi
+}
+
+zi auto has"psql" for postgresql
+# endregion
+
+# region rsync: fast incremental file transfer
 # https://rsync.samba.org
 zi auto wait1 for OMZP::rsync
+# endregion
 
-# sops: editor of encrypted files (age, gpg, cloud KMS)
+# region sops: editor of encrypted files (age, gpg, cloud KMS)
 # https://github.com/getsops/sops
 :sops-init() {
 	export SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
 }
 
 zi auto has"sops" wait1 for sops
+# endregion
 
-# ssh: secure shell
+# region ssh: secure shell
 # https://www.openssh.com
-mkdirp "${XDG_CACHE_HOME}/ssh"
-mkdirp "${HOME}/.ssh" 0700
-link ssh/config .ssh/config
+:ssh-init() {
+	mkdirp "${XDG_CACHE_HOME}/ssh"
+	mkdirp "${HOME}/.ssh" 0700
+	link ssh/config .ssh/config
 
-# ssh rejects a group/world-writable config; enforce 0600 without forking chmod
-# on every startup — only when the mode has actually drifted
-() {
+	# ssh rejects a group/world-writable config; enforce 0600 without forking
+	# chmod on every startup — only when the mode has actually drifted
 	local -a st
 	zmodload -F zsh/stat b:zstat
 	zstat -A st +mode -- "${HOME}/.ssh/config" 2>/dev/null &&
 		(((st[1] & 8#777) != 8#600)) && chmod 0600 "${HOME}/.ssh/config"
+
+	# prefer 1password's ssh agent socket when present, else OMZP::ssh-agent
+	# https://1password.community/discussion/comment/660153/#Comment_660153
+	local op_sock="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+	if [[ -e "${op_sock}" ]]; then
+		export SSH_AUTH_SOCK="${op_sock}"
+	else
+		zi auto silent wait1 for OMZP::ssh-agent
+	fi
 }
 
-# https://1password.community/discussion/comment/660153/#Comment_660153
-if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
-	export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-else
-	zi auto silent wait1 for OMZP::ssh-agent
-fi
+zi auto has"ssh" for ssh
+# endregion
 
-# tmux: a terminal multiplexer
+# region tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
 :tmux-init() {
 	export TMUX_PLUGIN_MANAGER_PATH="${XDG_CACHE_HOME}/tmux/plugins"
@@ -578,8 +651,9 @@ fi
 }
 
 zi auto has"tmux" silent for OMZP::tmux
+# endregion
 
-# vim: vi improved, via neovim
+# region vim: vi improved, via neovim
 # https://neovim.io
 :neovim-init() {
 	export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
@@ -591,8 +665,9 @@ zi auto has"tmux" silent for OMZP::tmux
 }
 
 zi auto has"nvim" for neovim
+# endregion
 
-# vscode: visual studio code editor
+# region vscode: visual studio code editor
 # https://code.visualstudio.com
 :vscode-init() {
 	if ! has "${HOME}/Library/Application Support/Code/User"; then
@@ -605,8 +680,9 @@ zi auto has"nvim" for neovim
 }
 
 zi auto has"code" wait1 for vscode
+# endregion
 
-# wget: retrieve files using HTTP, HTTPS, FTP and FTPS
+# region wget: retrieve files using HTTP, HTTPS, FTP and FTPS
 # https://www.gnu.org/software/wget/
 :wget-init() {
 	export WGETRC="${XDG_CONFIG_HOME}/wgetrc"
@@ -617,15 +693,17 @@ zi auto has"code" wait1 for vscode
 }
 
 zi auto has"wget" wait1 for wget
+# endregion
 
-# zsh-you-should-use: reminds you to use existing aliases for commands you just typed
+# region zsh/you-should-use: reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
 if has tput; then
 	zi auto wait1 for MichaelAquilina/zsh-you-should-use
 	YSU_MESSAGE_POSITION="after"
 fi
+# endregion
 
-# starship: minimal, blazing-fast, customizable prompt
+# region zsh/starship: minimal, blazing-fast, customizable prompt
 # https://starship.rs
 if has starship; then
 	eval "$(starship init zsh)"
@@ -634,16 +712,18 @@ if has starship; then
 	# empty by default — drop RPROMPT to halve command_lag.
 	unset RPROMPT
 fi
+# endregion
 
-# zsh-completions: extra completion functions. Loads before compinit so they
+# region zsh/completion: extra completion functions. Loads before compinit so they
 # land in fpath, then its atload runs compinit once — replaying the compdefs
 # queued by every completion plugin above — before fzf-tab and the widget
 # wrappers below.
 # https://github.com/zsh-users/zsh-completions
 zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
 	atload"zicompinit; zicdreplay" wait for zsh-users/zsh-completions
+# endregion
 
-# fzf-tab: replace the completion menu with fzf. Must load after compinit (above)
+# region zsh/completion: replace the completion menu with fzf-tab. Must load after compinit (above)
 # and before the widget-wrapping plugins (autosuggestions, F-Sy-H) below.
 # https://github.com/Aloxaf/fzf-tab
 zi auto has"fzf" wait for Aloxaf/fzf-tab
@@ -672,8 +752,9 @@ zstyle ':completion:*' menu no
 # CLAUDE.md (not claude_desktop_config.json), so it completes directly — the
 # ambiguity behind the old `CL`→`CLaude` two-tab problem can't arise.
 zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
+# endregion
 
-# completer chain: exact, then spelling correction, then fuzzy/approximate with an
+# region zsh/completion: completer chain — exact, then spelling correction, then fuzzy/approximate with an
 # error budget that scales with word length. fzf filters the candidate list itself,
 # but _correct/_approximate also repair typos in the typed prefix, which fzf can't.
 # https://zsh.sourceforge.io/Doc/Release/Completion-System.html#Control-Functions
@@ -699,14 +780,16 @@ zstyle '*' single-ignored show
 
 # don't complete zsh's own completion/widget functions as function names
 zstyle ':completion:*:functions' ignored-patterns '_*'
+# endregion
 
-# git: never offer ORIG_HEAD as a ref, and keep switch/checkout's native branch order
+# region zsh/completion: git — never offer ORIG_HEAD as a ref, and keep switch/checkout's native branch order
 # https://stackoverflow.com/questions/12508595/ignore-orig-head-in-zsh-git-autocomplete#comment99936479_14325591
 zstyle ':completion:*:*:git*:*' ignored-patterns '*ORIG_HEAD'
 zstyle ':completion:*:git-checkout:*' sort false
 zstyle ':completion:*:git-switch:*' sort false
+# endregion
 
-# make: invoke the makefile so macro-defined targets are completed too
+# region zsh/completion: make — invoke the makefile so macro-defined targets are completed too
 # https://unix.stackexchange.com/questions/657256/autocompletion-of-makefile-with-makro-in-zsh-not-correct-works-in-bash
 zstyle ':completion::complete:make:*:targets' call-command true
 
@@ -719,16 +802,23 @@ zstyle ':completion:*:corrections' format '%d (errors: %e)'
 
 # bash-style `complete -C` programmable completion (consul, nomad, tofu use it)
 autoload -U +X bashcompinit && bashcompinit
+# endregion
 
-# zsh/f-sy-h: feature-rich syntax highlighting for ZSH (loads last, after fzf-tab)
+# region zsh/f-sy-h: feature-rich syntax highlighting for ZSH (loads last, after fzf-tab)
 # https://github.com/z-shell/F-Sy-H
 zi auto wait for z-shell/F-Sy-H
+# endregion
 
-# zsh/autosuggestions: fish-like autosuggestions for zsh
+# region zsh/autosuggestions: fish-like autosuggestions for zsh
 # https://github.com/zsh-users/zsh-autosuggestions
 zi auto atload"_zsh_autosuggest_start" \
 	wait for zsh-users/zsh-autosuggestions
+# endregion
 
-# zsh/autopair: automatically close quotes, brackets and other delimiters
+# region zsh/autopair: automatically close quotes, brackets and other delimiters
 # https://github.com/hlissner/zsh-autopair
 zi auto wait for hlissner/zsh-autopair
+# endregion
+
+# add local bin last so user binaries take precedence over tool/brew paths
+add path "${HOME}/.local/bin"
