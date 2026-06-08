@@ -98,13 +98,13 @@ zup() {
 }
 # endregion
 
-# region zinit/default: set global default ice
+# region zi/default: set global default ice
 # https://github.com/z-shell/z-a-default-ice
 zi id-as for z-shell/z-a-default-ice
 zi default-ice -q lucid light-mode
 # endregion
 
-# region zinit/eval: creates a cache containing the output of a command
+# region zi/eval: creates a cache containing the output of a command
 # https://github.com/z-shell/z-a-eval
 zi id-as for z-shell/z-a-eval
 # endregion
@@ -825,11 +825,7 @@ zi auto has"wget" wait1 for wget
 zi auto has"yt-dlp" wait1 for youtube
 # endregion
 
-# region misc other aliases
-alias X="TERM=xterm-256color ssh -t 10.0.0.11 \"/usr/local/bin/zsh -i -c T\""
-# endregion
-
-# region zsh-you-should-use: reminds you to use existing aliases for commands you just typed
+# region zsh/you-should-use: reminds you to use existing aliases for commands you just typed
 # https://github.com/MichaelAquilina/zsh-you-should-use
 if has tput; then
 	zi auto wait1 for MichaelAquilina/zsh-you-should-use
@@ -837,7 +833,7 @@ if has tput; then
 fi
 # endregion
 
-# region starship: minimal, blazing-fast, customizable prompt
+# region zsh/starship: minimal, blazing-fast, customizable prompt
 # https://starship.rs
 if has starship; then
 	eval "$(starship init zsh)"
@@ -954,7 +950,7 @@ zi auto atload"_zsh_autosuggest_start" \
 zi auto wait for hlissner/zsh-autopair
 # endregion
 
-# region zsh-bench: benchmark zsh startup and interactive lag
+# region zsh/bench: benchmark zsh startup and interactive lag
 # https://github.com/romkatv/zsh-bench
 zi as"program" wait1 for romkatv/zsh-bench
 # endregion
