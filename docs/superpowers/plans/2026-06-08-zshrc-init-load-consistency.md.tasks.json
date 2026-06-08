@@ -1,0 +1,55 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-08-zshrc-init-load-consistency.md",
+  "specPath": "docs/superpowers/specs/2026-06-08-zshrc-init-load-consistency-design.md",
+  "tasks": [
+    {
+      "id": 7,
+      "subject": "Task 1: Create branch + split the brew template",
+      "status": "completed",
+      "description": "**Goal:** Branch the work, and bring `:brew-init` itself under the init/load rule by moving its aliases into a new `:brew-load`.\n\n**Files:** Modify `zsh/.zshrc` (`:brew-init` block ~143-162).\n\n**Acceptance Criteria:** new branch off main; `:brew-init` only export+add; `:brew-load` has bbd/bz; `:brew-update` unchanged; syntax + sourcing clean.\n\n**Verify:** `zsh -ic ':brew-load; alias bbd bz'`\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"zsh -ic ':brew-load; alias bbd bz'\", \"acceptanceCriteria\": [\"new branch off main\", \":brew-init has only export + add\", \":brew-load has bbd/bz aliases\", \":brew-update unchanged\", \"syntax + sourcing clean\"]}\n```"
+    },
+    {
+      "id": 8,
+      "subject": "Task 2: Group A — init-only blocks (new gated wait1 triggers)",
+      "status": "completed",
+      "blockedBy": [7],
+      "description": "**Goal:** Wrap sops, sqlite, glow, gnupg, parallel, claude, docker, ncdu in `:<name>-init` + new `zi auto has\"<cmd>\" wait1 for <name>`.\n\n**Files:** Modify `zsh/.zshrc`.\n\n**Acceptance Criteria:** 8 `:<name>-init` defined; 8 gated wait1 triggers; no inline export/link remain; syntax + sourcing clean.\n\n**Verify:** `zsh -ic 'for f in sops sqlite glow gnupg parallel claude docker ncdu; do functions :$f-init >/dev/null && echo \"$f ok\"; done'`\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"zsh -ic 'for f in sops sqlite glow gnupg parallel claude docker ncdu; do functions :$f-init >/dev/null && echo ok; done'\", \"acceptanceCriteria\": [\"8 :<name>-init functions\", \"8 new gated wait1 triggers\", \"no inline export/link remain\", \"syntax + sourcing clean\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 3: Group A — init+load and synchronous blocks",
+      "status": "completed",
+      "blockedBy": [8],
+      "description": "**Goal:** ansible/node/wget/youtube (gated wait1, aliases->load) + less/python synchronous (python gated python3, keep `if has brew` libexec inside init).\n\n**Files:** Modify `zsh/.zshrc`.\n\n**Acceptance Criteria:** ansible/node/wget init+load, youtube load-only; less/python sync; PAGER/EDITOR set at sourcing; syntax + sourcing clean.\n\n**Verify:** `zsh -ic 'print -r -- $PAGER; functions :python-init :ansible-load :wget-load >/dev/null && echo hooks-ok'`\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"zsh -ic 'print -r -- $PAGER; functions :python-init :ansible-load :wget-load >/dev/null && echo hooks-ok'\", \"acceptanceCriteria\": [\"ansible/node/wget split init+load\", \"youtube load-only\", \"less/python synchronous, python gated python3\", \"PAGER/EDITOR at sourcing\", \"syntax + sourcing clean\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 4: Group B — reuse existing trigger (no load-body interplay)",
+      "status": "completed",
+      "blockedBy": [9],
+      "description": "**Goal:** Add `:<name>-init`/`:<name>-load` to mise, aws, uv, go (rename `for golang`->`for go`), ruby (merge `:ruby-load` into `:ruby-init`), fzf, copier — reusing existing triggers/timing. uv/go/ruby stay synchronous.\n\n**Files:** Modify `zsh/.zshrc`.\n\n**Acceptance Criteria:** new init functions defined before trigger; go trigger `for go`; old `:ruby-load`/`:golang-*` gone; uv/go/ruby PATH at sourcing; syntax + sourcing clean.\n\n**Verify:** `zsh -ic 'print -l $path | grep -E \"uv/bin|go/bin|gem\"; functions :go-load :copier-load :aws-init :mise-init :fzf-init >/dev/null && echo hooks-ok'`\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"zsh -ic 'print -l $path | grep -E uv/bin; functions :go-load :copier-load :aws-init :mise-init :fzf-init >/dev/null && echo hooks-ok'\", \"acceptanceCriteria\": [\"mise/aws/uv/fzf gain :*-init\", \"go renamed for go + :go-init/:go-load\", \"ruby merged, old :ruby-load gone\", \"copier gains :copier-load\", \"uv/go/ruby synchronous\", \"syntax + sourcing clean\"]}\n```"
+    },
+    {
+      "id": 11,
+      "subject": "Task 5: Group B — blocks with -load body interplay (incl. git verification)",
+      "status": "completed",
+      "blockedBy": [10],
+      "description": "**Goal:** Convert opentofu, gcloud, colima, neovim; add `:git-load` and verify the `as\"completion\"` trigger fires atload (fallback: keep git aliases inline).\n\n**Files:** Modify `zsh/.zshrc`.\n\n**Acceptance Criteria:** opentofu init + tf aliases in load; gcloud-init added, gcloud-load intact; colima init + alias in load; neovim init+load synchronous (EDITOR set); git-load via completion line OR inline fallback (verified interactively); syntax + sourcing clean.\n\n**Verify:** `zsh -ic 'print -r -- $EDITOR; functions :opentofu-init :colima-init :gcloud-init :neovim-init >/dev/null && echo hooks-ok'` plus interactive git-load pipe test.\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"zsh -ic 'print -r -- $EDITOR; functions :opentofu-init :colima-init :gcloud-init :neovim-init >/dev/null && echo hooks-ok'\", \"acceptanceCriteria\": [\"opentofu init+load\", \"gcloud-init added, load intact\", \"colima init+load\", \"neovim init+load synchronous, EDITOR set\", \"git-load via completion OR inline fallback verified\", \"syntax + sourcing clean\"]}\n```"
+    },
+    {
+      "id": 12,
+      "subject": "Task 6: Group C — rule-consistency migrations of existing hooks",
+      "status": "completed",
+      "blockedBy": [11],
+      "description": "**Goal:** bat (`-load`->`-init`), eza (split), tmux (split + repoint `:tmux-update` to `:tmux-init`), postgresql (`-load`->`-init`), vscode (`-load`->`-init`). atuin/direnv unchanged.\n\n**Files:** Modify `zsh/.zshrc`.\n\n**Acceptance Criteria:** renames/splits done; `:tmux-update` calls `:tmux-init`; old hook names gone; syntax + sourcing clean.\n\n**Verify:** `zsh -ic 'functions :bat-init :eza-init :eza-load :tmux-init :tmux-load :postgresql-init :vscode-init >/dev/null && echo hooks-ok'`\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"zsh -ic 'functions :bat-init :eza-init :eza-load :tmux-init :tmux-load :postgresql-init :vscode-init >/dev/null && echo hooks-ok'\", \"acceptanceCriteria\": [\"bat-load->bat-init\", \"eza split\", \"tmux split + tmux-update repointed\", \"postgresql/vscode load->init\", \"atuin/direnv unchanged\", \"old names gone\", \"syntax + sourcing clean\"]}\n```"
+    },
+    {
+      "id": 13,
+      "subject": "Task 7: Full verification pass",
+      "status": "completed",
+      "blockedBy": [12],
+      "description": "**Goal:** Verify the whole file in a real interactive shell — env/aliases/PATH/perf — and that turbo triggers actually fire.\n\n**Files:** None expected (verification; fix-ups land here).\n\n**Acceptance Criteria:** clean interactive load (no collisions); turbo env+alias present after first prompt; sync prereqs immediate; no stray inline tool statements outside skip-list (ssh/ghostty/boto/ara/android/X/history/core); no zsh-bench regression vs main.\n\n**Verify:** `{ sleep 2; print 'print -r -- \"SOPS=$SOPS_AGE_KEY_FILE\"; alias ad'; sleep 1; print exit } | zsh -i 2>/dev/null | grep -E 'SOPS=|ad='`\n\n```json:metadata\n{\"files\": [\"zsh/.zshrc\"], \"verifyCommand\": \"{ sleep 2; print 'print -r -- SOPS=$SOPS_AGE_KEY_FILE; alias ad'; sleep 1; print exit } | zsh -i 2>/dev/null | grep -E 'SOPS=|ad='\", \"acceptanceCriteria\": [\"clean interactive load\", \"turbo env+alias after first prompt\", \"sync prereqs immediate\", \"no stray inline tool statements outside skip-list\", \"no zsh-bench regression\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-08T00:00:00Z"
+}
