@@ -1,12 +1,69 @@
 {
+  "[css]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[go]": {
+    "editor.defaultFormatter": "golang.go",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[hcl]": {
+    "editor.defaultFormatter": "fredwangwang.vscode-hcl-format"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
   "[ignore]": {
     "editor.formatOnSave": false
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "rvben.rumdl"
+  },
+  "[opentofu]": {
+    "editor.defaultFormatter": "opentofu.vscode-opentofu"
+  },
+  "[opentofu-vars]": {
+    "editor.defaultFormatter": "opentofu.vscode-opentofu"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[ruby]": {
+    "editor.defaultFormatter": "Shopify.ruby-lsp"
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "mkhl.shfmt"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
   },
   "ansible.lightspeed.enabled": false,
   "ansible.lightspeed.suggestions.enabled": false,
   "ansible.validation.lint.enabled": false,
   "catppuccin.italicKeywords": false,
   "csv-preview.resizeColumns": "all",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit",
+    "quickfix.biome": "explicit",
+    "source.organizeImports.ruff": "explicit",
+    "source.fixAll.ruff": "explicit",
+    "source.fixAll.rumdl": "explicit",
+    "source.fixAll.shellcheck": "explicit",
+    "source.formatAll.opentofu": "explicit"
+  },
   "editor.fontFamily": "'MesloLGS Nerd Font', Menlo, Monaco, 'Courier New', monospace",
   "editor.formatOnSave": true,
   "editor.minimap.enabled": false,
@@ -20,6 +77,9 @@
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   "go.useLanguageServer": true,
+  "gopls": {
+    "formatting.gofumpt": true
+  },
   "json.schemaDownload.trustedDomains": {
     "https://schemastore.azurewebsites.net/": true,
     "https://raw.githubusercontent.com/microsoft/vscode/": true,
