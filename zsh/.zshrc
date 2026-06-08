@@ -721,25 +721,29 @@ zi auto has"sqlite3" wait1 for sqlite
 
 # region ssh: secure shell
 # https://www.openssh.com
-mkdirp "${XDG_CACHE_HOME}/ssh"
-mkdirp "${HOME}/.ssh" 0700
-link ssh/config .ssh/config
+:ssh-init() {
+	mkdirp "${XDG_CACHE_HOME}/ssh"
+	mkdirp "${HOME}/.ssh" 0700
+	link ssh/config .ssh/config
 
-# ssh rejects a group/world-writable config; enforce 0600 without forking chmod
-# on every startup — only when the mode has actually drifted
-() {
+	# ssh rejects a group/world-writable config; enforce 0600 without forking
+	# chmod on every startup — only when the mode has actually drifted
 	local -a st
 	zmodload -F zsh/stat b:zstat
 	zstat -A st +mode -- "${HOME}/.ssh/config" 2>/dev/null &&
 		(((st[1] & 8#777) != 8#600)) && chmod 0600 "${HOME}/.ssh/config"
+
+	# prefer 1password's ssh agent socket when present, else OMZP::ssh-agent
+	# https://1password.community/discussion/comment/660153/#Comment_660153
+	local op_sock="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+	if [[ -e "${op_sock}" ]]; then
+		export SSH_AUTH_SOCK="${op_sock}"
+	else
+		zi auto silent wait1 for OMZP::ssh-agent
+	fi
 }
 
-# https://1password.community/discussion/comment/660153/#Comment_660153
-if [[ -e "${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" ]]; then
-	export SSH_AUTH_SOCK="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-else
-	zi auto silent wait1 for OMZP::ssh-agent
-fi
+zi auto has"ssh" for ssh
 # endregion
 
 # region sshp: Parallel SSH Executor
