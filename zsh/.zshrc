@@ -262,15 +262,40 @@ zi auto with"uv" for argcomplete
 
 zi auto has"go" for go
 
-# node/npm: JavaScript runtime
+# js/node: JavaScript runtime
 # https://nodejs.org
 :node-init() {
 	export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
 	mkdirp "${XDG_DATA_HOME}/node"
-	link npm/npmrc .npmrc
 }
 
 zi auto has"node" wait1 for node
+
+# js/npm: node package manager
+# https://docs.npmjs.com
+:npm-init() {
+	link npm/npmrc .npmrc
+}
+
+zi auto has"npm" wait1 for npm
+
+# js/bun: all-in-one JavaScript runtime & toolkit
+# https://bun.sh
+:bun-init() {
+	export BUN_INSTALL="${XDG_DATA_HOME}/bun"
+	export BUN_INSTALL_CACHE_DIR="${XDG_CACHE_HOME}/bun"
+	add path "${BUN_INSTALL}/bin"
+}
+
+zi auto has"bun" wait1 for bun
+
+# js/biome: formatter & linter for the web (JS/TS/JSON/CSS)
+# https://biomejs.dev
+:biome-eval() {
+	biome completions zsh
+}
+
+zi auto has"biome" for biome
 
 # ruby: programming language
 # https://www.ruby-lang.org
