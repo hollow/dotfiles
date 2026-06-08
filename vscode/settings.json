@@ -8,6 +8,9 @@
       "source.organizeImports": "explicit"
     }
   },
+  "[hcl]": {
+    "editor.defaultFormatter": "fredwangwang.vscode-hcl-format"
+  },
   "[html]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
@@ -25,6 +28,12 @@
   },
   "[markdown]": {
     "editor.defaultFormatter": "rvben.rumdl"
+  },
+  "[opentofu]": {
+    "editor.defaultFormatter": "opentofu.vscode-opentofu"
+  },
+  "[opentofu-vars]": {
+    "editor.defaultFormatter": "opentofu.vscode-opentofu"
   },
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
@@ -52,7 +61,8 @@
     "source.organizeImports.ruff": "explicit",
     "source.fixAll.ruff": "explicit",
     "source.fixAll.rumdl": "explicit",
-    "source.fixAll.shellcheck": "explicit"
+    "source.fixAll.shellcheck": "explicit",
+    "source.formatAll.opentofu": "explicit"
   },
   "editor.fontFamily": "'MesloLGS Nerd Font', Menlo, Monaco, 'Courier New', monospace",
   "editor.formatOnSave": true,
