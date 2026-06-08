@@ -1,0 +1,2 @@
+#!zsh
+:each */.git(:h) do "$@"

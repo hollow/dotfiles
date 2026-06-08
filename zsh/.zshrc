@@ -209,11 +209,6 @@ zi auto has"mise" for mise
 	fi
 }
 
-:python-load() {
-	alias python-each=':each */python.mk(:h) do'
-	alias python-parallel=':parallel */python.mk(:h) do'
-}
-
 zi auto has"python3" for python
 
 # python/uv: an extremely fast Python package manager
@@ -283,9 +278,6 @@ export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
 }
 
 :ansible-load() {
-	alias ansible-each=':each */ansible.mk(:h) do'
-	alias ansible-parallel=':parallel */ansible.mk(:h) do'
-
 	alias ad="ansible-doc"
 	alias ai="ansible-inventory"
 	alias ap="ansible-playbook"
@@ -392,15 +384,6 @@ zi auto has"colima" wait1 for colima
 }
 
 zi auto has"consul" wait1 for consul
-
-# copier: repository template framework
-# https://copier.readthedocs.io/en/stable/
-:copier-load() {
-	alias copier-each=':each */.copier-answers.yml(:h) do'
-	alias copier-parallel=':parallel */.copier-answers.yml(:h) do'
-}
-
-zi auto has"copier" wait1 for copier
 
 # dircolors: setup colors for ls and friends
 # https://github.com/trapd00r/LS_COLORS
@@ -511,9 +494,6 @@ zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
 
 # git is always present, so its aliases stay inline (synchronous) rather than in
 # a deferred :git-load hook — lazy-loading a guaranteed-present tool buys nothing
-alias git-each=':each */.git(:h) do'
-alias git-parallel=':parallel */.git(:h) do'
-
 alias ga="git add --all"
 alias gap="git add --patch"
 alias gba="git branch -a"
@@ -557,11 +537,6 @@ zi auto has"gpg" wait1 for gnupg
 	add path "${GOPATH}/bin"
 }
 
-:go-load() {
-	alias go-each=':each */go.mk(:h) do'
-	alias go-parallel=':parallel */go.mk(:h:a) do'
-}
-
 zi auto has"go" for go
 
 # less: pager configuration
@@ -594,11 +569,6 @@ zi auto has"ncdu" wait1 for ncdu
 	link npm/npmrc .npmrc
 }
 
-:node-load() {
-	alias node-each=':each */nodejs.mk(:h) do'
-	alias node-parallel=':parallel */nodejs.mk(:h) do'
-}
-
 zi auto has"node" wait1 for node
 
 # nomad: workload orchestrator
@@ -618,8 +588,6 @@ zi auto has"nomad" wait1 for nomad
 
 :opentofu-load() {
 	alias tf="tofu"
-	alias tf-each=':each */terraform.mk(:h) do'
-	alias tf-parallel=':parallel */terraform.mk(:h) do'
 
 	complete -o nospace -C tofu tofu
 }

@@ -1,0 +1,2 @@
+#!zsh
+:parallel */nodejs.mk(:h) do "$@"
