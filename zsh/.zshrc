@@ -15,6 +15,12 @@ ulimit -n $((1024 * 1024))
 autoload -Uz select-word-style
 select-word-style shell
 
+# create a directory only when missing, so a warm shell forks no external mkdir
+# here (each fork is ~8ms on macOS; a cold shell still does the work once). the
+# optional second arg is the mode, applied atomically at creation for dirs that
+# must not be group/world-accessible
+mkdirp() { [[ -d $1 ]] || mkdir -p ${2:+-m$2} $1; }
+
 # system path
 typeset -TUx PATH path=(/{usr/,}{local/,}{s,}bin)
 
@@ -26,12 +32,11 @@ export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
 export XDG_RUNTIME_DIR="${HOME}/.local/run"
 
-mkdir -p "${XDG_CONFIG_HOME}"
-mkdir -p "${XDG_CACHE_HOME}"
-mkdir -p "${XDG_DATA_HOME}"
-mkdir -p "${XDG_STATE_HOME}"
-mkdir -p "${XDG_RUNTIME_DIR}"
-chmod 0700 "${XDG_RUNTIME_DIR}"
+mkdirp "${XDG_CONFIG_HOME}"
+mkdirp "${XDG_CACHE_HOME}"
+mkdirp "${XDG_DATA_HOME}"
+mkdirp "${XDG_STATE_HOME}"
+mkdirp "${XDG_RUNTIME_DIR}" 0700
 
 # shell paths
 # https://zsh.sourceforge.io/Intro/intro_3.html
@@ -39,8 +44,9 @@ ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
 
-mkdir -p "${ZSH_CACHE_DIR}"{,/completions}
-mkdir -p "${ZSH_DATA_DIR}"
+mkdirp "${ZSH_DATA_DIR}"
+mkdirp "${ZSH_CACHE_DIR}"
+mkdirp "${ZSH_CACHE_DIR}/completions"
 
 # shell functions
 typeset -TUx FPATH fpath=(
@@ -277,9 +283,9 @@ zi auto has"claude" wait1 for claude
 	# colima has no option to relocate its heavy VM/instance state (_lima) and
 	# profile store (_store), so keep them in data (not the repo'd config dir) via
 	# symlinks resolved for both the CLI and the launchd service.
-	mkdir -p "${XDG_DATA_HOME}/colima/_lima"
+	mkdirp "${XDG_DATA_HOME}/colima/_lima"
 	ln -nfs "${XDG_DATA_HOME}/colima/_lima" "${XDG_CONFIG_HOME}/colima/_lima"
-	mkdir -p "${XDG_DATA_HOME}/colima/_store"
+	mkdirp "${XDG_DATA_HOME}/colima/_store"
 	ln -nfs "${XDG_DATA_HOME}/colima/_store" "${XDG_CONFIG_HOME}/colima/_store"
 }
 
@@ -356,7 +362,7 @@ zi auto has"fzf" wait1 for fzf
 # gcloud: Google Cloud SDK
 # https://cloud.google.com/sdk
 :gcloud-init() {
-	mkdir -p "${XDG_DATA_HOME}/gcloud"
+	mkdirp "${XDG_DATA_HOME}/gcloud"
 	ln -nfs "${XDG_DATA_HOME}/gcloud" "${XDG_CONFIG_HOME}/gcloud"
 }
 
@@ -422,19 +428,17 @@ zi auto has"glow" wait1 for glow
 :gnupg-init() {
 	export GPG_TTY="${TTY}"
 	export GNUPGHOME="${XDG_DATA_HOME}/gnupg"
-	mkdir -p "${GNUPGHOME}"
-	chmod 0700 "${GNUPGHOME}"
+	mkdirp "${GNUPGHOME}" 0700
 }
 
 zi auto has"gpg" wait1 for gnupg
-zi auto wait1 for OMZP::gpg-agent
 
 # less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 :less-init() {
 	export PAGER="${commands[less]}" LESS="--ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --chop-long-lines --tabs=4"
 	export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
-	mkdir -p "$(dirname "${LESSHISTFILE}")"
+	mkdirp "${LESSHISTFILE:h}"
 }
 
 zi auto has"less" for less
@@ -455,7 +459,7 @@ zi auto has"ncdu" wait1 for ncdu
 # https://nodejs.org
 :node-init() {
 	export NODE_REPL_HISTORY="${XDG_DATA_HOME}/node/repl_history"
-	mkdir -p "${XDG_DATA_HOME}/node"
+	mkdirp "${XDG_DATA_HOME}/node"
 	link npm/npmrc .npmrc
 }
 
@@ -465,7 +469,7 @@ zi auto has"node" wait1 for node
 # https://github.com/opentofu/opentofu
 :opentofu-init() {
 	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
-	mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+	mkdirp "${TF_PLUGIN_CACHE_DIR}"
 }
 
 :opentofu-load() {
@@ -483,7 +487,7 @@ alias tf-parallel=':parallel */terraform.mk(:h) do'
 # https://www.gnu.org/software/parallel/
 :parallel-init() {
 	export PARALLEL_HOME="${XDG_CONFIG_HOME}/parallel"
-	mkdir -p ${PARALLEL_HOME}
+	mkdirp ${PARALLEL_HOME}
 }
 
 zi auto has"parallel" wait1 for parallel
@@ -502,8 +506,8 @@ zi auto has"sops" wait1 for sops
 
 # ssh: secure shell
 # https://www.openssh.com
-mkdir -p "${HOME}/.ssh" "${XDG_CACHE_HOME}"/ssh
-chmod 0700 "${HOME}/.ssh"
+mkdirp "${XDG_CACHE_HOME}/ssh"
+mkdirp "${HOME}/.ssh" 0700
 
 link ssh/config .ssh/config
 chmod 0600 "${HOME}/.ssh/config"
