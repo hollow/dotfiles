@@ -15,6 +15,42 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 log() { printf '\033[1;34m==>\033[0m %s\n' "$1"; }
 err() { printf '\033[1;31merror:\033[0m %s\n' "$1" >&2; }
 
+# Ask a yes/no question on the controlling terminal. Returns success only on an
+# explicit "yes". With no terminal (e.g. `curl ... | sh`, whose stdin is the
+# pipe), we cannot prompt — so we answer "no" and destructive steps abort safely.
+confirm() {
+    # Need a usable controlling terminal to prompt. Open /dev/tty (not just test
+    # for the node): the node can exist while the process has no controlling
+    # terminal (background/CI), where opening fails — answer "no" cleanly.
+    { : < /dev/tty; } 2>/dev/null || return 1
+    printf '%s' "$1" > /dev/tty
+    read -r _reply < /dev/tty || return 1
+    case "$_reply" in
+        [Yy] | [Yy][Ee][Ss]) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# True when the given remote URL refers to remerge/dotfiles, in any of the forms
+# git prints (https, https with .git, ssh shorthand, ssh URL).
+is_remerge_remote() {
+    _url=${1%.git}
+    _url=${_url%/}
+    case "$_url" in
+        https://github.com/remerge/dotfiles) return 0 ;;
+        http://github.com/remerge/dotfiles) return 0 ;;
+        git@github.com:remerge/dotfiles) return 0 ;;
+        ssh://git@github.com/remerge/dotfiles) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# When sourced for testing (DOTFILES_INSTALL_LIB=1), stop here so the helper
+# functions above can be exercised without running the installer.
+if [ "${DOTFILES_INSTALL_LIB:-0}" = 1 ]; then
+    return 0
+fi
+
 os="$(uname -s)"
 
 # 1. Ensure git is available (macOS ships it via the Command Line Tools).
