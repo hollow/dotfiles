@@ -463,8 +463,10 @@ whole-section deletions plus the single `claude` intra-section hunk.)
   `zsh/completion` cluster. The **`claude`** region is the one expected
   difference — it must equal `c8a74a6`'s `claude` region with the three
   `claude_desktop_config.json` sync lines removed (Deviation 6).
-- **`claude` deviation preserved:** `grep -c 'claude_desktop_config.json'
-  zsh/.zshrc` → `0`.
+- **`claude` deviation preserved:** `grep -c 'local dst=.*claude_desktop_config'
+  zsh/.zshrc` → `0`. (Note: a broad `grep -c 'claude_desktop_config.json'`
+  returns `1` — a legitimate upstream comment in the `zsh/completion` region
+  mentions the filename; the sync-line grep above is the load-bearing check.)
 - **`zsh/mkdirp`:** `diff <(git show c8a74a6:zsh/mkdirp) zsh/mkdirp` is empty.
 - **No stray personal artifacts:** `grep -c 'alias X' zsh/.zshrc` → `0`; no
   `zsh/X` file; no `aws`/`boto` section introduced.
@@ -496,7 +498,7 @@ whole-section deletions plus the single `claude` intra-section hunk.)
   on all carried sections, and `add path "${HOME}/.local/bin"` as the file's
   final line. The `claude` region carries fold markers but keeps the fork's
   omission of the `claude_desktop_config.json` sync (`grep -c
-  'claude_desktop_config.json' zsh/.zshrc` → `0`).
+  'local dst=.*claude_desktop_config' zsh/.zshrc` → `0`).
 - `zsh/mkdirp` exists and is byte-identical to `c8a74a6:zsh/mkdirp`.
 - `Brewfile`: contains `biome`, `bun`, `gofumpt`, `gopls`, `postgresql@18`
   (`link: true`), `ruby`, and the `biomejs.biome`, `golang.go`,

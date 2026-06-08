@@ -1,6 +1,6 @@
 # Ring 14 — Upstream Sync 93b9788 → c8a74a6 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers-extended-cc:subagent-driven-development (recommended) or superpowers-extended-cc:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers-extended-cc:subagent-driven-development (recommended) or superpowers-extended-cc:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Sync the curated fork forward over the 15 upstream commits `93b9788..c8a74a6` in one ring, landing every carried section/tool byte-identical to `hollow/dotfiles@c8a74a6` (sole exception: the fork's `claude` deviation).
 
@@ -25,18 +25,18 @@
 - Create: `zsh/mkdirp`
 
 **Acceptance Criteria:**
-- [ ] `diff zsh/.zshrc <(git show hollow/main:zsh/.zshrc)` shows **zero** `<` (fork-side) lines and only `>` hunks for the 15 omitted regions, the 3 `claude` sync lines, and the `.envrc` block.
-- [ ] `zsh/mkdirp` is byte-identical to `git show hollow/main:zsh/mkdirp`.
-- [ ] `grep -c 'local dst=.*claude_desktop_config' zsh/.zshrc` → `0` (claude deviation preserved).
-- [ ] `grep -c 'alias X' zsh/.zshrc` → `0`; no `zsh/X` file exists.
-- [ ] File ends with `add path "${HOME}/.local/bin"` + single newline (no trailing blank line, no `.envrc` block).
-- [ ] `zsh -n zsh/.zshrc` and `zsh -n zsh/mkdirp` pass.
+- [x] `diff zsh/.zshrc <(git show hollow/main:zsh/.zshrc)` shows **zero** `<` (fork-side) lines and only `>` hunks for the 15 omitted regions, the 3 `claude` sync lines, and the `.envrc` block.
+- [x] `zsh/mkdirp` is byte-identical to `git show hollow/main:zsh/mkdirp`.
+- [x] `grep -c 'local dst=.*claude_desktop_config' zsh/.zshrc` → `0` (claude deviation preserved).
+- [x] `grep -c 'alias X' zsh/.zshrc` → `0`; no `zsh/X` file exists.
+- [x] File ends with `add path "${HOME}/.local/bin"` + single newline (no trailing blank line, no `.envrc` block).
+- [x] `zsh -n zsh/.zshrc` and `zsh -n zsh/mkdirp` pass.
 
 **Verify:** `diff zsh/.zshrc <(git show hollow/main:zsh/.zshrc) | grep -c '^<'` → `0` AND `zsh -n zsh/.zshrc && echo OK`
 
 **Steps:**
 
-- [ ] **Step 1: Create `zsh/mkdirp` byte-identical to upstream**
+- [x] **Step 1: Create `zsh/mkdirp` byte-identical to upstream**
 
 ```bash
 git show hollow/main:zsh/mkdirp > zsh/mkdirp
@@ -44,7 +44,7 @@ diff <(git show hollow/main:zsh/mkdirp) zsh/mkdirp && echo "mkdirp OK"
 ```
 Expected: empty diff, prints `mkdirp OK`.
 
-- [ ] **Step 2: Rebuild `zsh/.zshrc` via the tested derive-by-deletion pipeline**
+- [x] **Step 2: Rebuild `zsh/.zshrc` via the tested derive-by-deletion pipeline**
 
 This single pipeline (1) drops the 15 regions the fork doesn't carry, (2) strips the trailing `.envrc` block leaving `.local/bin` as the final line, (3) re-applies the fork's `claude` deviation (drops the 3 `claude_desktop_config.json` sync lines). Run from the repo root:
 
@@ -63,7 +63,7 @@ git show hollow/main:zsh/.zshrc | awk '
 
 (The awk `sb` flag consumes the blank line that followed each deleted region, so no double blanks remain. Both `perl -0pe` are full-file slurps anchored with `\z` / unique strings.)
 
-- [ ] **Step 3: Verify byte-identity against c8a74a6 (the core test)**
+- [x] **Step 3: Verify byte-identity against c8a74a6 (the core test)**
 
 ```bash
 diff zsh/.zshrc <(git show hollow/main:zsh/.zshrc) > /tmp/r14.diff
@@ -72,7 +72,7 @@ echo "omitted region headers in diff (MUST be 15):"; grep -cE '^> # region ' /tm
 ```
 Expected: `0` fork-side lines; `15` region headers. The full `/tmp/r14.diff` must contain **only**: the 15 omitted regions, the 3 `claude` sync lines, and the 4-line `.envrc` block — all as `>` (c8a74a6-only) lines. If any `<` line appears, the rebuild is wrong — stop and investigate.
 
-- [ ] **Step 4: Verify structural + deviation checks**
+- [x] **Step 4: Verify structural + deviation checks**
 
 ```bash
 grep -c 'local dst=.*claude_desktop_config' zsh/.zshrc   # -> 0 (claude deviation)
@@ -85,7 +85,7 @@ test ! -e zsh/X && echo "no zsh/X OK"
 ```
 Expected: `0`, `0`, `0`, `5`, `1`, the `.local/bin` line, `no zsh/X OK`.
 
-- [ ] **Step 5: Syntax check**
+- [x] **Step 5: Syntax check**
 
 ```bash
 zsh -n zsh/.zshrc && echo ".zshrc syntax OK"
@@ -93,7 +93,7 @@ zsh -n zsh/mkdirp && echo "mkdirp syntax OK"
 ```
 Expected: both print OK.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add zsh/.zshrc zsh/mkdirp
@@ -121,16 +121,16 @@ EOF
 - Modify: `Brewfile`
 
 **Acceptance Criteria:**
-- [ ] `Brewfile` contains `brew "biome"`, `brew "bun"`, `brew "gofumpt"`, `brew "gopls"`, `brew "postgresql@18", link: true`, `brew "ruby"` at the positions below.
-- [ ] `Brewfile` contains `vscode "biomejs.biome"`, `vscode "golang.go"`, `vscode "oven.bun-vscode"`, `vscode "shopify.ruby-lsp"`, `vscode "sorbet.sorbet-vscode-extension"`.
-- [ ] Each new line is byte-identical to its `c8a74a6` counterpart.
-- [ ] `diff <(git show hollow/main:Brewfile | grep -E 'biome|bun|gofumpt|gopls|postgresql@18|ruby|golang.go|oven.bun|shopify.ruby|sorbet') <(grep -E 'biome|bun|gofumpt|gopls|postgresql@18|ruby|golang.go|oven.bun|shopify.ruby|sorbet' Brewfile)` shows the same lines.
+- [x] `Brewfile` contains `brew "biome"`, `brew "bun"`, `brew "gofumpt"`, `brew "gopls"`, `brew "postgresql@18", link: true`, `brew "ruby"` at the positions below.
+- [x] `Brewfile` contains `vscode "biomejs.biome"`, `vscode "golang.go"`, `vscode "oven.bun-vscode"`, `vscode "shopify.ruby-lsp"`, `vscode "sorbet.sorbet-vscode-extension"`.
+- [x] Each new line is byte-identical to its `c8a74a6` counterpart.
+- [x] `diff <(git show hollow/main:Brewfile | grep -E 'biome|bun|gofumpt|gopls|postgresql@18|ruby|golang.go|oven.bun|shopify.ruby|sorbet') <(grep -E 'biome|bun|gofumpt|gopls|postgresql@18|ruby|golang.go|oven.bun|shopify.ruby|sorbet' Brewfile)` shows the same lines.
 
 **Verify:** `grep -cE '^brew "(biome|bun|gofumpt|gopls|postgresql@18|ruby)"' Brewfile` → `6` AND `grep -cE '^vscode "(biomejs.biome|golang.go|oven.bun-vscode|shopify.ruby-lsp|sorbet.sorbet-vscode-extension)"' Brewfile` → `5`
 
 **Steps:**
 
-- [ ] **Step 1: Insert the 5 `brew` lines** (each via exact two-line anchor)
+- [x] **Step 1: Insert the 5 `brew` lines** (each via exact two-line anchor)
 
 `brew "biome"` between `bat` and `bottom`:
 ```
@@ -193,7 +193,7 @@ brew "ruby"
 brew "ruff"
 ```
 
-- [ ] **Step 2: Insert the 5 `vscode` extension lines** (each via exact two-line anchor)
+- [x] **Step 2: Insert the 5 `vscode` extension lines** (each via exact two-line anchor)
 
 `vscode "biomejs.biome"` between `bierner.markdown-preview-github-styles` and `catppuccin.catppuccin-vsc`:
 ```
@@ -230,7 +230,7 @@ vscode "tamasfe.even-better-toml"
 ```
 → insert `vscode "sorbet.sorbet-vscode-extension"` between them.
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 ```bash
 grep -cE '^brew "(biome|bun|gofumpt|gopls|postgresql@18|ruby)"' Brewfile   # -> 6
@@ -242,7 +242,7 @@ done
 ```
 Expected: `6`, `5`, and `OK:` for every line.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add Brewfile
@@ -269,17 +269,17 @@ EOF
 - Modify: `vscode/settings.json`
 
 **Acceptance Criteria:**
-- [ ] `vscode/settings.json` is valid JSON.
-- [ ] `diff <(git show HEAD:vscode/settings.json) vscode/settings.json` shows **only additions** (`>`), no removals (`<`) of the fork's existing keys.
-- [ ] The added keys are exactly: the 15 `[lang]` blocks (`[css] [go] [hcl] [html] [javascript] [json] [jsonc] [markdown] [opentofu] [opentofu-vars] [python] [ruby] [shellscript] [typescript] [yaml]`), `editor.codeActionsOnSave`, `go.useLanguageServer`, `gopls`, `json.schemaDownload.trustedDomains`.
-- [ ] The fork's previous omissions stay absent: `grep -c 'ansible.lightspeed\|files.associations\|makefile.configureOnOpen\|window.commandCenter\|workbench.activityBar\|yaml.customTags' vscode/settings.json` → `0`.
-- [ ] File round-trips: `diff vscode/settings.json <(jq -S . vscode/settings.json)` is empty.
+- [x] `vscode/settings.json` is valid JSON.
+- [x] `diff <(git show HEAD:vscode/settings.json) vscode/settings.json` shows **only additions** (`>`), no removals (`<`) of the fork's existing keys.
+- [x] The added keys are exactly: the 15 `[lang]` blocks (`[css] [go] [hcl] [html] [javascript] [json] [jsonc] [markdown] [opentofu] [opentofu-vars] [python] [ruby] [shellscript] [typescript] [yaml]`), `editor.codeActionsOnSave`, `go.useLanguageServer`, `gopls`, `json.schemaDownload.trustedDomains`.
+- [x] The fork's previous omissions stay absent: `grep -c 'ansible.lightspeed\|files.associations\|makefile.configureOnOpen\|window.commandCenter\|workbench.activityBar\|yaml.customTags' vscode/settings.json` → `0`.
+- [x] File round-trips: `diff vscode/settings.json <(jq -S . vscode/settings.json)` is empty.
 
 **Verify:** `jq -e . vscode/settings.json >/dev/null && echo VALID` AND `diff <(git show HEAD:vscode/settings.json) vscode/settings.json | grep -c '^<'` → `0`
 
 **Steps:**
 
-- [ ] **Step 1: Rebuild `vscode/settings.json` from upstream minus the 13 curation-out keys** (tested — `jq -S` round-trips the repo's settings format byte-identically)
+- [x] **Step 1: Rebuild `vscode/settings.json` from upstream minus the 13 curation-out keys** (tested — `jq -S` round-trips the repo's settings format byte-identically)
 
 ```bash
 git show hollow/main:vscode/settings.json | jq -S 'del(
@@ -299,7 +299,7 @@ git show hollow/main:vscode/settings.json | jq -S 'del(
 )' > vscode/settings.json
 ```
 
-- [ ] **Step 2: Verify additions-only against the fork's previous settings**
+- [x] **Step 2: Verify additions-only against the fork's previous settings**
 
 ```bash
 diff <(git show HEAD:vscode/settings.json) vscode/settings.json > /tmp/r14_settings.diff
@@ -308,7 +308,7 @@ echo "added [lang] blocks (MUST be 15):"; grep -cE '^>   "\[' /tmp/r14_settings.
 ```
 Expected: `0` removals; `15` `[lang]` blocks. The `>` additions must be exactly the formatter-feature keys listed in the acceptance criteria.
 
-- [ ] **Step 3: Verify curation-outs absent + valid JSON + round-trip**
+- [x] **Step 3: Verify curation-outs absent + valid JSON + round-trip**
 
 ```bash
 jq -e . vscode/settings.json >/dev/null && echo "VALID JSON"
@@ -317,7 +317,7 @@ diff vscode/settings.json <(jq -S . vscode/settings.json) && echo "round-trip OK
 ```
 Expected: `VALID JSON`, `0`, `round-trip OK`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add vscode/settings.json
@@ -345,15 +345,15 @@ EOF
 - Modify: `docs/superpowers/plans/2026-06-08-zsh-dotfiles-ring14.md.tasks.json`
 
 **Acceptance Criteria:**
-- [ ] All Task 1–3 acceptance-criteria/step checkboxes in this plan are checked.
-- [ ] `.tasks.json` statuses for Tasks 1–3 are `completed`.
-- [ ] Whole-ring re-verification passes (commands below).
+- [x] All Task 1–3 acceptance-criteria/step checkboxes in this plan are checked.
+- [x] `.tasks.json` statuses for Tasks 1–3 are `completed`.
+- [x] Whole-ring re-verification passes (commands below).
 
 **Verify:** the full re-verification block prints all-OK.
 
 **Steps:**
 
-- [ ] **Step 1: Whole-ring re-verification** (run all at once; everything must pass)
+- [x] **Step 1: Whole-ring re-verification** (run all at once; everything must pass)
 
 ```bash
 # .zshrc byte-identity (0 fork-side lines)
@@ -370,9 +370,9 @@ diff vscode/settings.json <(jq -S . vscode/settings.json) && echo "settings roun
 ```
 Expected: `0`, `mkdirp OK`, `syntax OK`, `6`, `5`, `brewfile parses`, `settings valid`, `settings round-trip OK`.
 
-- [ ] **Step 2: Check the boxes** in this plan doc (Tasks 1–3 acceptance criteria + steps) and set Task 1–3 status to `completed` in `2026-06-08-zsh-dotfiles-ring14.md.tasks.json`.
+- [x] **Step 2: Check the boxes** in this plan doc (Tasks 1–3 acceptance criteria + steps) and set Task 1–3 status to `completed` in `2026-06-08-zsh-dotfiles-ring14.md.tasks.json`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add docs/superpowers/plans/2026-06-08-zsh-dotfiles-ring14.md docs/superpowers/plans/2026-06-08-zsh-dotfiles-ring14.md.tasks.json
