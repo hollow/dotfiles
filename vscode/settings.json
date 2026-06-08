@@ -2,6 +2,12 @@
   "[css]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
+  "[go]": {
+    "editor.defaultFormatter": "golang.go",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
   "[html]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
@@ -22,6 +28,9 @@
   },
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[ruby]": {
+    "editor.defaultFormatter": "Shopify.ruby-lsp"
   },
   "[shellscript]": {
     "editor.defaultFormatter": "mkhl.shfmt"
@@ -58,6 +67,9 @@
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   "go.useLanguageServer": true,
+  "gopls": {
+    "formatting.gofumpt": true
+  },
   "json.schemaDownload.trustedDomains": {
     "https://schemastore.azurewebsites.net/": true,
     "https://raw.githubusercontent.com/microsoft/vscode/": true,
