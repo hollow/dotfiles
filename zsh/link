@@ -1,6 +1,6 @@
 #!zsh
 
-autoload -Uz uri-parse
+zmodload -F zsh/stat b:zstat
 
 local source="$1"
 local target="$2"
@@ -22,6 +22,11 @@ if [[ "${target}" != '/'* ]]; then
     target="${HOME}/${target}"
 fi
 
-if [[ "$(readlink "${target}")" != "${source}" ]]; then
+# read the current symlink target without forking readlink (zstat -L +link is
+# lstat, so it reports the link itself, not what it resolves to); relink only
+# when missing or pointing elsewhere, so a warm shell forks nothing here
+local -a st
+zstat -A st -L +link -- "${target}" 2>/dev/null
+if [[ "${st[1]}" != "${source}" ]]; then
     ln -nfs "${source}" "${target}"
 fi
