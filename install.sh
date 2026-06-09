@@ -5,8 +5,9 @@
 #   curl -fsSL https://raw.githubusercontent.com/remerge/dotfiles/main/install.sh | sh
 #
 # Installs Apple Command Line Tools (for git) on macOS, clones this repo into
-# ~/.config, links ~/.zshrc, and starts a fresh zsh. The shell finishes the
-# bootstrap on first launch (Homebrew, plugins, prompt).
+# ~/.config, links ~/.zshrc, then (macOS) installs Homebrew and the Brewfile and
+# hands off via `zup` to update everything and start a fresh zsh. On non-macOS it
+# just starts zsh and the shell bootstraps plugins/prompt on first launch.
 set -eu
 
 REPO_URL="https://github.com/remerge/dotfiles"
@@ -135,6 +136,28 @@ place_dotfiles() {
     fi
 }
 
+# Ensure Homebrew is installed and the committed Brewfile is fully installed,
+# so the first `:brew-update` dump (later, via zup) cannot drop packages.
+# Apple-Silicon (/opt/homebrew) only. A bundle failure is warned, not fatal.
+provision_macos() {
+    _dir=$1
+    if ! command -v brew > /dev/null 2>&1; then
+        if [ ! -x /opt/homebrew/bin/brew ]; then
+            log "Installing Homebrew..."
+            NONINTERACTIVE=1 /bin/bash -c \
+                "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+                < /dev/tty
+        fi
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+
+    log "Installing packages from the Brewfile (this can take a while)..."
+    if ! HOMEBREW_BUNDLE_FILE="$_dir/Brewfile" HOMEBREW_BUNDLE_NO_LOCK=1 brew bundle install; then
+        err "Some Brewfile packages failed to install; continuing."
+        err "Re-run 'zup' later to retry."
+    fi
+}
+
 # When sourced for testing (DOTFILES_INSTALL_LIB=1), stop here so the helper
 # functions above can be exercised without running the installer.
 if [ "${DOTFILES_INSTALL_LIB:-0}" = 1 ]; then
@@ -193,15 +216,21 @@ if [ ! -f "$CONFIG_DIR/git/local" ]; then
     fi
 fi
 
-# 4. Hand off to a fresh interactive zsh to run the first-run bootstrap.
+# 4. Provision (macOS) and hand off to a fresh interactive zsh.
 if [ "$os" != "Darwin" ]; then
     log "Linux detected (best-effort): Homebrew and starship will NOT auto-install."
     log "See the README for manual steps: $REPO_URL"
 fi
 
-log "Done. Starting zsh — the first launch installs Homebrew, plugins, and the prompt."
 if [ -e /dev/tty ]; then
-    exec zsh -i </dev/tty
+    if [ "$os" = "Darwin" ]; then
+        provision_macos "$CONFIG_DIR"
+        log "Provisioning done. Updating everything via zup and starting zsh..."
+        exec zsh -ic zup </dev/tty
+    else
+        log "Starting zsh..."
+        exec zsh -i </dev/tty
+    fi
 else
     log "Open a new terminal window to finish setup (zsh bootstraps on first launch)."
 fi

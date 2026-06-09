@@ -135,6 +135,49 @@ else
 fi
 
 echo
+echo "# provision_macos"
+
+# Fakes: a brew that logs its args + bundle env, and a curl that must NOT be
+# called when brew is already present. Prepend a shim dir to PATH.
+PBIN="$WORK/pbin"; mkdir -p "$PBIN"
+export PLOG="$WORK/plog"; : > "$PLOG"
+cat > "$PBIN/brew" <<'SH'
+#!/bin/sh
+printf 'brew %s\n' "$*" >> "$PLOG"
+if [ "$1" = bundle ]; then
+    printf 'BUNDLE_FILE=%s NO_LOCK=%s\n' "${HOMEBREW_BUNDLE_FILE:-}" "${HOMEBREW_BUNDLE_NO_LOCK:-}" >> "$PLOG"
+    exit "${BREW_BUNDLE_RC:-0}"
+fi
+exit 0
+SH
+cat > "$PBIN/curl" <<'SH'
+#!/bin/sh
+printf 'curl %s\n' "$*" >> "$PLOG"
+exit 0
+SH
+chmod +x "$PBIN/brew" "$PBIN/curl"
+
+# Case A: brew already present -> no Homebrew install (no curl), bundle install
+# runs with the right env.
+PC="$WORK/pc"; mkdir -p "$PC"; printf 'brew-upstream\n' > "$PC/Brewfile"
+: > "$PLOG"; BREW_BUNDLE_RC=0 PATH="$PBIN:$PATH" provision_macos "$PC" > /dev/null 2>&1; rc=$?
+if [ "$rc" -eq 0 ] \
+    && ! grep -q '^curl ' "$PLOG" \
+    && grep -q "BUNDLE_FILE=$PC/Brewfile NO_LOCK=1" "$PLOG"; then
+    ok "brew present: skips Homebrew install, bundle install has BUNDLE_FILE+NO_LOCK"
+else
+    bad "brew present: skips Homebrew install, bundle install has BUNDLE_FILE+NO_LOCK"
+fi
+
+# Case B: bundle install fails -> provision_macos is non-fatal (returns 0).
+: > "$PLOG"; BREW_BUNDLE_RC=1 PATH="$PBIN:$PATH" provision_macos "$PC" > /dev/null 2>&1; rc=$?
+if [ "$rc" -eq 0 ]; then
+    ok "bundle failure is non-fatal (returns 0)"
+else
+    bad "bundle failure is non-fatal (returns 0)"
+fi
+
+echo
 echo "Result: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ] && echo "ALL PASS"
 [ "$FAIL" -eq 0 ]

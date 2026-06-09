@@ -1,0 +1,26 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-09-install-fresh-provision.md",
+  "tasks": [
+    {
+      "id": 14,
+      "subject": "Task 1: provision_macos helper + unit tests",
+      "status": "completed",
+      "description": "**Goal:** Add a `provision_macos <dir>` function to `install.sh` (above the test-lib guard) that ensures Homebrew is installed and runs `brew bundle install` of the committed Brewfile, with bundle failure non-fatal; cover its control flow with unit tests.\n\n**Files:**\n- Modify: `install.sh` (add `provision_macos` among helper functions, before the `DOTFILES_INSTALL_LIB` guard ~line 139)\n- Modify: `tests/install_test.sh` (add `provision_macos` scenario block before the `Result:` summary ~line 136)\n\n**Acceptance Criteria:**\n- [ ] `provision_macos` defined above the `DOTFILES_INSTALL_LIB` guard.\n- [ ] When `brew` already on PATH: does NOT invoke the Homebrew installer (`curl`), and runs `brew bundle install` with `HOMEBREW_BUNDLE_FILE=<dir>/Brewfile` and `HOMEBREW_BUNDLE_NO_LOCK=1`.\n- [ ] A failing `brew bundle install` is non-fatal: returns 0.\n- [ ] `sh tests/install_test.sh` ends `ALL PASS`.\n\n**Verify:** `sh tests/install_test.sh` -> `ALL PASS`\n\n**Steps:** TDD per plan doc: add the two provision_macos test cases (PATH-shimmed fake brew/curl), run->fail, implement provision_macos (command -v brew skip; Apple-Silicon /opt/homebrew install via NONINTERACTIVE curl `< /dev/tty`; eval shellenv; `if ! HOMEBREW_BUNDLE_FILE=... HOMEBREW_BUNDLE_NO_LOCK=1 brew bundle install; then err; fi`), run->ALL PASS, `sh -n` both, commit.\n\n```json:metadata\n{\"files\": [\"install.sh\", \"tests/install_test.sh\"], \"verifyCommand\": \"sh tests/install_test.sh\", \"acceptanceCriteria\": [\"provision_macos defined above lib guard\", \"brew-present: no curl, bundle install has HOMEBREW_BUNDLE_FILE+NO_LOCK\", \"bundle failure non-fatal (returns 0)\", \"sh tests/install_test.sh -> ALL PASS\"]}\n```"
+    },
+    {
+      "id": 15,
+      "subject": "Task 2: Wire provision_macos into the install handoff",
+      "status": "completed",
+      "blockedBy": [14],
+      "description": "**Goal:** Change the tail of `install.sh` so that on macOS with a usable terminal it provisions then hands off via `zup`; non-macOS and no-tty behavior unchanged.\n\n**Files:**\n- Modify: `install.sh` (final handoff block ~lines 196-207)\n\n**Acceptance Criteria:**\n- [ ] macOS + `/dev/tty`: tail calls `provision_macos \"$CONFIG_DIR\"` then `exec zsh -ic zup </dev/tty`.\n- [ ] non-macOS + `/dev/tty`: unchanged — `exec zsh -i </dev/tty`.\n- [ ] no-tty: unchanged — prints the guidance.\n- [ ] `zsh/.zshrc` NOT modified.\n- [ ] `sh -n install.sh` parses; `sh tests/install_test.sh` still `ALL PASS`.\n\n**Verify:** `sh -n install.sh && sh tests/install_test.sh` -> parses + `ALL PASS`\n\n**Steps:** Replace the handoff block per plan doc (Darwin: provision_macos + `exec zsh -ic zup </dev/tty`; else `exec zsh -i </dev/tty`; no-tty print unchanged); confirm `.zshrc` untouched + `sh -n` + tests; commit.\n\n```json:metadata\n{\"files\": [\"install.sh\"], \"verifyCommand\": \"sh -n install.sh && sh tests/install_test.sh\", \"acceptanceCriteria\": [\"macOS+tty: provision_macos then exec zsh -ic zup\", \"non-macOS+tty: exec zsh -i unchanged\", \"no-tty: guidance print unchanged\", \"zsh/.zshrc not modified\", \"sh -n parses, tests ALL PASS\"]}\n```"
+    },
+    {
+      "id": 16,
+      "subject": "Task 3: Mark plan complete + final verify",
+      "status": "completed",
+      "blockedBy": [14, 15],
+      "description": "**Goal:** Flip this plan's checkboxes, sync `.tasks.json`, run the full check suite, and commit the bookkeeping (final commit before PR).\n\n**Files:**\n- Modify: `docs/superpowers/plans/2026-06-09-install-fresh-provision.md`\n- Modify: `docs/superpowers/plans/2026-06-09-install-fresh-provision.md.tasks.json`\n\n**Acceptance Criteria:**\n- [ ] Task 1-2 checkboxes checked; Task 1-2 statuses `completed` in `.tasks.json`.\n- [ ] Full check suite passes.\n\n**Verify:** `sh tests/install_test.sh && sh -n install.sh && echo DONE`\n\n**Steps:** Run full re-verification (tests ALL PASS, `sh -n` both, only expected files changed main..HEAD, provision_macos count >=2, `.zshrc` untouched); check plan boxes + set Task 1-2 completed in `.tasks.json`; commit `docs(install): mark fresh-provision plan tasks complete (IT-8323)`.\n\n```json:metadata\n{\"files\": [\"docs/superpowers/plans/2026-06-09-install-fresh-provision.md\", \"docs/superpowers/plans/2026-06-09-install-fresh-provision.md.tasks.json\"], \"verifyCommand\": \"sh tests/install_test.sh && sh -n install.sh\", \"acceptanceCriteria\": [\"plan boxes checked\", \".tasks.json Tasks 1-2 completed\", \"tests ALL PASS + sh -n parses + zshrc untouched\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-09T00:00:00Z"
+}
