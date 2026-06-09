@@ -5,8 +5,9 @@
 #   curl -fsSL https://raw.githubusercontent.com/remerge/dotfiles/main/install.sh | sh
 #
 # Installs Apple Command Line Tools (for git) on macOS, clones this repo into
-# ~/.config, links ~/.zshrc, and starts a fresh zsh. The shell finishes the
-# bootstrap on first launch (Homebrew, plugins, prompt).
+# ~/.config, links ~/.zshrc, then (macOS) installs Homebrew and the Brewfile and
+# hands off via `zup` to update everything and start a fresh zsh. On non-macOS it
+# just starts zsh and the shell bootstraps plugins/prompt on first launch.
 set -eu
 
 REPO_URL="https://github.com/remerge/dotfiles"
