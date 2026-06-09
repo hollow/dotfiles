@@ -91,7 +91,7 @@ zup() {
 	:gcloud-update
 
 	zi self-update
-	zi update --all
+	zi update --all --no-pager
 
 	cd "${oldpwd}"
 
