@@ -6,8 +6,10 @@
 #
 # Installs Apple Command Line Tools (for git) on macOS, clones this repo into
 # ~/.config, links ~/.zshrc, then (macOS) installs Homebrew and the Brewfile and
-# hands off via `zup` to update everything and start a fresh zsh. On non-macOS it
-# just starts zsh and the shell bootstraps plugins/prompt on first launch.
+# hands off via `zup` to update everything and start a fresh zsh; when run from a
+# non-Ghostty terminal it then opens Ghostty so you land in the configured one.
+# On non-macOS it just starts zsh and the shell bootstraps plugins/prompt on
+# first launch.
 set -eu
 
 REPO_URL="https://github.com/remerge/dotfiles"
@@ -201,7 +203,25 @@ if [ "$os" != "Darwin" ]; then
 fi
 
 if [ -e /dev/tty ]; then
-    exec zsh -ic zup </dev/tty
+    if [ "$os" = "Darwin" ] && [ "${TERM_PROGRAM:-}" != "ghostty" ]; then
+        # Run from a non-Ghostty terminal (e.g. the stock Terminal.app on a
+        # fresh Mac): update/provision here — this is also where the Brewfile
+        # installs Ghostty itself — then open Ghostty so the user lands in the
+        # configured terminal. Can't `exec`: we must return here to open it.
+        # ZUP_NO_EXEC stops zup from ending in `exec zsh` (an interactive shell),
+        # which would otherwise block here until the user logged out, delaying
+        # the Ghostty hand-off. `|| true` so a zup hiccup still lets us hand off.
+        ZUP_NO_EXEC=1 zsh -ic zup </dev/tty || true
+        if [ -d /Applications/Ghostty.app ]; then
+            log "Opening Ghostty..."
+            open -a Ghostty
+        else
+            log "Ghostty isn't installed; staying in this terminal."
+        fi
+    else
+        # Already in Ghostty (or non-macOS): update in place and stay here.
+        exec zsh -ic zup </dev/tty
+    fi
 else
     log "Open a new terminal window to finish setup (zsh bootstraps on first launch)."
 fi

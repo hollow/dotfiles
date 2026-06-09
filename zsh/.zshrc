@@ -91,9 +91,13 @@ zup() {
 	:gcloud-update
 
 	zi self-update
-	zi update --all
+	zi update --all --no-pager
 
 	cd "${oldpwd}"
+
+	# The installer sets ZUP_NO_EXEC to provision without dropping into an
+	# interactive shell, so it can hand off to Ghostty; interactive use re-execs.
+	[[ -n ${ZUP_NO_EXEC:-} ]] && return 0
 	exec zsh
 }
 # endregion
