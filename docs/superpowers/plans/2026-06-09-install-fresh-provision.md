@@ -1,6 +1,6 @@
 # install.sh fresh-provision Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers-extended-cc:subagent-driven-development (recommended) or superpowers-extended-cc:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers-extended-cc:subagent-driven-development (recommended) or superpowers-extended-cc:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Make `install.sh` install Homebrew + the committed Brewfile and then run `zup` before handing off, so the first `:brew-update` dump can't clobber the Brewfile / cause missing packages on a fresh setup.
 
@@ -22,16 +22,16 @@
 - Modify: `tests/install_test.sh` (add a `provision_macos` scenario block before the final `Result:` summary, ~line 136)
 
 **Acceptance Criteria:**
-- [ ] `provision_macos` is defined above the `DOTFILES_INSTALL_LIB` guard (so `DOTFILES_INSTALL_LIB=1 . install.sh` defines it without running main).
-- [ ] When `brew` is already on `PATH`: it does NOT invoke the Homebrew installer (`curl`), and DOES run `brew bundle install` with `HOMEBREW_BUNDLE_FILE=<dir>/Brewfile` and `HOMEBREW_BUNDLE_NO_LOCK=1`.
-- [ ] A failing `brew bundle install` is non-fatal: `provision_macos` returns 0.
-- [ ] `sh tests/install_test.sh` ends `ALL PASS` (existing scenarios still pass + the two new cases).
+- [x] `provision_macos` is defined above the `DOTFILES_INSTALL_LIB` guard (so `DOTFILES_INSTALL_LIB=1 . install.sh` defines it without running main).
+- [x] When `brew` is already on `PATH`: it does NOT invoke the Homebrew installer (`curl`), and DOES run `brew bundle install` with `HOMEBREW_BUNDLE_FILE=<dir>/Brewfile` and `HOMEBREW_BUNDLE_NO_LOCK=1`.
+- [x] A failing `brew bundle install` is non-fatal: `provision_macos` returns 0.
+- [x] `sh tests/install_test.sh` ends `ALL PASS` (existing scenarios still pass + the two new cases).
 
 **Verify:** `sh tests/install_test.sh` → `ALL PASS`
 
 **Steps:**
 
-- [ ] **Step 1: Add the failing tests** to `tests/install_test.sh`, immediately before the `echo` / `Result:` summary block (currently ~line 136). Insert:
+- [x] **Step 1: Add the failing tests** to `tests/install_test.sh`, immediately before the `echo` / `Result:` summary block (currently ~line 136). Insert:
 
 ```sh
 echo
@@ -78,12 +78,12 @@ else
 fi
 ```
 
-- [ ] **Step 2: Run the tests — expect failure** (function not yet defined):
+- [x] **Step 2: Run the tests — expect failure** (function not yet defined):
 
 Run: `sh tests/install_test.sh`
 Expected: the two new `provision_macos` lines `FAIL` (and likely a `command not found: provision_macos` to stderr); existing scenarios still `ok`.
 
-- [ ] **Step 3: Implement `provision_macos`** in `install.sh`. Insert it among the helper functions, immediately BEFORE the test-lib guard (the `if [ "${DOTFILES_INSTALL_LIB:-0}" = 1 ]; then return 0; fi` block at ~line 139):
+- [x] **Step 3: Implement `provision_macos`** in `install.sh`. Insert it among the helper functions, immediately BEFORE the test-lib guard (the `if [ "${DOTFILES_INSTALL_LIB:-0}" = 1 ]; then return 0; fi` block at ~line 139):
 
 ```sh
 # Ensure Homebrew is installed and the committed Brewfile is fully installed,
@@ -109,17 +109,17 @@ provision_macos() {
 }
 ```
 
-- [ ] **Step 4: Run the tests — expect pass**:
+- [x] **Step 4: Run the tests — expect pass**:
 
 Run: `sh tests/install_test.sh`
 Expected: `ALL PASS` (all existing scenarios + both new `provision_macos` cases `ok`).
 
-- [ ] **Step 5: Syntax + lint:**
+- [x] **Step 5: Syntax + lint:**
 
 Run: `sh -n install.sh && sh -n tests/install_test.sh && echo SYNTAX_OK`
 Expected: `SYNTAX_OK`. If `shellcheck` is available: `shellcheck install.sh tests/install_test.sh` (clean, or only pre-existing/style notes).
 
-- [ ] **Step 6: Commit:**
+- [x] **Step 6: Commit:**
 
 ```bash
 git add install.sh tests/install_test.sh
@@ -145,17 +145,17 @@ EOF
 - Modify: `install.sh` (the final handoff block, currently the Linux notice + `if [ -e /dev/tty ]; then exec zsh -i </dev/tty; else …; fi` at ~lines 196–207)
 
 **Acceptance Criteria:**
-- [ ] On macOS + `/dev/tty`: the tail calls `provision_macos "$CONFIG_DIR"` then `exec zsh -ic zup </dev/tty`.
-- [ ] On non-macOS + `/dev/tty`: unchanged — `exec zsh -i </dev/tty`.
-- [ ] On no-tty: unchanged — prints the "Open a new terminal window…" guidance.
-- [ ] `zsh/.zshrc` is NOT modified by this task.
-- [ ] `sh -n install.sh` parses; `sh tests/install_test.sh` still `ALL PASS` (the lib-mode `return 0` short-circuit means the tail never runs under test).
+- [x] On macOS + `/dev/tty`: the tail calls `provision_macos "$CONFIG_DIR"` then `exec zsh -ic zup </dev/tty`.
+- [x] On non-macOS + `/dev/tty`: unchanged — `exec zsh -i </dev/tty`.
+- [x] On no-tty: unchanged — prints the "Open a new terminal window…" guidance.
+- [x] `zsh/.zshrc` is NOT modified by this task.
+- [x] `sh -n install.sh` parses; `sh tests/install_test.sh` still `ALL PASS` (the lib-mode `return 0` short-circuit means the tail never runs under test).
 
 **Verify:** `sh -n install.sh && sh tests/install_test.sh` → parses + `ALL PASS`
 
 **Steps:**
 
-- [ ] **Step 1: Replace the handoff block.** The current tail (Step-4 comment through the final `fi`) reads:
+- [x] **Step 1: Replace the handoff block.** The current tail (Step-4 comment through the final `fi`) reads:
 
 ```sh
 # 4. Hand off to a fresh interactive zsh to run the first-run bootstrap.
@@ -195,7 +195,7 @@ else
 fi
 ```
 
-- [ ] **Step 2: Confirm `.zshrc` untouched and syntax OK:**
+- [x] **Step 2: Confirm `.zshrc` untouched and syntax OK:**
 
 Run:
 ```bash
@@ -205,7 +205,7 @@ sh tests/install_test.sh | tail -1
 ```
 Expected: `zshrc untouched OK`, `SYNTAX_OK`, `ALL PASS`.
 
-- [ ] **Step 3: Commit:**
+- [x] **Step 3: Commit:**
 
 ```bash
 git add install.sh
@@ -233,14 +233,14 @@ EOF
 - Modify: `docs/superpowers/plans/2026-06-09-install-fresh-provision.md.tasks.json`
 
 **Acceptance Criteria:**
-- [ ] Task 1–2 checkboxes checked in this plan; Task 1–2 statuses `completed` in `.tasks.json`.
-- [ ] Full check suite passes (commands below).
+- [x] Task 1–2 checkboxes checked in this plan; Task 1–2 statuses `completed` in `.tasks.json`.
+- [x] Full check suite passes (commands below).
 
 **Verify:** `sh tests/install_test.sh && sh -n install.sh && echo DONE`
 
 **Steps:**
 
-- [ ] **Step 1: Full re-verification:**
+- [x] **Step 1: Full re-verification:**
 
 ```bash
 cd /Users/bene/src/remerge/dotfiles
@@ -252,9 +252,9 @@ git diff --quiet main..HEAD -- zsh/.zshrc && echo "zshrc untouched OK"
 ```
 Expected: `ALL PASS`, `SYNTAX_OK`, only the expected files, `provision_macos` count ≥ 2, `zshrc untouched OK`.
 
-- [ ] **Step 2:** Check the boxes in Tasks 1–2 of this plan doc and set Task 1–2 status to `completed` in `2026-06-09-install-fresh-provision.md.tasks.json`.
+- [x] **Step 2:** Check the boxes in Tasks 1–2 of this plan doc and set Task 1–2 status to `completed` in `2026-06-09-install-fresh-provision.md.tasks.json`.
 
-- [ ] **Step 3: Commit:**
+- [x] **Step 3: Commit:**
 
 ```bash
 git add docs/superpowers/plans/2026-06-09-install-fresh-provision.md docs/superpowers/plans/2026-06-09-install-fresh-provision.md.tasks.json
