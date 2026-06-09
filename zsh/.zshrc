@@ -335,6 +335,19 @@ zi auto has"ruby" for ruby
 zi auto has"op" wait1 for 1password-cli
 # endregion
 
+# region atuin: magical shell history with optional sync
+# https://github.com/atuinsh/atuin
+:atuin-load() {
+	alias a="atuin"
+}
+
+:atuin-eval() {
+	atuin init zsh --disable-up-arrow
+}
+
+zi auto has"atuin" wait1 for atuin
+# endregion
+
 # region bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 :bat-init() {
@@ -400,6 +413,19 @@ zi auto has"colima" wait1 for colima
 }
 
 zi auto id-as"dircolors" wait1 for trapd00r/LS_COLORS
+# endregion
+
+# region direnv: change environment based on the current directory
+# https://github.com/direnv/direnv
+:direnv-load() {
+	alias da="direnv allow"
+}
+
+:direnv-eval() {
+	direnv hook zsh
+}
+
+zi auto has"direnv" for direnv/direnv
 # endregion
 
 # region docker: container runtime CLI
@@ -824,3 +850,8 @@ zi auto wait for hlissner/zsh-autopair
 
 # add local bin last so user binaries take precedence over tool/brew paths
 add path "${HOME}/.local/bin"
+
+# Load .envrc after shell initialization if present
+if [[ -e .envrc ]]; then
+	pushd "${HOME}" &>/dev/null && popd
+fi
