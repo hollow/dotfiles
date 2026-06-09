@@ -215,15 +215,21 @@ if [ ! -f "$CONFIG_DIR/git/local" ]; then
     fi
 fi
 
-# 4. Hand off to a fresh interactive zsh to run the first-run bootstrap.
+# 4. Provision (macOS) and hand off to a fresh interactive zsh.
 if [ "$os" != "Darwin" ]; then
     log "Linux detected (best-effort): Homebrew and starship will NOT auto-install."
     log "See the README for manual steps: $REPO_URL"
 fi
 
-log "Done. Starting zsh — the first launch installs Homebrew, plugins, and the prompt."
 if [ -e /dev/tty ]; then
-    exec zsh -i </dev/tty
+    if [ "$os" = "Darwin" ]; then
+        provision_macos "$CONFIG_DIR"
+        log "Provisioning done. Updating everything via zup and starting zsh..."
+        exec zsh -ic zup </dev/tty
+    else
+        log "Starting zsh..."
+        exec zsh -i </dev/tty
+    fi
 else
     log "Open a new terminal window to finish setup (zsh bootstraps on first launch)."
 fi
