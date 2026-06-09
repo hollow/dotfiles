@@ -135,6 +135,28 @@ place_dotfiles() {
     fi
 }
 
+# Ensure Homebrew is installed and the committed Brewfile is fully installed,
+# so the first `:brew-update` dump (later, via zup) cannot drop packages.
+# Apple-Silicon (/opt/homebrew) only. A bundle failure is warned, not fatal.
+provision_macos() {
+    _dir=$1
+    if ! command -v brew > /dev/null 2>&1; then
+        if [ ! -x /opt/homebrew/bin/brew ]; then
+            log "Installing Homebrew..."
+            NONINTERACTIVE=1 /bin/bash -c \
+                "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+                < /dev/tty
+        fi
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+
+    log "Installing packages from the Brewfile (this can take a while)..."
+    if ! HOMEBREW_BUNDLE_FILE="$_dir/Brewfile" HOMEBREW_BUNDLE_NO_LOCK=1 brew bundle install; then
+        err "Some Brewfile packages failed to install; continuing."
+        err "Re-run 'zup' later to retry."
+    fi
+}
+
 # When sourced for testing (DOTFILES_INSTALL_LIB=1), stop here so the helper
 # functions above can be exercised without running the installer.
 if [ "${DOTFILES_INSTALL_LIB:-0}" = 1 ]; then
