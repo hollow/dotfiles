@@ -166,8 +166,6 @@ link "${HISTFILE}" .zsh_history
 		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 		eval "$(/opt/homebrew/bin/brew shellenv)"
 		:brew-init
-	else
-		brew bundle dump -f
 	fi
 
 	brew update
