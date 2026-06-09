@@ -1,0 +1,19 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md",
+  "tasks": [
+    {
+      "id": 1,
+      "subject": "Task 1: Port atuin + direnv config (single commit)",
+      "status": "pending",
+      "description": "**Goal:** Apply all atuin and direnv config edits — `Brewfile`, `zsh/.zshrc`, and the new `atuin/` dir — each byte-identical to `981e133`, verify, and land them as one commit.\n\n**Files:**\n- Modify: `Brewfile` (add `brew \"atuin\"` after `atool`; `brew \"direnv\"` after `curl`)\n- Modify: `zsh/.zshrc` (insert `# region atuin` between 1password/bat; `# region direnv` between dircolors/docker; append trailing `.envrc` hook after final `add path` line)\n- Create: `atuin/config.toml`\n- Create: `atuin/themes/catppuccin-mocha-blue.toml`\n\n**Acceptance Criteria:**\n- [ ] `brew \"atuin\"` between `atool` and `bash`; `brew \"direnv\"` between `curl` and `docker`.\n- [ ] `# region atuin` between 1password and bat regions, byte-identical to `981e133`.\n- [ ] `# region direnv` between dircolors and docker regions, byte-identical to `981e133`.\n- [ ] trailing `.envrc` hook after `add path \"${HOME}/.local/bin\"`, byte-identical to pin file tail.\n- [ ] `atuin/config.toml` and `atuin/themes/catppuccin-mocha-blue.toml` byte-identical to `981e133`.\n- [ ] `zsh -n zsh/.zshrc` exits 0.\n- [ ] Fork `Brewfile` stays a strict subset of upstream (no new fork-only line).\n\n**Verify:** `zsh -n zsh/.zshrc && echo SYNTAX-OK` plus byte-identity diffs (Step 7) each print `OK`; `comm -13 <(git show 981e133:Brewfile|sort) <(sort Brewfile)` contains no atuin/direnv line.\n\n**Steps:** Step 0 ensure pin reachable; Step 1 two Brewfile inserts; Step 2 atuin region; Step 3 direnv region; Step 4 trailing `.envrc` hook (TAB-indented `pushd`); Step 5 `git show 981e133:atuin/...` into config + theme; Step 6 `zsh -n`; Step 7 byte-identity diffs + region order + Brewfile subset; Step 8 single commit.\n\n```json:metadata\n{\"files\": [\"Brewfile\", \"zsh/.zshrc\", \"atuin/config.toml\", \"atuin/themes/catppuccin-mocha-blue.toml\"], \"verifyCommand\": \"zsh -n zsh/.zshrc && echo SYNTAX-OK\", \"acceptanceCriteria\": [\"brew atuin between atool/bash and direnv between curl/docker\", \"atuin region between 1password/bat byte-identical to 981e133\", \"direnv region between dircolors/docker byte-identical to 981e133\", \"trailing .envrc hook byte-identical to pin tail\", \"atuin/ config files byte-identical to 981e133\", \"zsh -n passes\", \"Brewfile stays subset of upstream\"]}\n```"
+    },
+    {
+      "id": 2,
+      "subject": "Task 2: Mark plan tasks complete",
+      "status": "pending",
+      "blockedBy": [1],
+      "description": "**Goal:** Tick the checkboxes in the Ring 15 plan and commit — the standard ring closing artifact.\n\n**Files:**\n- Modify: `docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md` (check all `- [ ]` → `- [x]`)\n\n**Acceptance Criteria:**\n- [ ] All step/criterion checkboxes in Task 1 and Task 2 are `- [x]`.\n- [ ] A commit records the completed plan.\n\n**Verify:** `grep -c '\\- \\[ \\]' docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md` → `0`.\n\n**Steps:** Step 1 replace each `- [ ]` with `- [x]` throughout the plan; Step 2 verify `grep -c` returns `0`; Step 3 commit `IT-8323: Ring 15 — mark plan tasks complete`.\n\n```json:metadata\n{\"files\": [\"docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md\"], \"verifyCommand\": \"grep -c '\\\\- \\\\[ \\\\]' docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md\", \"acceptanceCriteria\": [\"all checkboxes ticked\", \"commit records completed plan\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-09"
+}
