@@ -208,8 +208,10 @@ if [ -e /dev/tty ]; then
         # fresh Mac): update/provision here — this is also where the Brewfile
         # installs Ghostty itself — then open Ghostty so the user lands in the
         # configured terminal. Can't `exec`: we must return here to open it.
-        # `|| true` so a zup hiccup still lets us hand off if Ghostty installed.
-        zsh -ic zup </dev/tty || true
+        # ZUP_NO_EXEC stops zup from ending in `exec zsh` (an interactive shell),
+        # which would otherwise block here until the user logged out, delaying
+        # the Ghostty hand-off. `|| true` so a zup hiccup still lets us hand off.
+        ZUP_NO_EXEC=1 zsh -ic zup </dev/tty || true
         if [ -d /Applications/Ghostty.app ]; then
             log "Opening Ghostty..."
             open -a Ghostty
