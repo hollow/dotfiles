@@ -91,6 +91,11 @@ zup() {
 	:gcloud-update
 
 	zi self-update
+	# prune plugins/snippets this config no longer loads before updating, so
+	# `zi update --all` has nothing unloaded left to warn about (--yes skips the
+	# interactive confirm). turbo loads have all fired in this interactive shell,
+	# so "not loaded" == "no longer specified".
+	zi delete --clean --yes
 	zi update --all
 
 	cd "${oldpwd}"

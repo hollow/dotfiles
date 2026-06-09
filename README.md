@@ -132,6 +132,9 @@ enhancing shell performance and functionality.
   - Tmux plugins
   - Google Cloud SDK components
   - Zi plugin manager itself
+  - Zi-managed plugins and snippets the config no longer loads, which are
+    pruned (`zi delete --clean --yes`) before updating so `zi update --all`
+    no longer reports "update includes unloaded plugins/snippets"
   - All Zi-managed zsh plugins
 
   This ensures the entire development environment stays current with a single
