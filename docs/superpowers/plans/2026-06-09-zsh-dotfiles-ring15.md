@@ -1,6 +1,6 @@
 # Ring 15 — atuin + direnv Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers-extended-cc:subagent-driven-development (recommended) or superpowers-extended-cc:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers-extended-cc:subagent-driven-development (recommended) or superpowers-extended-cc:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Port atuin and direnv from `hollow/dotfiles@981e133` into the fork, byte-identical, as one config commit plus a plan-complete commit.
 
@@ -25,26 +25,26 @@
 - Create: `atuin/themes/catppuccin-mocha-blue.toml`
 
 **Acceptance Criteria:**
-- [ ] `Brewfile` has `brew "atuin"` between `brew "atool"` and `brew "bash"`, and `brew "direnv"` between `brew "curl"` and `brew "docker"`.
-- [ ] `zsh/.zshrc` has `# region atuin` between the `1password` and `bat` regions, byte-identical to `981e133`.
-- [ ] `zsh/.zshrc` has `# region direnv` between the `dircolors` and `docker` regions, byte-identical to `981e133`.
-- [ ] `zsh/.zshrc` ends with the `.envrc` startup hook after `add path "${HOME}/.local/bin"`, byte-identical to `981e133`'s file tail.
-- [ ] `atuin/config.toml` and `atuin/themes/catppuccin-mocha-blue.toml` are byte-identical to `981e133`.
-- [ ] `zsh -n zsh/.zshrc` exits 0.
-- [ ] Fork's `Brewfile` `brew`/`cask` lines remain a strict subset of upstream (no new fork-only line from this ring).
+- [x] `Brewfile` has `brew "atuin"` between `brew "atool"` and `brew "bash"`, and `brew "direnv"` between `brew "curl"` and `brew "docker"`.
+- [x] `zsh/.zshrc` has `# region atuin` between the `1password` and `bat` regions, byte-identical to `981e133`.
+- [x] `zsh/.zshrc` has `# region direnv` between the `dircolors` and `docker` regions, byte-identical to `981e133`.
+- [x] `zsh/.zshrc` ends with the `.envrc` startup hook after `add path "${HOME}/.local/bin"`, byte-identical to `981e133`'s file tail.
+- [x] `atuin/config.toml` and `atuin/themes/catppuccin-mocha-blue.toml` are byte-identical to `981e133`.
+- [x] `zsh -n zsh/.zshrc` exits 0.
+- [x] Fork's `Brewfile` `brew`/`cask` lines remain a strict subset of upstream (no new fork-only line from this ring).
 
 **Verify:** `zsh -n zsh/.zshrc && echo SYNTAX-OK` plus the byte-identity diffs in Step 7 (each prints `OK`).
 
 **Steps:**
 
-- [ ] **Step 0: Ensure the pin is reachable**
+- [x] **Step 0: Ensure the pin is reachable**
 
 ```bash
 git cat-file -e 981e133^{commit} 2>/dev/null || git fetch hollow
 ```
 Expected: no output (commit present). If it fetches, that's fine too.
 
-- [ ] **Step 1: Add the two `Brewfile` lines**
+- [x] **Step 1: Add the two `Brewfile` lines**
 
 Insert `brew "atuin"` after `brew "atool"`:
 
@@ -72,7 +72,7 @@ brew "direnv"
 brew "docker"
 ```
 
-- [ ] **Step 2: Insert the `# region atuin` block in `zsh/.zshrc`**
+- [x] **Step 2: Insert the `# region atuin` block in `zsh/.zshrc`**
 
 Edit `zsh/.zshrc` — replace:
 ```
@@ -102,7 +102,7 @@ zi auto has"atuin" wait1 for atuin
 # region bat: cat(1) clone with wings
 ```
 
-- [ ] **Step 3: Insert the `# region direnv` block in `zsh/.zshrc`**
+- [x] **Step 3: Insert the `# region direnv` block in `zsh/.zshrc`**
 
 Edit `zsh/.zshrc` — replace:
 ```
@@ -132,7 +132,7 @@ zi auto has"direnv" for direnv/direnv
 # region docker: container runtime CLI
 ```
 
-- [ ] **Step 4: Append the trailing `.envrc` startup hook**
+- [x] **Step 4: Append the trailing `.envrc` startup hook**
 
 Edit `zsh/.zshrc` — replace (this is the current last line of the file plus its comment):
 ```
@@ -150,7 +150,7 @@ if [[ -e .envrc ]]; then
 fi
 ```
 
-- [ ] **Step 5: Create the atuin config dir from the pin (guarantees byte-identity)**
+- [x] **Step 5: Create the atuin config dir from the pin (guarantees byte-identity)**
 
 ```bash
 mkdir -p atuin/themes
@@ -158,14 +158,14 @@ git show 981e133:atuin/config.toml > atuin/config.toml
 git show 981e133:atuin/themes/catppuccin-mocha-blue.toml > atuin/themes/catppuccin-mocha-blue.toml
 ```
 
-- [ ] **Step 6: Syntax check**
+- [x] **Step 6: Syntax check**
 
 ```bash
 zsh -n zsh/.zshrc && echo SYNTAX-OK
 ```
 Expected: `SYNTAX-OK`
 
-- [ ] **Step 7: Verify byte-identity against the pin**
+- [x] **Step 7: Verify byte-identity against the pin**
 
 ```bash
 # --- zsh/.zshrc regions ---
@@ -194,7 +194,7 @@ comm -13 <(git show 981e133:Brewfile | sort) <(sort Brewfile)
 ```
 Expected: every `diff` empty with its `OK` echo; `1password < atuin < bat` and `dircolors < direnv < docker` line ordering; the `grep` shows `atool, atuin, bash` and `curl, direnv, docker` adjacent; the `comm -13` output does **not** contain `brew "atuin"` or `brew "direnv"` (they are subset lines now present upstream too).
 
-- [ ] **Step 8: Commit (single config commit)**
+- [x] **Step 8: Commit (single config commit)**
 
 ```bash
 git add Brewfile zsh/.zshrc atuin/
@@ -220,28 +220,28 @@ EOF
 **Goal:** Tick the checkboxes in this plan and the spec status, and commit — the standard ring closing artifact.
 
 **Files:**
-- Modify: `docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md` (check all `- [ ]` → `- [x]`)
+- Modify: `docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md` (check all `- [x]` → `- [x]`)
 
 **Acceptance Criteria:**
-- [ ] All step/criterion checkboxes in Task 1 are `- [x]`.
-- [ ] A commit records the completed plan.
+- [x] All step/criterion checkboxes in Task 1 are `- [x]`.
+- [x] A commit records the completed plan.
 
 **Verify:** `grep -c '\- \[ \]' docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md` → `0` (no unchecked boxes remain).
 
 **Steps:**
 
-- [ ] **Step 1: Check every box in Task 1 and Task 2**
+- [x] **Step 1: Check every box in Task 1 and Task 2**
 
-Replace each `- [ ]` with `- [x]` throughout this plan file (Task 1 Steps 0–8, Task 1 acceptance criteria, and Task 2's own boxes).
+Replace each `- [x]` with `- [x]` throughout this plan file (Task 1 Steps 0–8, Task 1 acceptance criteria, and Task 2's own boxes).
 
-- [ ] **Step 2: Verify no unchecked boxes remain**
+- [x] **Step 2: Verify no unchecked boxes remain**
 
 ```bash
 grep -c '\- \[ \]' docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md
 ```
 Expected: `0`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add docs/superpowers/plans/2026-06-09-zsh-dotfiles-ring15.md
