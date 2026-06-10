@@ -565,11 +565,6 @@ zi auto has"gpg" wait1 for gnupg
 zi auto has"less" for less
 # endregion
 
-# region man: unix documentation system
-# https://www.nongnu.org/man-db/
-zi auto wait1 for OMZP::colored-man-pages
-# endregion
-
 # region ncdu: disk usage analyzer
 # https://dev.yorhel.nl/ncdu
 :ncdu-init() {
