@@ -91,14 +91,13 @@ zup() {
 	:gcloud-update
 
 	zi self-update
-	# prune plugins/snippets this config no longer loads before updating, so
-	# `zi update --all` has nothing unloaded left to warn about (--yes skips the
-	# interactive confirm). turbo loads have all fired in this interactive shell,
-	# so "not loaded" == "no longer specified".
-	zi delete --clean --yes
-	zi update --all
+	zi update --all --no-pager
 
 	cd "${oldpwd}"
+
+	# The installer sets ZUP_NO_EXEC to provision without dropping into an
+	# interactive shell, so it can hand off to Ghostty; interactive use re-execs.
+	[[ -n ${ZUP_NO_EXEC:-} ]] && return 0
 	exec zsh
 }
 # endregion
@@ -635,11 +634,6 @@ zi auto has"gpg" wait1 for gnupg
 }
 
 zi auto has"less" for less
-# endregion
-
-# region man: unix documentation system
-# https://www.nongnu.org/man-db/
-zi auto wait1 for OMZP::colored-man-pages
 # endregion
 
 # region ncdu: disk usage analyzer
