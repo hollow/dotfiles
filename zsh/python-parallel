@@ -1,0 +1,2 @@
+#!zsh
+:parallel */python.mk(:h) do "$@"

@@ -1,0 +1,2 @@
+#!zsh
+:each */terraform.mk(:h) do "$@"
