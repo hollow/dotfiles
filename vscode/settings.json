@@ -47,13 +47,16 @@
 	"[typescript]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
 	"[yaml]": {
 		"editor.defaultFormatter": "redhat.vscode-yaml"
 	},
 	"catppuccin.italicKeywords": false,
 	"csv-preview.resizeColumns": "all",
 	"editor.codeActionsOnSave": {
-		"quickfix.biome": "explicit",
+		"source.fixAll.biome": "explicit",
 		"source.fixAll.ruff": "explicit",
 		"source.fixAll.rumdl": "explicit",
 		"source.fixAll.shellcheck": "explicit",
