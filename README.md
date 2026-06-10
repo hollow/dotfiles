@@ -4,6 +4,8 @@ A ready-to-use shell setup for your Mac. One command gives you a modern terminal
 — a clean prompt, command autocompletion, syntax highlighting, and
 autosuggestions — with nothing to configure.
 
+![The terminal in action: starship prompt, eza, fzf-tab completion, autosuggestions, and bat](demo.gif)
+
 Linux is supported on a best-effort basis: the installer clones the config and
 links `~/.zshrc`, but it does **not** auto-install Homebrew or starship (that
 step is macOS-only). Install [Homebrew](https://brew.sh) and
@@ -37,6 +39,14 @@ Open the **Terminal** app, paste this line, and press Enter:
 ```sh
 curl -fsSL https://raw.githubusercontent.com/remerge/dotfiles/main/install.sh | sh
 ```
+
+> [!WARNING]
+> The installer takes over `~/.config` as a checkout of this repository. If you
+> already keep configuration there, any file whose path collides with one
+> tracked in this repo will be **replaced**. Before changing anything, the
+> installer lists every file it would overwrite, offers to show the full diff,
+> and asks for confirmation — and files not tracked by this repo are left in
+> place. Still, back up anything you care about first.
 
 That's it. The installer will:
 
