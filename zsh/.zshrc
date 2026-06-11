@@ -167,7 +167,9 @@ link "${HISTFILE}" .zsh_history
 
 :brew-update() {
 	if ! has brew; then
-		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+		# NONINTERACTIVE skips the installer's "Press RETURN to continue"
+		# confirmation; the sudo password prompt still appears when needed.
+		NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 		eval "$(/opt/homebrew/bin/brew shellenv)"
 		:brew-init
 	fi
