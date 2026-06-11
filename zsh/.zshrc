@@ -85,6 +85,11 @@ zup() {
 	set -e
 	local oldpwd="${PWD}"
 
+	# Pull the dotfiles first so the rest of zup (Brewfile, plugin list, …)
+	# and the final `exec zsh` run against the latest config. Non-fatal:
+	# offline or diverged checkouts print git's error and zup carries on.
+	git -C "${XDG_CONFIG_HOME}" pull --ff-only || :
+
 	:brew-update
 	:uv-update
 	:tmux-update
