@@ -214,6 +214,9 @@ if [ -e /dev/tty ]; then
         ZUP_NO_EXEC=1 zsh -ic zup </dev/tty || true
         if [ -d /Applications/Ghostty.app ]; then
             log "Opening Ghostty..."
+            # Strip Homebrew's quarantine flag so Gatekeeper skips the
+            # "downloaded from the internet" popup on first launch.
+            xattr -dr com.apple.quarantine /Applications/Ghostty.app 2>/dev/null || true
             open -a Ghostty
         else
             log "Ghostty isn't installed; staying in this terminal."

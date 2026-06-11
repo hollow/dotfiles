@@ -85,6 +85,11 @@ zup() {
 	set -e
 	local oldpwd="${PWD}"
 
+	# Pull the dotfiles first so the rest of zup (Brewfile, plugin list, …)
+	# and the final `exec zsh` run against the latest config. Non-fatal:
+	# offline or diverged checkouts print git's error and zup carries on.
+	git -C "${XDG_CONFIG_HOME}" pull --ff-only || :
+
 	:brew-update
 	:uv-update
 	:tmux-update
@@ -167,7 +172,9 @@ link "${HISTFILE}" .zsh_history
 
 :brew-update() {
 	if ! has brew; then
-		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+		# NONINTERACTIVE skips the installer's "Press RETURN to continue"
+		# confirmation; the sudo password prompt still appears when needed.
+		NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 		eval "$(/opt/homebrew/bin/brew shellenv)"
 		:brew-init
 	fi
@@ -554,7 +561,9 @@ zi auto has"fzf" wait1 for fzf
 }
 
 :gcloud-update() {
-	gcloud components update --quiet || :
+	# --quiet only skips prompts; the banner and progress output bypass
+	# --verbosity, so silence everything (failures are ignored anyway).
+	gcloud components update --quiet > /dev/null 2>&1 || :
 }
 
 :gcloud-load() {
