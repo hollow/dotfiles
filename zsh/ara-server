@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+
+mkdir -p "${ARA_BASE_DIR}"
+docker stop ara-server
+docker rm ara-server
+docker run --name ara-server --detach --tty \
+    --volume ${ARA_BASE_DIR}:/opt/ara -p 8000:8000 \
+    docker.io/recordsansible/ara-api:latest

@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+
+typeset -a regions
+regions=( $(aws ec2 describe-regions | jq -r '.Regions[].RegionName') )
+
+typeset region
+for region in ${regions}; do
+    echo "\n>>> ${region}"
+    aws --no-cli-pager --region "${region}" "$@"
+done
