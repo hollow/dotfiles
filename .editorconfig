@@ -1,0 +1,21 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+
+[*.{js,jsx,ts,tsx,json,css,html}]
+indent_style = tab
+indent_size = 2
+
+# "ignore" is a shfmt extension (https://github.com/mvdan/sh#editorconfig) — editors ignore unknown keys
+[node_modules/**]
+ignore = true
+
+[_site/**]
+ignore = true
+
+[*.md]
+trim_trailing_whitespace = false
