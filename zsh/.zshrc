@@ -342,38 +342,6 @@ zi auto has"ruby" for ruby
 zi auto has"op" wait1 for 1password-cli
 # endregion
 
-# region android: development kit
-# https://developer.android.com/studio/command-line/variables
-export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
-# endregion
-
-# region ansible: simple IT automation
-# https://github.com/ansible/ansible
-# ANSIBLE_HOME is the base for collections, roles, plugins and the galaxy token
-# (all data); tmp/cp go to runtime and the galaxy cache to cache instead.
-:ansible-init() {
-	export ANSIBLE_HOME="${XDG_DATA_HOME}/ansible"
-	export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible"
-	export ANSIBLE_LOCAL_TEMP="${XDG_RUNTIME_DIR}/ansible/tmp"
-	export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
-}
-
-:ansible-load() {
-	alias ad="ansible-doc"
-	alias ai="ansible-inventory"
-	alias ap="ansible-playbook"
-}
-
-zi auto has"ansible" wait1 for ansible
-# endregion
-
-# region ansible/ara: ARA Records Ansible
-# https://github.com/ansible-community/ara
-export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
-export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
-export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
-# endregion
-
 # region atuin: magical shell history with optional sync
 # https://github.com/atuinsh/atuin
 :atuin-load() {
@@ -387,23 +355,6 @@ export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
 zi auto has"atuin" wait1 for atuin
 # endregion
 
-# region aws: Amazon Web Services CLI
-# https://aws.amazon.com/cli/
-:aws-init() {
-	export SHOW_AWS_PROMPT=false
-}
-
-zi auto has"aws" wait1 for OMZP::aws
-# endregion
-
-# region aws/boto: AWS SDK for Python
-# https://github.com/boto/boto3
-export BOTO_CONFIG="${XDG_DATA_HOME}/boto"
-print -r -- "[GSUtil]
-state_dir = ${XDG_DATA_HOME}/gsutil
-parallel_composite_upload_threshold = 150M" >"${BOTO_CONFIG}"
-# endregion
-
 # region bat: cat(1) clone with wings
 # https://github.com/sharkdp/bat
 :bat-init() {
@@ -414,24 +365,11 @@ parallel_composite_upload_threshold = 150M" >"${BOTO_CONFIG}"
 zi auto has"bat" wait1 for bat
 # endregion
 
-# region checkov: static code analysis tool for Terraform & Co
-# https://github.com/bridgecrewio/checkov
-:checkov-eval() {
-	:register-python-argcomplete checkov
-}
-
-zi auto has"checkov" wait1 for checkov
-# endregion
-
 # region claude: AI assistant by Anthropic
 # https://claude.ai
 :claude-init() {
 	export CLAUDE_CODE_NEW_INIT=1
 	export ENABLE_CLAUDEAI_MCP_SERVERS=true
-
-	local src="${HOME}/Library/Application Support/Claude/claude_desktop_config.json"
-	local dst="${HOME}/.claude/claude_desktop_config.json"
-	[[ -e ${src} && ${src} -nt ${dst} ]] && cp "${src}" "${dst}"
 }
 
 zi auto has"claude" wait1 for claude
@@ -465,15 +403,6 @@ zi auto has"claude" wait1 for claude
 }
 
 zi auto has"colima" wait1 for colima
-# endregion
-
-# region consul: distributed, highly available service discovery
-# https://github.com/hashicorp/consul
-:consul-load() {
-	complete -o nospace -C consul consul
-}
-
-zi auto has"consul" wait1 for consul
 # endregion
 
 # region dircolors: setup colors for ls and friends
@@ -654,15 +583,6 @@ zi auto has"less" for less
 zi auto has"ncdu" wait1 for ncdu
 # endregion
 
-# region nomad: workload orchestrator
-# https://github.com/hashicorp/nomad
-:nomad-load() {
-	complete -o nospace -C nomad nomad
-}
-
-zi auto has"nomad" wait1 for nomad
-# endregion
-
 # region opentofu: open-source terraform fork, installed via mise
 # https://github.com/opentofu/opentofu
 :opentofu-init() {
@@ -716,15 +636,6 @@ zi auto wait1 for OMZP::rsync
 zi auto has"sops" wait1 for sops
 # endregion
 
-# region sqlite: database engine
-# https://sqlite.org
-:sqlite-init() {
-	export SQLITE_HISTORY="${XDG_DATA_HOME}/sqlite/history"
-}
-
-zi auto has"sqlite3" wait1 for sqlite
-# endregion
-
 # region ssh: secure shell
 # https://www.openssh.com
 :ssh-init() {
@@ -752,11 +663,6 @@ zi auto has"sqlite3" wait1 for sqlite
 zi auto has"ssh" for ssh
 # endregion
 
-# region sshp: Parallel SSH Executor
-# https://github.com/bahamas10/sshp
-zi make as"program" for bahamas10/sshp
-# endregion
-
 # region tmux: a terminal multiplexer
 # https://github.com/tmux/tmux
 :tmux-init() {
@@ -777,11 +683,6 @@ zi make as"program" for bahamas10/sshp
 }
 
 zi auto has"tmux" silent for OMZP::tmux
-# endregion
-
-# region tmux/xpanes: run commands across synchronized tmux panes
-# https://github.com/greymd/tmux-xpanes
-zi auto has"tmux" wait1 for greymd/tmux-xpanes
 # endregion
 
 # region vim: vi improved, via neovim
@@ -824,15 +725,6 @@ zi auto has"code" wait1 for vscode
 }
 
 zi auto has"wget" wait1 for wget
-# endregion
-
-# region youtube: download audio
-# https://github.com/yt-dlp/yt-dlp
-:youtube-load() {
-	alias yta="yt-dlp --extract-audio --audio-format mp3 --add-metadata"
-}
-
-zi auto has"yt-dlp" wait1 for youtube
 # endregion
 
 # region zsh/you-should-use: reminds you to use existing aliases for commands you just typed
@@ -958,11 +850,6 @@ zi auto atload"_zsh_autosuggest_start" \
 # region zsh/autopair: automatically close quotes, brackets and other delimiters
 # https://github.com/hlissner/zsh-autopair
 zi auto wait for hlissner/zsh-autopair
-# endregion
-
-# region zsh/bench: benchmark zsh startup and interactive lag
-# https://github.com/romkatv/zsh-bench
-zi as"program" wait1 for romkatv/zsh-bench
 # endregion
 
 # add local bin last so user binaries take precedence over tool/brew paths

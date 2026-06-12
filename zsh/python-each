@@ -1,2 +1,0 @@
-#!zsh
-:each */python.mk(:h) do "$@"

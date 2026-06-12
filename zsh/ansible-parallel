@@ -1,2 +1,0 @@
-#!zsh
-:parallel */ansible.mk(:h) do "$@"
