@@ -1,6 +1,0 @@
-#!/usr/bin/env zsh
-emulate -L zsh
-
-ansible "${1:-all}" --list-hosts \
-    | sed '/hosts.*:$/d;s/ //g' \
-    | sort -u

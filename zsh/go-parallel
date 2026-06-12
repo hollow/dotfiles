@@ -1,2 +1,0 @@
-#!zsh
-:parallel */go.mk(:h:a) do "$@"

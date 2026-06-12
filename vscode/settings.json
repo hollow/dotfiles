@@ -53,9 +53,6 @@
 	"[yaml]": {
 		"editor.defaultFormatter": "redhat.vscode-yaml"
 	},
-	"ansible.lightspeed.enabled": false,
-	"ansible.lightspeed.suggestions.enabled": false,
-	"ansible.validation.lint.enabled": false,
 	"catppuccin.italicKeywords": false,
 	"csv-preview.resizeColumns": "all",
 	"editor.codeActionsOnSave": {
@@ -72,10 +69,6 @@
 	"editor.minimap.enabled": false,
 	"editor.showFoldingControls": "always",
 	"editor.wordWrap": "on",
-	"files.associations": {
-		"*.alloy": "grafana-alloy",
-		"*.jinja": "jinja"
-	},
 	"files.insertFinalNewline": true,
 	"files.trimFinalNewlines": true,
 	"files.trimTrailingWhitespace": true,
@@ -93,7 +86,6 @@
 		"https://schemastore.azurewebsites.net/": true,
 		"https://www.schemastore.org/": true
 	},
-	"makefile.configureOnOpen": false,
 	"markdown.extension.toc.levels": "2..6",
 	"mise.checkForNewMiseVersion": false,
 	"redhat.telemetry.enabled": false,
@@ -104,14 +96,6 @@
 	"terminal.integrated.shellIntegration.decorationsEnabled": "never",
 	"terminal.integrated.stickyScroll.enabled": false,
 	"terminal.integrated.suggest.enabled": false,
-	"window.commandCenter": false,
-	"window.newWindowDimensions": "inherit",
-	"workbench.activityBar.location": "hidden",
-	"workbench.browser.showInTitleBar": false,
 	"workbench.colorTheme": "Catppuccin Mocha",
-	"workbench.iconTheme": "catppuccin-mocha",
-	"workbench.layoutControl.enabled": false,
-	"workbench.navigationControl.enabled": false,
-	"workbench.startupEditor": "none",
-	"yaml.customTags": ["!encrypted/pkcs1-oaep scalar", "!vault scalar"]
+	"workbench.iconTheme": "catppuccin-mocha"
 }

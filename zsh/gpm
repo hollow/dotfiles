@@ -1,2 +1,0 @@
-#!/usr/bin/env zsh
-gh pr merge --merge --admin --delete-branch
