@@ -1,0 +1,2 @@
+#!zsh
+:each */.copier-answers.yml(:h) do "$@"

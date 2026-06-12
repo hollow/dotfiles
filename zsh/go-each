@@ -1,0 +1,2 @@
+#!zsh
+:each */go.mk(:h) do "$@"

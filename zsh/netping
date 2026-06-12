@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+
+typeset i
+for i in "$@"; do
+    fping -g "${i}" 2>/dev/null
+done

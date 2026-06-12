@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+pwgen -s 32 1 | clipcopy
