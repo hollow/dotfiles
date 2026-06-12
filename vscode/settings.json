@@ -27,7 +27,8 @@
 		"editor.defaultFormatter": "biomejs.biome"
 	},
 	"[markdown]": {
-		"editor.defaultFormatter": "rvben.rumdl"
+		"editor.defaultFormatter": "rvben.rumdl",
+		"files.trimTrailingWhitespace": false
 	},
 	"[opentofu-vars]": {
 		"editor.defaultFormatter": "opentofu.vscode-opentofu"
@@ -69,6 +70,7 @@
 	"editor.minimap.enabled": false,
 	"editor.showFoldingControls": "always",
 	"editor.wordWrap": "on",
+	"files.eol": "\n",
 	"files.insertFinalNewline": true,
 	"files.trimFinalNewlines": true,
 	"files.trimTrailingWhitespace": true,
