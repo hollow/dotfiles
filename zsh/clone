@@ -24,6 +24,15 @@ fi
 if [[ ! -e "${repo_path}" ]]; then
     mkdir -p "$(dirname ${repo_path})"
     git clone "${repo_url}" "${repo_path}" || return
+elif [[ -d "${repo_path}/.git" && -z "$(git -C ${repo_path} status --porcelain)" ]]; then
+    typeset branch
+    for branch in main master; do
+        if git -C "${repo_path}" show-ref --verify --quiet "refs/heads/${branch}"; then
+            git -C "${repo_path}" switch "${branch}" || return
+            git -C "${repo_path}" pull --ff-only || return
+            break
+        fi
+    done
 fi
 
 # only cd when invoked as a command/interactively, not when
