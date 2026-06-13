@@ -27,7 +27,8 @@
 		"editor.defaultFormatter": "biomejs.biome"
 	},
 	"[markdown]": {
-		"editor.defaultFormatter": "rvben.rumdl"
+		"editor.defaultFormatter": "rvben.rumdl",
+		"files.trimTrailingWhitespace": false
 	},
 	"[opentofu-vars]": {
 		"editor.defaultFormatter": "opentofu.vscode-opentofu"
@@ -76,6 +77,7 @@
 		"*.alloy": "grafana-alloy",
 		"*.jinja": "jinja"
 	},
+	"files.eol": "\n",
 	"files.insertFinalNewline": true,
 	"files.trimFinalNewlines": true,
 	"files.trimTrailingWhitespace": true,
