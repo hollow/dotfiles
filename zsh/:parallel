@@ -3,48 +3,56 @@
 local dirs=(${argv:1:((${argv[(Ie)do]}-1))})
 local cmd=(${argv:((${argv[(Ie)do]}+1))})
 
-# Fork workers from the live shell instead of spawning fresh shells via GNU
-# parallel: forks inherit aliases, functions, and PATH, so no .zshrc sourcing
-# or zi-scheduler burst is needed.
-setopt local_options no_notify no_monitor
-
 # dark 256-color backgrounds (readable with default light text): red, green,
 # olive, navy, purple, teal
 local -a colors=(52 22 58 17 53 23)
-local -a pids
-local -i jobs=5 i=0 ret=0 w=0
-local dir color on tag line pid
-local off="${(%):-%k}" eol=$'\e[K'
+local -i jobs=5 w=0
+local dir
 
 # right-pad tags to a common width with spaces (a tab would leave the skipped
 # cells unpainted, breaking the full-line background)
 for dir in "${dirs[@]}"; do (( ${#dir} > w )) && w=${#dir}; done
 
-for dir in "${dirs[@]}"; do
-    color="%K{${colors[i++ % $#colors + 1]}}"
-    on="${(%)color}"
-    tag="${(r:w:)dir}"
-    (
-        # cd would fire the inherited direnv chpwd hook, dumping untagged
-        # output to the terminal; drop the hooks and load .envrc quietly.
-        chpwd_functions=() precmd_functions=()
-        cd "${dir}" || exit
-        (( $+commands[direnv] )) && eval "$(direnv export zsh 2>/dev/null)"
-        eval "${cmd[*]}" 2>&1 | while IFS= read -r line; do
-            # \e[K paints the background to the right edge for a full-width line
-            print -r -- "${on}${tag}  ${line}${eol}${off}"
-        done
-        return "${pipestatus[1]}"
-    ) </dev/null &
-    pids+=($!)
-    if (( $#pids >= jobs )); then
-        wait "${pids[1]}" || ret=1
-        pids[1]=()
-    fi
-done
+# Run the fork/wait orchestration in a subshell so workers are children of
+# THAT shell, not the interactive parent. :parallel is an autoload function,
+# so `&`-jobs would otherwise land in the interactive shell's job table; with
+# `no_monitor` they also share the parent's process group, which leaves
+# residual "[N] done" entries and "can't set tty pgrp" errors after the
+# function returns. Containing it all to a throwaway child isolates job
+# control and keeps the parent's job table clean.
+(
+    setopt no_notify no_monitor
+    local -a pids=()
+    local -i i=0 ret=0
+    local color on tag pid
+    local off="${(%):-%k}" eol=$'\e[K'
 
-for pid in "${pids[@]}"; do
-    wait "${pid}" || ret=1
-done
+    for dir in "${dirs[@]}"; do
+        color="%K{${colors[i++ % $#colors + 1]}}"
+        on="${(%)color}"
+        tag="${(r:w:)dir}"
+        (
+            # cd would fire the inherited direnv chpwd hook, dumping untagged
+            # output to the terminal; drop the hooks and load .envrc quietly.
+            chpwd_functions=() precmd_functions=()
+            cd "${dir}" || exit
+            (( $+commands[direnv] )) && eval "$(direnv export zsh 2>/dev/null)"
+            eval "${cmd[*]}" 2>&1 | while IFS= read -r line; do
+                # \e[K paints the background to the right edge for a full-width line
+                print -r -- "${on}${tag}  ${line}${eol}${off}"
+            done
+            return "${pipestatus[1]}"
+        ) </dev/null &
+        pids+=($!)
+        if (( $#pids >= jobs )); then
+            wait "${pids[1]}" || ret=1
+            pids[1]=()
+        fi
+    done
 
-return ${ret}
+    for pid in "${pids[@]}"; do
+        wait "${pid}" || ret=1
+    done
+
+    exit ${ret}
+)
