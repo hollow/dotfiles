@@ -28,8 +28,8 @@ elif [[ -d "${repo_path}/.git" && -z "$(git -C ${repo_path} status --porcelain)"
     typeset branch
     for branch in main master; do
         if git -C "${repo_path}" show-ref --verify --quiet "refs/heads/${branch}"; then
-            git -C "${repo_path}" switch "${branch}" || return
-            git -C "${repo_path}" pull --ff-only || return
+            git -C "${repo_path}" switch --quiet "${branch}" || return
+            git -C "${repo_path}" pull --ff-only --quiet || return
             break
         fi
     done

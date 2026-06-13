@@ -83,20 +83,51 @@ alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
 
 zup() {
 	set -e
+	# pipefail so the awk-filtered `zi update` pipeline (and any other pipe in
+	# zup) still trips `set -e` when an upstream stage fails; local_options
+	# scopes the change to this function.
+	setopt local_options pipefail
 	local oldpwd="${PWD}"
 
 	# Pull the dotfiles first so the rest of zup (Brewfile, plugin list, …)
 	# and the final `exec zsh` run against the latest config. Non-fatal:
 	# offline or diverged checkouts print git's error and zup carries on.
-	git -C "${XDG_CONFIG_HOME}" pull --ff-only || :
+	git -C "${XDG_CONFIG_HOME}" pull --ff-only --quiet || :
 
 	:brew-update
 	:uv-update
 	:tmux-update
 	:gcloud-update
 
-	zi self-update
-	zi update --all --no-pager
+	zi self-update -q
+	# zi update is chatty: a "Updating: <plugin>" header for every plugin,
+	# git commit logs for plugins that advanced, curl --progress-bar frames
+	# for snippet downloads, fast-forward/diff stats. -q only kills some of
+	# it. Filter the rest: buffer "Updating:" lines and only release them
+	# when followed by a real commit line, so we see which plugins moved.
+	# sed converts the \r-overwritten progress frames into separate lines
+	# so the awk anchors can match them.
+	zi update --all --no-pager 2>&1 | sed -E 's/\r/\n/g' | awk '
+		/^Updating: / { pending = $0; next }
+		/^\* [0-9a-fA-F]+ - .*<.*>$/ {
+			if (pending != "") { print pending; pending = "" }
+			next
+		}
+		/^Updating [0-9a-fA-F]+\.\.[0-9a-fA-F]+$/ { next }
+		/^Fast-forward$/ { next }
+		/^Updating snippet: / { next }
+		/^Downloading: / { next }
+		/^From https?:\/\// { next }
+		/^ +\* branch +[^ ]+ +-> / { next }
+		/^ +[^ ]+ +\| +[0-9]+/ { next }
+		/^ +[0-9]+ files? changed/ { next }
+		/^[#[:space:]]+[0-9]+\.[0-9]+%[[:space:]]*$/ { next }
+		/^[[:space:]]*$/ { next }
+		{
+			if (pending != "") { print pending; pending = "" }
+			print
+		}
+	'
 
 	cd "${oldpwd}"
 
@@ -179,11 +210,17 @@ link "${HISTFILE}" .zsh_history
 		:brew-init
 	fi
 
-	brew update
-	brew upgrade
-	brew bundle install
+	# HOMEBREW_NO_ASK skips the "Do you want to proceed?" prompt that brew
+	# upgrade/install added in 4.4+. HOMEBREW_NO_ENV_HINTS suppresses the
+	# "Disable this behaviour by setting..." hints after each step.
+	local -x HOMEBREW_NO_ASK=1
+	local -x HOMEBREW_NO_ENV_HINTS=1
+
+	brew update --quiet
+	brew upgrade --quiet
+	brew bundle install --quiet
 	brew autoremove
-	brew cleanup -s --prune=all
+	brew cleanup -s --prune=all --quiet
 	chmod go-w "${HOMEBREW_PREFIX}/share"
 }
 
@@ -773,7 +810,10 @@ zi make as"program" for bahamas10/sshp
 :tmux-update() {
 	:tmux-init
 	clone tmux-plugins/tpm "${TMUX_PLUGIN_MANAGER_PATH}/tpm"
-	${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins
+	# tpm has no quiet flag; filter the per-plugin "Already installed" noise
+	# but keep real install/update lines. grep exits 1 when nothing passes,
+	# which is normal here, so absorb it.
+	${TMUX_PLUGIN_MANAGER_PATH}/tpm/bin/install_plugins | grep -v '^Already installed' || :
 }
 
 zi auto has"tmux" silent for OMZP::tmux
