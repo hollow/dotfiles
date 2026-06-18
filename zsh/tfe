@@ -19,7 +19,7 @@ _tfe_jq_debug() { _tfe_is_debug && jq "$@" }
 
 _tfe_token() {
     jq -r '.credentials["app.terraform.io"].token' \
-        "${TF_CLI_CONFIG_FILE:-${HOME}/.terraform.d/credentials.tfrc.json}"
+        "${TF_CLI_CONFIG_FILE:-${HOME}/.config/opentofu/credentials.tfrc.json}"
 }
 
 _tfe_call() {
