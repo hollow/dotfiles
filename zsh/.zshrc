@@ -600,7 +600,7 @@ zi auto has"fzf" wait1 for fzf
 :gcloud-update() {
 	# --quiet only skips prompts; the banner and progress output bypass
 	# --verbosity, so silence everything (failures are ignored anyway).
-	gcloud components update --quiet > /dev/null 2>&1 || :
+	gcloud components update --quiet >/dev/null 2>&1 || :
 }
 
 :gcloud-load() {
@@ -705,6 +705,7 @@ zi auto has"nomad" wait1 for nomad
 :opentofu-init() {
 	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
 	mkdirp "${TF_PLUGIN_CACHE_DIR}"
+	link opentofu .terraform.d
 }
 
 :opentofu-load() {
