@@ -468,7 +468,7 @@ zi auto has"checkov" wait1 for checkov
 
 	local src="${HOME}/Library/Application Support/Claude/claude_desktop_config.json"
 	local dst="${HOME}/.claude/claude_desktop_config.json"
-	[[ -e ${src} && ${src} -nt ${dst} ]] && cp "${src}" "${dst}"
+	[[ -e ${src} ]] && cp "${src}" "${dst}"
 }
 
 zi auto has"claude" wait1 for claude
@@ -900,7 +900,7 @@ fi
 # queued by every completion plugin above — before fzf-tab and the widget
 # wrappers below.
 # https://github.com/zsh-users/zsh-completions
-zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
+zi auto blockf atpull'zinit creinstall -q .' \
 	atload"zicompinit; zicdreplay" wait for zsh-users/zsh-completions
 # endregion
 
