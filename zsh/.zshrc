@@ -463,12 +463,9 @@ zi auto has"checkov" wait1 for checkov
 # region claude: AI assistant by Anthropic
 # https://claude.ai
 :claude-init() {
-	export CLAUDE_CODE_NEW_INIT=1
-	export ENABLE_CLAUDEAI_MCP_SERVERS=true
-
 	local src="${HOME}/Library/Application Support/Claude/claude_desktop_config.json"
 	local dst="${HOME}/.claude/claude_desktop_config.json"
-	[[ -e ${src} && ${src} -nt ${dst} ]] && cp "${src}" "${dst}"
+	[[ -e ${src} ]] && cp "${src}" "${dst}"
 }
 
 zi auto has"claude" wait1 for claude
