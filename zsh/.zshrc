@@ -197,7 +197,7 @@ link "${HISTFILE}" .zsh_history
 }
 
 :brew-load() {
-	alias bbd="brew bundle dump -f"
+	alias bbd="brew bundle dump --no-describe --force"
 	alias bz="brew uninstall --zap"
 }
 
