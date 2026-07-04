@@ -897,7 +897,7 @@ fi
 # queued by every completion plugin above — before fzf-tab and the widget
 # wrappers below.
 # https://github.com/zsh-users/zsh-completions
-zi auto blockf atpull'zinit creinstall -q zsh-users/zsh-completions' \
+zi auto blockf atpull'zinit creinstall -q .' \
 	atload"zicompinit; zicdreplay" wait for zsh-users/zsh-completions
 # endregion
 
