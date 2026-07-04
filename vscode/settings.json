@@ -72,15 +72,13 @@
 	"editor.formatOnSave": true,
 	"editor.minimap.enabled": false,
 	"editor.showFoldingControls": "always",
+	"editor.tabSize": 2,
 	"editor.wordWrap": "on",
-	"files.associations": {
-		"*.alloy": "grafana-alloy",
-		"*.jinja": "jinja"
-	},
 	"files.eol": "\n",
 	"files.insertFinalNewline": true,
 	"files.trimFinalNewlines": true,
 	"files.trimTrailingWhitespace": true,
+	"git.openRepositoryInParentFolders": "never",
 	"go.useLanguageServer": true,
 	"gopls": {
 		"formatting.gofumpt": true
@@ -98,6 +96,7 @@
 	"makefile.configureOnOpen": false,
 	"markdown.extension.toc.levels": "2..6",
 	"mise.checkForNewMiseVersion": false,
+	"python.terminal.activateEnvironment": false,
 	"redhat.telemetry.enabled": false,
 	"search.followSymlinks": false,
 	"search.showLineNumbers": true,
@@ -114,6 +113,7 @@
 	"workbench.iconTheme": "catppuccin-mocha",
 	"workbench.layoutControl.enabled": false,
 	"workbench.navigationControl.enabled": false,
+	"workbench.secondarySideBar.defaultVisibility": "hidden",
 	"workbench.startupEditor": "none",
 	"yaml.customTags": ["!encrypted/pkcs1-oaep scalar", "!vault scalar"]
 }
