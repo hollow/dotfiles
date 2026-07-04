@@ -14,6 +14,19 @@ macos-non-native-fullscreen = visible-menu
 keybind = super+c=copy_to_clipboard
 keybind = super+v=paste_from_clipboard
 
+# macOS line + word navigation
+# Translate Cmd/Option + arrows into escape sequences that Neovim and zsh's line
+# editor already understand, so they work without any per-app key mappings:
+#   Cmd+Left  / Cmd+Right      -> Home / End             (start / end of line)
+#   Option+Left / Option+Right -> Shift+Left / Shift+Right (previous / next word)
+# Shift+arrow maps to Vim's fine, punctuation-aware word motion (w/b); Ctrl+arrow
+# would be the coarse WORD motion (W/B) that only stops at whitespace.
+# Only the arrow combos are captured, so Option+letter accented input still works.
+keybind = super+left=csi:H
+keybind = super+right=csi:F
+keybind = opt+left=csi:1;2D
+keybind = opt+right=csi:1;2C
+
 # scrollback
 scrollback-limit = 134217728
 
