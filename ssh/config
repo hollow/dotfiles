@@ -7,3 +7,8 @@ StrictHostKeyChecking no
 # Prevent connections from beind dropped
 ServerAliveInterval 900
 ServerAliveCountMax 0
+
+Host *.rmge.net
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    LogLevel QUIET
