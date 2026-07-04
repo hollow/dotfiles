@@ -702,6 +702,7 @@ zi auto has"nomad" wait1 for nomad
 :opentofu-init() {
 	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
 	mkdirp "${TF_PLUGIN_CACHE_DIR}"
+	link opentofu .terraform.d
 }
 
 :opentofu-load() {
