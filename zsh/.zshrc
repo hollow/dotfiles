@@ -597,7 +597,7 @@ zi auto has"fzf" wait1 for fzf
 :gcloud-update() {
 	# --quiet only skips prompts; the banner and progress output bypass
 	# --verbosity, so silence everything (failures are ignored anyway).
-	gcloud components update --quiet > /dev/null 2>&1 || :
+	gcloud components update --quiet >/dev/null 2>&1 || :
 }
 
 :gcloud-load() {
