@@ -159,9 +159,76 @@ zi for \
 	OMZL::directories.zsh \
 	OMZL::functions.zsh \
 	OMZL::history.zsh \
-	OMZL::key-bindings.zsh \
 	OMZL::spectrum.zsh \
 	OMZL::termsupport.zsh
+
+# region zle: command-line editor key bindings
+# Keep default emacs-style ZLE behavior, then add only the transport bindings
+# needed for Ghostty's macOS-style navigation chords to work in the prompt:
+#   Cmd+Left/Right     -> start/end of line
+#   Option+Left/Right  -> previous/next shell word
+#   Shift+Tab          -> reverse completion menu
+bindkey -e
+# Load $terminfo when Ghostty provides a TERMINFO database; literal fallback
+# bindings below keep the common xterm-style sequences working either way.
+zmodload zsh/terminfo 2>/dev/null || true
+
+# Application cursor/keypad mode makes terminfo Home/End/arrow sequences match
+# what Ghostty sends while ZLE is active. Hook instead of replacing
+# zle-line-init/finish so later widgets can coexist.
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+	autoload -Uz add-zle-hook-widget
+	:zle-application-mode-start() { echoti smkx }
+	:zle-application-mode-stop() { echoti rmkx }
+	add-zle-hook-widget line-init :zle-application-mode-start
+	add-zle-hook-widget line-finish :zle-application-mode-stop
+fi
+
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search edit-command-line
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+zle -N edit-command-line
+
+# Up/Down use prefix-history search: type a prefix, then walk only matching
+# history entries. Bind both CSI and SS3 forms because the application-cursor
+# hook can make terminals switch between them.
+bindkey "^[[A" up-line-or-beginning-search
+bindkey "^[[B" down-line-or-beginning-search
+bindkey "^[OA" up-line-or-beginning-search
+bindkey "^[OB" down-line-or-beginning-search
+[[ -n "${terminfo[kcuu1]}" ]] && bindkey "${terminfo[kcuu1]}" up-line-or-beginning-search
+[[ -n "${terminfo[kcud1]}" ]] && bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
+
+# Home/End: Ghostty sends CSI H/F for Cmd+Left/Right; xterm-ghostty terminfo
+# uses SS3 OH/OF. Bind both so ZLE accepts either transport.
+[[ -n "${terminfo[khome]}" ]] && bindkey "${terminfo[khome]}" beginning-of-line
+[[ -n "${terminfo[kend]}" ]] && bindkey "${terminfo[kend]}" end-of-line
+bindkey "^[[H" beginning-of-line
+bindkey "^[[F" end-of-line
+bindkey "^[OH" beginning-of-line
+bindkey "^[OF" end-of-line
+
+# Option+Left/Right: Ghostty sends Shift+Left/Right so Vim/Neovim can use their
+# default word motions; map the same sequences to shell-word motion in ZLE.
+bindkey "^[[1;2D" backward-word
+bindkey "^[[1;2C" forward-word
+
+# Common terminal Ctrl+Left/Right fallback. Not emitted by Ghostty for Option,
+# but useful if another terminal sends it.
+bindkey "^[[1;5D" backward-word
+bindkey "^[[1;5C" forward-word
+
+# Editing conveniences. Ctrl+R, Ctrl+U, Backspace, and Option+Backspace remain
+# zsh defaults from bindkey -e/select-word-style; the lines here add terminal
+# transport fallbacks plus magic-space history expansion.
+[[ -n "${terminfo[kdch1]}" ]] && bindkey "${terminfo[kdch1]}" delete-char
+bindkey "^[[3~" delete-char
+bindkey " " magic-space
+bindkey "^[[5~" up-line-or-history
+bindkey "^[[6~" down-line-or-history
+bindkey "^[[Z" reverse-menu-complete
+bindkey "^X^E" edit-command-line
+# endregion
 
 alias ..="cd .."
 alias ...="cd ../.."
