@@ -44,6 +44,7 @@ export XDG_RUNTIME_DIR="${HOME}/.local/run"
 ZDOTDIR="${XDG_CONFIG_HOME}/zsh"
 ZSH_DATA_DIR="${XDG_DATA_HOME}/zsh"
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
+ZSH_STATE_DIR="${XDG_STATE_HOME}/zsh"
 
 # fpath: where zsh finds autoloadable functions and completions
 typeset -TUx FPATH fpath=(
@@ -69,6 +70,7 @@ mkdirp "${XDG_RUNTIME_DIR}" 0700
 mkdirp "${ZSH_DATA_DIR}"
 mkdirp "${ZSH_CACHE_DIR}"
 mkdirp "${ZSH_CACHE_DIR}/completions"
+mkdirp "${ZSH_STATE_DIR}"
 # endregion
 
 # region zi: Flexible and fast ZSH plugin manager
@@ -80,6 +82,8 @@ source "${ZDOTDIR}/zzinit" && zzinit
 
 alias zre="exec zsh"
 alias zx="sudo rm -rf ${XDG_CACHE_HOME} && zre"
+dotfiles-update-check notice
+dotfiles-update-check start
 
 zup() {
 	set -e
@@ -92,7 +96,10 @@ zup() {
 	# Pull the dotfiles first so the rest of zup (Brewfile, plugin list, …)
 	# and the final `exec zsh` run against the latest config. Non-fatal:
 	# offline or diverged checkouts print git's error and zup carries on.
-	git -C "${XDG_CONFIG_HOME}" pull --ff-only --quiet || :
+	# On success, clear any cached background-check notice.
+	if git -C "${XDG_CONFIG_HOME}" pull --ff-only --quiet; then
+		dotfiles-update-check mark-up-to-date >/dev/null 2>&1 || :
+	fi
 
 	:brew-update
 	:uv-update

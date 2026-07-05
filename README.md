@@ -64,8 +64,10 @@ To update everything later (Homebrew packages and plugins), run:
 zup
 ```
 
-This updates your Homebrew packages, the ZI plugin manager, and all installed
-plugins in one go.
+This updates your dotfiles checkout, Homebrew packages, the ZI plugin manager,
+and all installed plugins in one go. New shells also run a daily background
+check for dotfiles updates; that check is notify-only, and prints a shell notice
+when an update is available so you can run `zup` yourself.
 
 ### Set your git identity
 
@@ -124,8 +126,9 @@ well-worn library files — directory, key-binding, and color defaults plus
 terminal-title handling — and the `..`, `...`, `....` shortcuts for moving up
 directories. Your shell
 [history](https://zsh.sourceforge.io/Doc/Release/Options.html#History) is kept
-large. Run `zup` at any time to update Homebrew packages, ZI, and all plugins
-in one go.
+large. New shells check daily for dotfiles updates in the background and tell
+you to run `zup` when one is available. Run `zup` at any time to update the
+dotfiles checkout, Homebrew packages, ZI, and all plugins in one go.
 
 ### XDG base directories
 
