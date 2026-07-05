@@ -37,6 +37,15 @@ assert_eq() {
 	fi
 }
 
+assert_ne() {
+	local name=$1 unexpected=$2 actual=$3
+	if [[ "${actual}" != "${unexpected}" ]]; then
+		ok "${name}"
+	else
+		bad "${name}: expected value other than <${unexpected}>"
+	fi
+}
+
 assert_empty() {
 	local name=$1 actual=$2
 	if [[ -z "${actual}" ]]; then
@@ -69,6 +78,38 @@ capture_notice() {
 		export DOTFILES_UPDATE_CHECK_STATE_DIR="${state_dir}"
 		dotfiles-update-check notice
 	)
+}
+
+capture_notice_output() {
+	local repo=$1 state_dir=$2
+	(
+		export DOTFILES_UPDATE_CHECK_REPO="${repo}"
+		export DOTFILES_UPDATE_CHECK_STATE_DIR="${state_dir}"
+		dotfiles-update-check notice
+	) 2>&1
+}
+
+capture_default_output() {
+	local repo=$1 state_dir=$2
+	(
+		export DOTFILES_UPDATE_CHECK_REPO="${repo}"
+		export DOTFILES_UPDATE_CHECK_STATE_DIR="${state_dir}"
+		dotfiles-update-check
+	) 2>&1
+}
+
+capture_mark_with_fake_date() {
+	local repo=$1 state_dir=$2 fakebin="${WORK}/fakebin"
+	mkdir -p "${fakebin}"
+	print -r -- '#!/bin/sh' > "${fakebin}/date"
+	print -r -- 'printf "%s\n" 123456789' >> "${fakebin}/date"
+	chmod +x "${fakebin}/date"
+	(
+		export DOTFILES_UPDATE_CHECK_REPO="${repo}"
+		export DOTFILES_UPDATE_CHECK_STATE_DIR="${state_dir}"
+		PATH="${fakebin}:${PATH}"
+		dotfiles-update-check mark-up-to-date
+	) 2>&1
 }
 
 make_pair() {
@@ -154,12 +195,20 @@ mkdir -p "${state_dir}"
 print -r -- "not-a-state" > "${state_dir}/dotfiles-update-check.state"
 assert_empty "malformed state prints no notice" "$(capture_notice "${checkout}" "${state_dir}")"
 
+state_dir="${WORK}/state-missing"
+assert_empty "missing state prints no notice or error" "$(capture_notice_output "${checkout}" "${state_dir}")"
+assert_empty "default invocation without state prints no notice or error" "$(capture_default_output "${checkout}" "${state_dir}")"
+
 state_dir="${WORK}/state-mark"
 mkdir -p "${state_dir}"
 print -r -- "behind" > "${state_dir}/dotfiles-update-check.state"
 run_checker mark-up-to-date "${checkout}" "${state_dir}" >/dev/null
 assert_eq "mark-up-to-date clears stale behind state" "up-to-date" "$(state_value "${state_dir}")"
 assert_empty "mark-up-to-date removes notice" "$(capture_notice "${checkout}" "${state_dir}")"
+
+state_dir="${WORK}/state-epochseconds"
+assert_empty "mark-up-to-date with fake date prints no output" "$(capture_mark_with_fake_date "${checkout}" "${state_dir}")"
+assert_ne "timestamp uses EPOCHSECONDS instead of date fallback" "123456789" "$(cat "${state_dir}/dotfiles-update-check.last")"
 
 print -r --
 print -r -- "PASS: ${PASS}"
