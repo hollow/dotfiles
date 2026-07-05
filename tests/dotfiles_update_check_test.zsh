@@ -151,7 +151,12 @@ add_origin_commit "${origin}" upstream
 state_dir="${WORK}/state-behind"
 run_checker run "${checkout}" "${state_dir}" >/dev/null
 assert_eq "behind checkout records behind" "behind" "$(state_value "${state_dir}")"
-assert_eq "behind checkout prints notice" "dotfiles update available; run zup" "$(capture_notice "${checkout}" "${state_dir}")"
+notice="$(capture_notice "${checkout}" "${state_dir}")"
+if [[ "${notice}" == *"󰚰"* && "${notice}" == *"dotfiles update available — run"* && "${notice}" == *"zup"* ]]; then
+	ok "behind checkout prints styled notice"
+else
+	bad "behind checkout prints styled notice: got <${notice}>"
+fi
 
 read -r origin checkout <<< "$(make_pair diverged)"
 add_origin_commit "${origin}" upstream

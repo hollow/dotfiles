@@ -35,7 +35,7 @@ case "${command_name}" in
 		local state
 		[[ -r "${state_file}" ]] || return 0
 		IFS= read -r state < "${state_file}" 2>/dev/null || return 0
-		[[ "${state}" == behind ]] && print -r -- "dotfiles update available; run zup"
+		[[ "${state}" == behind ]] && print -P -- "%F{cyan}󰚰%f dotfiles update available — run %F{green}zup%f"
 		return 0
 		;;
 	start)
