@@ -70,7 +70,7 @@ case "${command_name}" in
 			_dotfiles_update_check_write_state error
 			return 0
 		fi
-		if ! git -C "${repo}" fetch --quiet origin main >/dev/null 2>&1; then
+		if ! git -C "${repo}" fetch --quiet origin >/dev/null 2>&1; then
 			_dotfiles_update_check_write_state error
 			return 0
 		fi
