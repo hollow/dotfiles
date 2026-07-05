@@ -1,0 +1,12 @@
+{
+  "planPath": "docs/superpowers/plans/2026-07-05-dotfiles-update-notice-style.md",
+  "tasks": [
+    {
+      "id": 0,
+      "subject": "Task 1: Style dotfiles update notice",
+      "status": "pending",
+      "description": "**Goal:** Render the `behind` notice as a noticeable zsh-formatted shell line while preserving all update-check behavior.\n\n**Files:**\n- Modify: `zsh/dotfiles-update-check:33-40`\n- Modify: `tests/dotfiles_update_check_test.zsh`\n\n**Acceptance Criteria:**\n- [ ] `dotfiles-update-check notice` for cached `behind` includes the Nerd Font icon `\udb81\udeb0`.\n- [ ] The notice includes `dotfiles update available \u2014 run zup`.\n- [ ] The implementation uses `print -P -- \"%F{cyan}\udb81\udeb0%f dotfiles update available \u2014 run %F{green}zup%f\"`.\n- [ ] Non-actionable states still produce no stdout or stderr.\n- [ ] Existing update-check behavior tests still pass with `PASS: 19` and `FAIL: 0` or a higher pass count with zero failures.\n\n**Verify:** `zsh -n zsh/.zshrc && zsh -n zsh/dotfiles-update-check && zsh tests/dotfiles_update_check_test.zsh` \u2192 expected final line `FAIL: 0`\n\n**Steps:**\n- Update the notice test first so the current plain notice fails.\n- Run `zsh tests/dotfiles_update_check_test.zsh` and observe the styled-notice assertion fail.\n- Change the notice line in `zsh/dotfiles-update-check` to the approved `print -P` prompt-expanded string.\n- Run the verify command.\n- Commit `zsh/dotfiles-update-check` and `tests/dotfiles_update_check_test.zsh`.\n\n```json:metadata\n{\"files\": [\"zsh/dotfiles-update-check\", \"tests/dotfiles_update_check_test.zsh\"], \"verifyCommand\": \"zsh -n zsh/.zshrc && zsh -n zsh/dotfiles-update-check && zsh tests/dotfiles_update_check_test.zsh\", \"acceptanceCriteria\": [\"behind notice includes Nerd Font icon\", \"behind notice includes dotfiles update available \u2014 run zup\", \"implementation uses zsh print -P prompt colors\", \"non-actionable states stay silent\", \"update-check tests end with FAIL: 0\"], \"tags\": [], \"modelTier\": \"mechanical\"}\n```"
+    }
+  ],
+  "lastUpdated": "2026-07-05T09:21:49.883497+00:00"
+}
