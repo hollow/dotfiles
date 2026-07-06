@@ -7,6 +7,12 @@ theme = Catppuccin Mocha
 unfocused-split-opacity = 0.6
 unfocused-split-fill = #000000
 
+# ssh: set TERM=xterm-256color for ssh sessions. Without this, remote hosts see
+# TERM=xterm-ghostty (no such terminfo entry) and every `tput` fails. We don't
+# use ssh-terminfo (install the real ghostty terminfo remotely) because it fails
+# and adds latency on our fleet.
+shell-integration-features = ssh-env
+
 # macOS
 macos-non-native-fullscreen = visible-menu
 
