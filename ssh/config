@@ -11,4 +11,3 @@ ServerAliveCountMax 0
 Host *.rmge.net
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
-    LogLevel QUIET
