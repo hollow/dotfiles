@@ -770,21 +770,21 @@ zi auto has"ncdu" wait1 for ncdu
 zi auto has"nomad" wait1 for nomad
 # endregion
 
-# region opentofu: open-source terraform fork, installed via mise
-# https://github.com/opentofu/opentofu
-:opentofu-init() {
-	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/opentofu/plugins"
+# region terraform: infrastructure as code
+# https://github.com/hashicorp/terraform
+:terraform-init() {
+	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/terraform/plugins"
 	mkdirp "${TF_PLUGIN_CACHE_DIR}"
-	link opentofu .terraform.d
+	link terraform .terraform.d
 }
 
-:opentofu-load() {
-	alias tf="tofu"
+:terraform-load() {
+	alias tf="terraform"
 
-	complete -o nospace -C tofu tofu
+	complete -o nospace -C terraform terraform
 }
 
-zi auto has"tofu" wait1 for opentofu
+zi auto has"terraform" wait1 for terraform
 # endregion
 
 # region parallel: run commands in parallel
@@ -1051,7 +1051,7 @@ zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*:corrections' format '%d (errors: %e)'
 
-# bash-style `complete -C` programmable completion (consul, nomad, tofu use it)
+# bash-style `complete -C` programmable completion (consul, nomad, terraform use it)
 autoload -U +X bashcompinit && bashcompinit
 # endregion
 

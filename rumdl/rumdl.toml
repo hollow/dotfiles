@@ -1,0 +1,10 @@
+# user-level rumdl config (~/.config/rumdl/rumdl.toml); applies to every
+# workspace that has no project-local rumdl/markdownlint config. project
+# configs always win. https://rumdl.dev/configuration/
+
+[MD013]
+line-length = 80
+# reflow enables MD013 automatic fixes: rewrap long lines on format/fixAll.
+# https://rumdl.dev/md013/#automatic-fixes
+reflow = true
+reflow-mode = "default"
