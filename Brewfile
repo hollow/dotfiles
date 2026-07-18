@@ -1,4 +1,3 @@
-tap "can1357/tap"
 tap "hashicorp/tap"
 brew "shellcheck"
 brew "actionlint"
@@ -131,7 +130,6 @@ brew "yaml-language-server"
 brew "yamllint"
 brew "yq"
 brew "yt-dlp"
-brew "can1357/tap/omp", trusted: true
 brew "hashicorp/tap/consul", trusted: true
 brew "hashicorp/tap/consul-template", trusted: true
 brew "hashicorp/tap/nomad", trusted: true

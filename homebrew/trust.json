@@ -1,6 +1,5 @@
 {
   "trustedformulae": [
-    "can1357/tap/omp",
     "hashicorp/tap/consul",
     "hashicorp/tap/consul-template",
     "hashicorp/tap/nomad",
