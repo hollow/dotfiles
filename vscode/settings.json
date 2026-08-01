@@ -58,6 +58,7 @@
 	"ansible.lightspeed.suggestions.enabled": false,
 	"ansible.validation.lint.enabled": false,
 	"catppuccin.italicKeywords": false,
+	"chat.titleBar.openInAgentsWindow.enabled": false,
 	"csv-preview.resizeColumns": "all",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.biome": "explicit",
@@ -114,6 +115,5 @@
 	"workbench.layoutControl.enabled": false,
 	"workbench.navigationControl.enabled": false,
 	"workbench.secondarySideBar.defaultVisibility": "hidden",
-	"workbench.startupEditor": "none",
-	"yaml.customTags": ["!encrypted/pkcs1-oaep scalar", "!vault scalar"]
+	"workbench.startupEditor": "none"
 }
