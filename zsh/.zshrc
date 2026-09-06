@@ -510,11 +510,14 @@ zi auto has"ansible" wait1 for ansible
 }
 
 # the ansible repos' .envrc overwrites ANSIBLE_CALLBACK_PLUGINS and PYTHONPATH,
-# so a plain global export never reaches ansible there. direnv puts its precmd
-# hook first in precmd_functions; this hook runs after it and appends ara's
-# paths whenever direnv has set ANSIBLE_CALLBACK_PLUGINS (i.e. in a repo that
-# runs ansible). leaving the repo, direnv restores both variables itself.
-:ara-precmd() {
+# so a plain global export never reaches ansible there. direnv puts its hook
+# first in both chpwd_functions and precmd_functions; this hook is registered
+# on both as well, runs after it, and appends ara's paths whenever direnv has
+# set ANSIBLE_CALLBACK_PLUGINS (i.e. in a repo that runs ansible). chpwd covers
+# helpers like :each that cd and run a command before the next prompt; :parallel
+# clears the hook arrays and re-runs the chpwd hooks itself after loading direnv.
+# leaving the repo, direnv restores both variables itself.
+:ara-hook() {
 	[[ -n ${ANSIBLE_CALLBACK_PLUGINS-} && ${ANSIBLE_CALLBACK_PLUGINS} != *"${_ara_callback_plugins}"* ]] || return 0
 	export ANSIBLE_CALLBACK_PLUGINS="${ANSIBLE_CALLBACK_PLUGINS}:${_ara_callback_plugins}"
 	export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}${_ara_pythonpath}"
@@ -522,7 +525,8 @@ zi auto has"ansible" wait1 for ansible
 
 :ara-load() {
 	autoload -Uz add-zsh-hook
-	add-zsh-hook precmd :ara-precmd
+	add-zsh-hook chpwd :ara-hook
+	add-zsh-hook precmd :ara-hook
 
 	# bootstrap is a no-op once the agent is loaded (exit 37), so fire-and-forget
 	# like colima: launchctl forks are slow and must not block the prompt.

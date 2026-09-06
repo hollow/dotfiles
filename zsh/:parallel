@@ -24,7 +24,7 @@ for dir in "${dirs[@]}"; do (( ${#dir} > w )) && w=${#dir}; done
     setopt no_notify no_monitor
     local -a pids=()
     local -i i=0 ret=0
-    local color on tag pid
+    local color on tag pid hook
     local off="${(%):-%k}" eol=$'\e[K'
 
     for dir in "${dirs[@]}"; do
@@ -33,10 +33,14 @@ for dir in "${dirs[@]}"; do (( ${#dir} > w )) && w=${#dir}; done
         tag="${(r:w:)dir}"
         (
             # cd would fire the inherited direnv chpwd hook, dumping untagged
-            # output to the terminal; drop the hooks and load .envrc quietly.
+            # output to the terminal; drop the hooks and load .envrc quietly,
+            # then run the other chpwd hooks (e.g. :ara-hook) that expect to
+            # follow direnv, in their original order.
+            local -a chpwd_rest=(${chpwd_functions:#_direnv_hook})
             chpwd_functions=() precmd_functions=()
             cd "${dir}" || exit
             (( $+commands[direnv] )) && eval "$(direnv export zsh 2>/dev/null)"
+            for hook in "${chpwd_rest[@]}"; do "${hook}"; done
             eval "${cmd[*]}" 2>&1 | while IFS= read -r line; do
                 # \e[K paints the background to the right edge for a full-width line
                 print -r -- "${on}${tag}  ${line}${eol}${off}"
