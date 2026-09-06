@@ -1,0 +1,33 @@
+#compdef ara
+# completion for ara (ARA Records Ansible). `ara complete` only speaks bash
+# (its script needs bash-completion's _get_comp_words_by_ref and ${!var}), but
+# `--shell none` prints just the command tree as `cmds_<sub>_<cmd>='…'` lines.
+# read that once per shell (~150ms) and walk it.
+
+_ara() {
+	if (( ! ${+_ara_cmds} )); then
+		typeset -gA _ara_cmds
+		local line
+		for line in ${(f)"$(ara complete --shell none)"}; do
+			line=${line##[[:space:]]#}
+			_ara_cmds[${line%%=*}]=${(Q)${line#*=}}
+		done
+	fi
+
+	# descend the tree along the words typed so far; an option or an unknown
+	# word (a positional argument) ends the descent at the current level
+	local key=cmds word
+	for word in "${(@)words[2,CURRENT-1]}"; do
+		[[ ${word} != -* && -n ${_ara_cmds[${key}_${word//-/_}]-} ]] || break
+		key="${key}_${word//-/_}"
+	done
+
+	local -a completed=(${=_ara_cmds[${key}]})
+	if [[ ${completed[1]} == -* ]]; then
+		_arguments -s "${completed[@]}" '*:argument:_files'
+	else
+		_describe -t commands 'ara command' completed
+	fi
+}
+
+_ara "$@"

@@ -345,10 +345,6 @@ zi auto has"python3" for python
 	uv tool upgrade --all
 }
 
-:uv-eval() {
-	uv generate-shell-completion zsh
-}
-
 zi auto has"uv" for uv
 # endregion
 
@@ -363,10 +359,6 @@ zi auto has"uv" for uv
 :argcomplete-fix-ifs() {
 	local code="$(cat)"
 	print -r -- "${code//_describe /IFS=$' \t\n' _describe }"
-}
-
-:register-python-argcomplete() {
-	register-python-argcomplete --shell zsh "$@" | :argcomplete-fix-ifs
 }
 
 :argcomplete-eval() {
@@ -416,15 +408,6 @@ zi auto has"npm" wait1 for npm
 zi auto has"bun" wait1 for bun
 # endregion
 
-# region js/biome: formatter & linter for the web (JS/TS/JSON/CSS)
-# https://biomejs.dev
-:biome-eval() {
-	biome completions zsh
-}
-
-zi auto has"biome" for biome
-# endregion
-
 # region ruby: programming language
 # https://www.ruby-lang.org
 :ruby-init() {
@@ -448,8 +431,11 @@ add path "${HOME}/.local/bin"
 
 # region 1password: remembers all your passwords for you
 # https://1password.com
-:1password-cli-eval() {
-	chmod 0700 "${XDG_CONFIG_HOME}/op"
+:1password-cli-init() {
+	mkdirp "${XDG_CONFIG_HOME}/op" 0700
+}
+
+:1password-cli-completion() {
 	op completion zsh
 }
 
@@ -533,6 +519,7 @@ zi auto has"ansible" wait1 for ansible
 	launchctl bootstrap gui/${UID} "${HOME}/Library/LaunchAgents/ara-server.plist" &>/dev/null &|
 }
 
+# tab completion: zsh/_ara
 zi auto has"ara-manage" wait1 for ara
 # endregion
 
@@ -574,15 +561,6 @@ parallel_composite_upload_threshold = 150M" >"${BOTO_CONFIG}"
 }
 
 zi auto has"bat" wait1 for bat
-# endregion
-
-# region checkov: static code analysis tool for Terraform & Co
-# https://github.com/bridgecrewio/checkov
-:checkov-eval() {
-	:register-python-argcomplete checkov
-}
-
-zi auto has"checkov" wait1 for checkov
 # endregion
 
 # region claude: AI assistant by Anthropic
@@ -776,8 +754,7 @@ add path "${GHOSTTY_BIN_DIR}"
 	alias s="git st ."
 }
 
-zi auto id-as"git" as"completion" blockf mv"git->_git" wait1 for \
-	https://github.com/git/git/blob/master/contrib/completion/git-completion.zsh
+zi auto has"git" wait1 for git
 # endregion
 
 # region glow: terminal markdown rendering
@@ -1026,12 +1003,21 @@ fi
 # endregion
 
 # region zsh/completion: extra completion functions. Loads before compinit so they
-# land in fpath, then its atload runs compinit once — replaying the compdefs
-# queued by every completion plugin above — before fzf-tab and the widget
-# wrappers below.
+# land in fpath, then its atload runs compinit once — before fzf-tab and the
+# widget wrappers below.
+#
+# completion contract: a completer is a `#compdef` file on fpath (brew's
+# site-functions, zsh-completions, zsh/, and ${ZSH_CACHE_DIR}/completions, which
+# :<name>-completion hooks fill at install/update time), so compinit registers
+# everything itself. zi only queues `compdef` calls made while a plugin loads;
+# zicdreplay runs that queue once, here, for the synchronous blocks above
+# (argcomplete's -default-, tmux aliases) — a wait1 block calling compdef is
+# lost. bashcompinit is loaded here as well: its `complete` needs compdef, so
+# `complete -C` calls belong in wait1 :<name>-load hooks, never at top level.
 # https://github.com/zsh-users/zsh-completions
 zi auto blockf atpull'zinit creinstall -q .' \
-	atload"zicompinit; zicdreplay" wait for zsh-users/zsh-completions
+	atload"zicompinit; zicdreplay; autoload -Uz bashcompinit && bashcompinit" \
+	wait for zsh-users/zsh-completions
 # endregion
 
 # region zsh/completion: replace the completion menu with fzf-tab. Must load after compinit (above)
@@ -1110,9 +1096,6 @@ zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*:corrections' format '%d (errors: %e)'
-
-# bash-style `complete -C` programmable completion (consul, nomad, terraform use it)
-autoload -U +X bashcompinit && bashcompinit
 # endregion
 
 # region zsh/f-sy-h: feature-rich syntax highlighting for ZSH (loads last, after fzf-tab)

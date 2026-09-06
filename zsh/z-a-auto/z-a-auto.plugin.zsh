@@ -53,6 +53,22 @@
         :${___ehid}-update "$@"
     }
 
+    # :<name>-completion prints a zsh completion function (`#compdef <cmd> …`
+    # first line). store it as ${ZSH_CACHE_DIR}/completions/_<cmd>, which is on
+    # fpath, so compinit registers it like any other completion file and no
+    # compdef call has to run while the plugin loads (zi only queues those).
+    # runs at clone and pull time, i.e. when the tool itself was (re)installed.
+    if (( ${+functions[:${___ehid}-completion]} )) {
+        local ___code="$(:${___ehid}-completion)"
+        local ___cmd="${${${(f)___code}[1]#\#compdef }%% *}"
+        if [[ ${___code} == '#compdef '* && -n ${___cmd} ]] {
+            print -r -- "${___code}" >| "${ZSH_CACHE_DIR}/completions/_${___cmd}"
+            debug "{func}[${___ehid}]{msg} wrote completion {file}_${___cmd}"
+        } else {
+            +zi-message "{annex}z-a-auto{ehi}:{rst} {warn}:${___ehid}-completion printed no {cmd}#compdef{warn} file, nothing stored{rst}"
+        }
+    }
+
     return 0
 }
 
