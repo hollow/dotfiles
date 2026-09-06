@@ -140,7 +140,7 @@ brew "hashicorp/tap/terraform", trusted: true
 brew "hashicorp/tap/terraform-ls", trusted: true
 brew "hashicorp/tap/vault", trusted: true
 cask "1password"
-cask "1password-cli"
+cask "1password-cli@beta"
 cask "adguard"
 cask "calibre"
 cask "claude"
