@@ -6,5 +6,6 @@
 python.uv_venv_auto = "create|source"
 
 [tools]
-node = "26.8.1"
+go = "latest"
+node = "latest"
 yarn = "latest"
