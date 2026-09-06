@@ -443,6 +443,9 @@ zi auto has"biome" for biome
 zi auto has"ruby" for ruby
 # endregion
 
+# add local bin so user binaries take precedence over tool/brew paths
+add path "${HOME}/.local/bin"
+
 # region 1password: remembers all your passwords for you
 # https://1password.com
 :1password-cli-eval() {
@@ -539,6 +542,11 @@ zi auto has"checkov" wait1 for checkov
 	local src="${HOME}/Library/Application Support/Claude/claude_desktop_config.json"
 	local dst="${HOME}/.claude/claude_desktop_config.json"
 	[[ -e ${src} ]] && cp "${src}" "${dst}"
+}
+
+:claude-load() {
+    alias c="claude"
+    alias cr="claude -r"
 }
 
 zi auto has"claude" wait1 for claude
@@ -686,6 +694,8 @@ zi auto has"fzf" wait1 for fzf
 		export CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=true
 	fi
 }
+
+export GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file
 
 zi auto has"gcloud" wait1 for gcloud
 # endregion
@@ -1076,9 +1086,6 @@ zi auto wait for hlissner/zsh-autopair
 # https://github.com/romkatv/zsh-bench
 zi as"program" wait1 for romkatv/zsh-bench
 # endregion
-
-# add local bin last so user binaries take precedence over tool/brew paths
-add path "${HOME}/.local/bin"
 
 # Load .envrc after shell initialization if present
 if [[ -e .envrc ]]; then

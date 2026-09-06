@@ -2,7 +2,6 @@ Include %d/.config/ssh/config.crypto
 Include %d/.config/colima/ssh_config
 
 HashKnownHosts no
-StrictHostKeyChecking no
 
 # Prevent connections from beind dropped
 ServerAliveInterval 900
@@ -11,3 +10,4 @@ ServerAliveCountMax 0
 Host *.rmge.net
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
+    LogLevel ERROR
