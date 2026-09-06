@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	ARA Records Ansible API server, always on via launchd (there is no brew
+	formula for ara, so this replaces `brew services`). Linked into
+	~/Library/LaunchAgents under the Label's name and bootstrapped by the ara
+	region in zsh/.zshrc.
+
+	Binaries come from `uv tool install 'ara[server]' --with gunicorn`.
+	launchd expands neither ~ nor $HOME in plist values, hence the /bin/sh -c
+	wrapper. After editing this file: launchctl bootout gui/$UID/<Label> &&
+	launchctl bootstrap gui/$UID ~/Library/LaunchAgents/<Label>.plist
+	-->
+	<key>Label</key>
+	<string>ara-server</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/sh</string>
+		<string>-c</string>
+		<string>set -eu
+export ARA_BASE_DIR="$HOME/.local/share/ara/server"
+export ARA_SETTINGS="$HOME/.config/ara/settings.yaml"
+mkdir -p "$ARA_BASE_DIR" "$HOME/.local/state/ara"
+exec >>"$HOME/.local/state/ara/server.log" 2>&amp;1
+bin="$HOME/.cache/uv/tools/ara/bin"
+"$bin/ara-manage" migrate
+exec "$bin/gunicorn" --workers 2 --threads 4 --worker-class gthread --bind 127.0.0.1:8100 --control-socket "$ARA_BASE_DIR/gunicorn.ctl" ara.server.wsgi</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+	<key>ProcessType</key>
+	<string>Background</string>
+</dict>
+</plist>

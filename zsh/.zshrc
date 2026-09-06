@@ -183,10 +183,10 @@ zmodload zsh/terminfo 2>/dev/null || true
 # Application cursor/keypad mode makes terminfo Home/End/arrow sequences match
 # what Ghostty sends while ZLE is active. Hook instead of replacing
 # zle-line-init/finish so later widgets can coexist.
-if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+if ((${+terminfo[smkx]})) && ((${+terminfo[rmkx]})); then
 	autoload -Uz add-zle-hook-widget
-	:zle-application-mode-start() { echoti smkx }
-	:zle-application-mode-stop() { echoti rmkx }
+	:zle-application-mode-start() { echoti smkx; }
+	:zle-application-mode-stop() { echoti rmkx; }
 	add-zle-hook-widget line-init :zle-application-mode-start
 	add-zle-hook-widget line-finish :zle-application-mode-stop
 fi
@@ -469,6 +469,8 @@ export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
 	export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible"
 	export ANSIBLE_LOCAL_TEMP="${XDG_RUNTIME_DIR}/ansible/tmp"
 	export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
+	export ANSIBLE_DISPLAY_SKIPPED_HOSTS=no
+	export ANSIBLE_DISPLAY_OK_HOSTS=no
 }
 
 :ansible-load() {
@@ -482,9 +484,52 @@ zi auto has"ansible" wait1 for ansible
 
 # region ansible/ara: ARA Records Ansible
 # https://github.com/ansible-community/ara
-export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
-export ARA_DATABASE_NAME="${ARA_BASE_DIR}/ansible.sqlite"
-export ARA_SETTINGS="${ARA_BASE_DIR}/settings.yaml"
+#
+# server and client both come from `uv tool install 'ara[server]' --with
+# gunicorn --python 3.14`. the server is kept running by launchd
+# (launchd/ara-server.plist, settings in ara/settings.yaml);
+# the client is ara's callback plugin, which Ansible loads from that same tool
+# env so the ansible repos themselves carry no ara dependency or config.
+:ara-init() {
+	export ARA_BASE_DIR="${XDG_DATA_HOME}/ara/server"
+	export ARA_SETTINGS="${XDG_CONFIG_HOME}/ara/settings.yaml"
+	export ARA_API_CLIENT="http"
+	export ARA_API_SERVER="http://127.0.0.1:8100"
+
+	link launchd/ara-server.plist Library/LaunchAgents/ara-server.plist
+
+	# the callback runs inside each repo's venv python, which must import `ara`
+	# (and requests, which the repos have). expose only the ara package through
+	# a dedicated import dir so nothing else from the tool env shadows the venv.
+	# not ARA_*: ara's dynaconf would read any such variable as a setting.
+	local -a site=(${UV_TOOL_DIR}/ara/lib/python3.<->/site-packages(N/))
+	typeset -g _ara_callback_plugins="${site[1]}/ara/plugins/callback"
+	typeset -g _ara_pythonpath="${XDG_DATA_HOME}/ara/pythonpath"
+	mkdirp "${_ara_pythonpath}"
+	link "${site[1]}/ara" "${_ara_pythonpath}/ara"
+}
+
+# the ansible repos' .envrc overwrites ANSIBLE_CALLBACK_PLUGINS and PYTHONPATH,
+# so a plain global export never reaches ansible there. direnv puts its precmd
+# hook first in precmd_functions; this hook runs after it and appends ara's
+# paths whenever direnv has set ANSIBLE_CALLBACK_PLUGINS (i.e. in a repo that
+# runs ansible). leaving the repo, direnv restores both variables itself.
+:ara-precmd() {
+	[[ -n ${ANSIBLE_CALLBACK_PLUGINS-} && ${ANSIBLE_CALLBACK_PLUGINS} != *"${_ara_callback_plugins}"* ]] || return 0
+	export ANSIBLE_CALLBACK_PLUGINS="${ANSIBLE_CALLBACK_PLUGINS}:${_ara_callback_plugins}"
+	export PYTHONPATH="${PYTHONPATH:+${PYTHONPATH}:}${_ara_pythonpath}"
+}
+
+:ara-load() {
+	autoload -Uz add-zsh-hook
+	add-zsh-hook precmd :ara-precmd
+
+	# bootstrap is a no-op once the agent is loaded (exit 37), so fire-and-forget
+	# like colima: launchctl forks are slow and must not block the prompt.
+	launchctl bootstrap gui/${UID} "${HOME}/Library/LaunchAgents/ara-server.plist" &>/dev/null &|
+}
+
+zi auto has"ara-manage" wait1 for ara
 # endregion
 
 # region atuin: magical shell history with optional sync
@@ -545,8 +590,8 @@ zi auto has"checkov" wait1 for checkov
 }
 
 :claude-load() {
-    alias c="claude"
-    alias cr="claude -r"
+	alias c="claude"
+	alias cr="claude -r"
 }
 
 zi auto has"claude" wait1 for claude

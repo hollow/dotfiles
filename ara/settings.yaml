@@ -1,0 +1,17 @@
+# ARA Records Ansible: API server settings.
+# https://ara.readthedocs.io/en/latest/api-configuration.html
+#
+# Loaded through ARA_SETTINGS (exported by :ara-init in zsh/.zshrc and by the
+# launchd agent in launchd/ara-server.plist). Only values that
+# differ from ara's defaults live here; paths resolve $HOME at load time through
+# dynaconf's @format so this file stays machine-independent.
+#
+# SECRET_KEY is deliberately absent: this repo is public, and ara generates a
+# random key per process when none is set. Nothing depends on a stable key
+# because login is disabled (READ/WRITE_LOGIN_REQUIRED default to false).
+default:
+  BASE_DIR: "@format {env[HOME]}/.local/share/ara/server"
+  DATABASE_NAME: "@format {env[HOME]}/.local/share/ara/server/ansible.sqlite"
+  CORS_ORIGIN_WHITELIST:
+    - http://127.0.0.1:8100
+    - http://localhost:8100

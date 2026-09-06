@@ -1,8 +1,0 @@
-#!/usr/bin/env zsh
-emulate -L zsh
-
-set -x
-source <(python3 -m ara.setup.env)
-export ARA_API_CLIENT="http"
-export ARA_API_SERVER="http://127.0.0.1:8000"
-set +x
