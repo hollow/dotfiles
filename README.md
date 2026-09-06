@@ -170,7 +170,7 @@ reminds you about it.
 
 [Mise](https://mise.en.dev/) manages dev-tool versions, per-project environment
 variables, and tasks across all languages — when a project pins a specific tool
-version, mise provides it (OpenTofu is installed through it).
+version, mise provides it.
 
 #### JavaScript (state of the art)
 
@@ -243,8 +243,8 @@ For containers, [Docker](https://docs.docker.com) provides the CLI and
 [Colima](https://github.com/abiosoft/colima) runs the container VM on macOS,
 started in the background on demand.
 
-On the cloud side, [OpenTofu](https://opentofu.org) — the open-source
-Terraform fork (`tf`) — uses a shared plugin cache,
+On the cloud side, [Terraform](https://developer.hashicorp.com/terraform)
+(`tf`) uses a shared plugin cache,
 [gcloud](https://cloud.google.com/sdk), the Google Cloud SDK, has completion
 enabled and usage reporting off, and [PostgreSQL](https://www.postgresql.org)
 adds the client tools and headers to `PATH` for building against libpq.

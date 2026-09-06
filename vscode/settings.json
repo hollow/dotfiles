@@ -30,12 +30,6 @@
 		"editor.defaultFormatter": "rvben.rumdl",
 		"files.trimTrailingWhitespace": false
 	},
-	"[opentofu-vars]": {
-		"editor.defaultFormatter": "opentofu.vscode-opentofu"
-	},
-	"[opentofu]": {
-		"editor.defaultFormatter": "opentofu.vscode-opentofu"
-	},
 	"[python]": {
 		"editor.defaultFormatter": "charliermarsh.ruff"
 	},
@@ -65,7 +59,6 @@
 		"source.fixAll.ruff": "explicit",
 		"source.fixAll.rumdl": "explicit",
 		"source.fixAll.shellcheck": "explicit",
-		"source.formatAll.opentofu": "explicit",
 		"source.organizeImports.biome": "explicit",
 		"source.organizeImports.ruff": "explicit"
 	},
