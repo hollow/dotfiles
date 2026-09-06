@@ -778,6 +778,15 @@ zi auto has"glow" wait1 for glow
 zi auto has"gpg" wait1 for gnupg
 # endregion
 
+# region leaf: terminal markdown previewer
+# https://leaf.rivolink.mg
+:leaf-completion() {
+	leaf --auto-complete zsh:dump
+}
+
+zi auto has"leaf" wait1 for leaf
+# endregion
+
 # region less: pager configuration
 # https://man7.org/linux/man-pages/man1/less.1.html#OPTIONS
 :less-init() {
