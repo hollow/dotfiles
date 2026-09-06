@@ -8,6 +8,7 @@ ServerAliveInterval 900
 ServerAliveCountMax 0
 
 Host *.rmge.net
+    SetEnv TERM=xterm-256color
     StrictHostKeyChecking no
     UserKnownHostsFile /dev/null
     LogLevel ERROR
