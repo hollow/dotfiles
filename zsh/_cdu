@@ -1,0 +1,7 @@
+#compdef cdu=diff
+
+# cdu is `diff -u "$@" | cdl`; complete like diff. _diff probes the variant
+# by running `$words[1] --version`, which for cdu would pipe into the pager
+# and hang, so point it at the real binary first.
+words[1]=diff
+_diff "$@"

@@ -1,0 +1,26 @@
+#compdef :each :parallel ansible-each ansible-parallel copier-each copier-parallel git-each git-parallel go-each go-parallel node-each node-parallel python-each python-parallel tf-each tf-parallel
+
+# :each / :parallel take `<dir>… do <command>…`; the *-each / *-parallel
+# wrappers supply the dirs and `do` themselves and take just the command.
+
+local -i doidx=${words[(i)do]} # first `do`, or $#words+1 when absent
+
+case ${service} in
+	(:each | :parallel)
+		if (( CURRENT <= doidx )); then
+			# still on the directory list; offer `do` once there is a dir
+			local -a alts=('directories:directory:_directories')
+			(( CURRENT > 2 )) && alts+=('keywords:keyword:(do)')
+			_alternative "${alts[@]}"
+			return
+		fi
+		shift doidx words
+		(( CURRENT -= doidx ))
+		;;
+	(*)
+		shift words
+		(( CURRENT-- ))
+		;;
+esac
+
+_normal -p ${service}

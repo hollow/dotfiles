@@ -1,0 +1,7 @@
+#compdef ssu=ssh sshlive=ssh
+
+# ssu and sshlive pass their arguments straight to ssh, so complete like it.
+# the `=ssh` form makes compinit set $service to ssh for _ssh's own dispatch;
+# words[1] is set too so any version probe hits ssh, not the wrapper.
+words[1]=ssh
+_ssh "$@"

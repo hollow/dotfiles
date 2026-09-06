@@ -1,0 +1,8 @@
+#compdef pr
+
+# pr (zsh/pr) is `git push && gh pr create -f "$@"`: hand the words to gh's
+# completer as if the user had typed `gh pr create -f …`. Without this the
+# system _pr (GNU pr, the paginator) wins.
+words=(gh pr create -f "${(@)words[2,-1]}")
+(( CURRENT += 3 ))
+_gh "$@"
