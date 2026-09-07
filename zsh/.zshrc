@@ -1114,8 +1114,18 @@ zi auto wait for z-shell/F-Sy-H
 
 # region zsh/autosuggestions: fish-like autosuggestions for zsh
 # https://github.com/zsh-users/zsh-autosuggestions
-zi auto atload"_zsh_autosuggest_start" \
-	wait for zsh-users/zsh-autosuggestions
+:zsh-autosuggestions-load() {
+	# F-Sy-H keeps the original of every widget it wraps under fsh-orig-*
+	# (orig-* before its 2026-08 rewrite, which autosuggestions ignores by
+	# default). Without this entry the copies get wrapped as "modify" widgets
+	# too: every Up press then fetches a suggestion, the async
+	# autosuggest-suggest widget resets LASTWIDGET, and
+	# up-line-or-beginning-search restarts its search with the whole line as
+	# prefix after one or two presses. Must precede the first bind below.
+	ZSH_AUTOSUGGEST_IGNORE_WIDGETS+=('fsh-orig-*')
+	_zsh_autosuggest_start
+}
+zi auto wait for zsh-users/zsh-autosuggestions
 # endregion
 
 # region zsh/autopair: automatically close quotes, brackets and other delimiters
