@@ -4,6 +4,11 @@
 # and sources the .venv. Per-repo python versions are declared per project
 # (.python-version or [tools] python = "..."); brew stays the global default.
 python.uv_venv_auto = "create|source"
+# keep mise's shims off PATH: with them on, `uv venv` (auto-created above, no
+# --python since python is not a mise tool) probes the python3 shim, which is
+# mise again and re-enters venv creation -> unbounded recursion. Costs the
+# command-not-found auto-install, which the shims are only kept for.
+not_found_auto_install = false
 
 [tools]
 go = "latest"
