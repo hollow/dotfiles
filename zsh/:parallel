@@ -35,13 +35,17 @@ for dir in "${dirs[@]}"; do (( ${#dir} > w )) && w=${#dir}; done
             # cd would fire the inherited direnv chpwd hook, dumping untagged
             # output to the terminal; drop the hooks and load .envrc quietly,
             # then run the other chpwd hooks (e.g. :ara-hook) that expect to
-            # follow direnv, in their original order.
+            # follow direnv, in their original order. The hooks run inside the
+            # tagged pipe too, so e.g. `mise WARN missing:` from the mise chpwd
+            # hook is attributed to its repo instead of landing untagged.
             local -a chpwd_rest=(${chpwd_functions:#_direnv_hook})
             chpwd_functions=() precmd_functions=()
-            cd "${dir}" || exit
-            (( $+commands[direnv] )) && eval "$(direnv export zsh 2>/dev/null)"
-            for hook in "${chpwd_rest[@]}"; do "${hook}"; done
-            eval "${cmd[*]}" 2>&1 | while IFS= read -r line; do
+            {
+                cd "${dir}" || exit
+                (( $+commands[direnv] )) && eval "$(direnv export zsh 2>/dev/null)"
+                for hook in "${chpwd_rest[@]}"; do "${hook}"; done
+                eval "${cmd[*]}"
+            } 2>&1 | while IFS= read -r line; do
                 # \e[K paints the background to the right edge for a full-width line
                 print -r -- "${on}${tag}  ${line}${eol}${off}"
             done
