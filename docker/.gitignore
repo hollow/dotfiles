@@ -1,2 +1,5 @@
 cli-plugins/
 contexts/
+.token_seed
+.token_seed.lock
+buildx/
