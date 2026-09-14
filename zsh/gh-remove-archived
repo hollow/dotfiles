@@ -2,4 +2,4 @@
 emulate -L zsh
 [[ $TRACE -eq 1 ]] && set -x
 
-gh-repo-list --archived "$@" | parallel rm -rvf "${HOME}/src/{}"
+gh-repo-list --archived "$@" | parallel 'echo {}; rm -rf "${HOME}/src/{}"'
