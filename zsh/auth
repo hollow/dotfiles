@@ -1,0 +1,34 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+[[ ${TRACE:-0} -eq 1 ]] && set -x
+
+# daily authentication dance: aws sso, gcloud adc, google workspace cli.
+# runs all steps by default; pass step names to run a subset.
+
+local -A steps=(
+	aws    'aws sso login --profile remerge'
+	gcloud 'gcloud auth login --update-adc'
+	gws    'gws auth login --full'
+)
+local -a order=(aws gcloud gws) failed
+local name
+
+if (( $# )); then
+	for name in "$@"; do
+		if [[ -z "${steps[$name]}" ]]; then
+			print -u2 -- "usage: auth [${(j:|:)order}]..."
+			return 2
+		fi
+	done
+	order=("$@")
+fi
+
+for name in "${order[@]}"; do
+	print -P -- "%F{cyan}==>%f %B${name}%b: ${steps[$name]}"
+	eval "${steps[$name]}" || failed+=("${name}")
+done
+
+if (( ${#failed} )); then
+	print -P -u2 -- "%F{red}failed:%f ${(j:, :)failed}"
+	return 1
+fi
