@@ -5,10 +5,28 @@ emulate -L zsh
 # daily authentication dance: aws sso, gcloud adc, google workspace cli.
 # runs all steps by default; pass step names to run a subset.
 
+# gws: --full is a fixed list of workspace scopes without any admin sdk
+# scopes, and --scopes replaces the set instead of extending it, so spell
+# out --full's scopes plus the admin ones we need (audit log for drive
+# recovery etc.).
+local -a gws_scopes=(
+	https://www.googleapis.com/auth/drive
+	https://www.googleapis.com/auth/spreadsheets
+	https://www.googleapis.com/auth/gmail.modify
+	https://www.googleapis.com/auth/calendar
+	https://www.googleapis.com/auth/documents
+	https://www.googleapis.com/auth/presentations
+	https://www.googleapis.com/auth/tasks
+	https://www.googleapis.com/auth/pubsub
+	https://www.googleapis.com/auth/cloud-platform
+	https://www.googleapis.com/auth/admin.reports.audit.readonly
+	https://www.googleapis.com/auth/admin.datatransfer
+	https://www.googleapis.com/auth/admin.directory.user.readonly
+)
 local -A steps=(
 	aws    'aws sso login --profile remerge'
 	gcloud 'gcloud auth login --update-adc'
-	gws    'gws auth login --full'
+	gws    "gws auth login --scopes ${(j:,:)gws_scopes}"
 )
 local -a order=(aws gcloud gws) failed
 local name
