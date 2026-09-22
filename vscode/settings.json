@@ -68,6 +68,7 @@
 	"editor.showFoldingControls": "always",
 	"editor.tabSize": 2,
 	"editor.wordWrap": "on",
+	"explorer.confirmDelete": false,
 	"files.eol": "\n",
 	"files.insertFinalNewline": true,
 	"files.trimFinalNewlines": true,
@@ -88,7 +89,10 @@
 		"https://www.schemastore.org/": true
 	},
 	"makefile.configureOnOpen": false,
+	"markdown.extension.preview.autoShowPreviewToSide": true,
 	"markdown.extension.toc.levels": "2..6",
+	"markdown.preview.doubleClickToSwitchToEditor": true,
+	"markdown.preview.markEditorSelection": true,
 	"mise.checkForNewMiseVersion": false,
 	"python.terminal.activateEnvironment": false,
 	"redhat.telemetry.enabled": false,
