@@ -9,6 +9,11 @@ python.uv_venv_auto = "create|source"
 # mise again and re-enters venv creation -> unbounded recursion. Costs the
 # command-not-found auto-install, which the shims are only kept for.
 not_found_auto_install = false
+# do not point GOBIN at the toolchain's own bin dir: `go install` then drops
+# binaries next to go and gofmt, they are lost on every go upgrade, and
+# `brew bundle dump` reports the toolchain itself as `go "cmd/go"`. Unset, go
+# uses its default $GOPATH/bin, which .zshrc already puts on PATH.
+go.set_gobin = false
 
 [tools]
 go = "latest"
