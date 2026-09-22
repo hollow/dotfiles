@@ -1,7 +1,26 @@
 #!/usr/bin/env zsh
 emulate -L zsh
+setopt local_options extended_glob
 [[ $TRACE -eq 1 ]] && set -x
 
+# repos to skip are listed in ~/src/<owner>/.cloneignore, one per line, as
+# either <name> or <owner>/<name>; blank lines and #-comments are ignored
+typeset owner="${${@:#-*}[1]}"
+typeset cloneignore="${HOME}/src/${owner}/.cloneignore"
+
+typeset -a exceptions=()
+typeset line
+if [[ -n "${owner}" && -r "${cloneignore}" ]]; then
+	while IFS= read -r line || [[ -n "${line}" ]]; do
+		line="${${line%%\#*}##[[:space:]]#}"
+		line="${line%%[[:space:]]#}"
+		[[ -z "${line}" ]] && continue
+		[[ "${line}" == */* ]] || line="${owner}/${line}"
+		exceptions+=("${line}")
+	done < "${cloneignore}"
+fi
+
 gh-repo-list --no-archived "$@" |
+	grep -vxF -f <(print -rl -- "${exceptions[@]}") |
 	parallel --bar --tagstring "[{}]" --jobs 5 \
 		clone https://github.com/{} "${HOME}/src/{}"
