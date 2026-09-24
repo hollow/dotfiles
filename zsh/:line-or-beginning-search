@@ -1,0 +1,37 @@
+#!zsh
+# Replacement for zsh's {up,down}-line-or-beginning-search; bind it as
+# up-line-or-beginning-search and down-line-or-beginning-search, the widget
+# name picks the direction. The stock widgets tell a continued search from a
+# new one by $LASTWIDGET, but async plugin callbacks (F-Sy-H's `zle -F -w`
+# chroma handler, zsh-autosuggestions' async suggest) run as widgets between
+# two key presses and overwrite it; the next press then searches with the
+# whole recalled line as prefix and gets stuck on the first entry. Continue
+# the search whenever the line is exactly as the previous press left it.
+
+emulate -L zsh
+typeset -g _lobs_state _lobs_cursor
+local continued=0
+[[ ${+NUMERIC} -eq 0 && $_lobs_state == "$HISTNO:$CURSOR:$BUFFER" ]] && continued=1
+_lobs_state=
+if [[ $WIDGET == up-* ]]; then
+	[[ $LBUFFER == *$'\n'* ]] && { zle .up-line-or-history; return; }
+	((continued)) && CURSOR=$_lobs_cursor
+	_lobs_cursor=$CURSOR
+	zle .history-beginning-search-backward
+	zle .end-of-line
+else
+	if ((continued)) || [[ $RBUFFER != *$'\n'* ]]; then
+		((continued)) && CURSOR=$_lobs_cursor
+		_lobs_cursor=$CURSOR
+		if zle .history-beginning-search-forward; then
+			[[ $RBUFFER == *$'\n'* ]] || zle .end-of-line
+		elif [[ $RBUFFER == *$'\n'* ]]; then
+			zle .down-line-or-history
+			return
+		fi
+	else
+		zle .down-line-or-history
+		return
+	fi
+fi
+_lobs_state="$HISTNO:$CURSOR:$BUFFER"

@@ -191,9 +191,12 @@ if ((${+terminfo[smkx]})) && ((${+terminfo[rmkx]})); then
 	add-zle-hook-widget line-finish :zle-application-mode-stop
 fi
 
-autoload -Uz up-line-or-beginning-search down-line-or-beginning-search edit-command-line
-zle -N up-line-or-beginning-search
-zle -N down-line-or-beginning-search
+# Up/Down: :line-or-beginning-search (in ZDOTDIR) replaces the stock
+# widgets, which stall when async plugin callbacks reset $LASTWIDGET.
+zle -N up-line-or-beginning-search :line-or-beginning-search
+zle -N down-line-or-beginning-search :line-or-beginning-search
+
+autoload -Uz edit-command-line
 zle -N edit-command-line
 
 # Up/Down use prefix-history search: type a prefix, then walk only matching
@@ -1118,10 +1121,8 @@ zi auto wait for z-shell/F-Sy-H
 	# F-Sy-H keeps the original of every widget it wraps under fsh-orig-*
 	# (orig-* before its 2026-08 rewrite, which autosuggestions ignores by
 	# default). Without this entry the copies get wrapped as "modify" widgets
-	# too: every Up press then fetches a suggestion, the async
-	# autosuggest-suggest widget resets LASTWIDGET, and
-	# up-line-or-beginning-search restarts its search with the whole line as
-	# prefix after one or two presses. Must precede the first bind below.
+	# too, and every Up press fetches a needless suggestion. Must precede the
+	# first bind below.
 	ZSH_AUTOSUGGEST_IGNORE_WIDGETS+=('fsh-orig-*')
 	_zsh_autosuggest_start
 }
