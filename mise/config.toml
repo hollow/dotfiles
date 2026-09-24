@@ -18,4 +18,5 @@ go.set_gobin = false
 [tools]
 go = "latest"
 node = "latest"
+rust = "latest"
 yarn = "latest"
