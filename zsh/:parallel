@@ -1,7 +1,16 @@
 #!zsh
 
-local dirs=(${argv:1:((${argv[(Ie)do]}-1))})
-local cmd=(${argv:((${argv[(Ie)do]}+1))})
+# without `do`, every argument is a directory and there is no command
+local -i doidx=${argv[(Ie)do]}
+(( doidx )) || doidx=$(( $# + 1 ))
+local dirs=("${(@)argv[1,doidx-1]}")
+local cmd=("${(@)argv[doidx+1,-1]}")
+
+# workers read from /dev/null, so there is no interactive fallback like :each
+if (( ! $#cmd )); then
+    print -u2 "usage: :parallel <dir>... do <command>..."
+    return 2
+fi
 
 # dark 256-color backgrounds (readable with default light text): red, green,
 # olive, navy, purple, teal
