@@ -72,7 +72,16 @@
     return 0
 }
 
+# zi runs outside :za-auto-ices so a synchronous load sources the plugin and
+# its hooks with the user's options, as a turbo load does, not the annex's
+# (warn_create_global would flag every global a plugin creates).
 :za-auto-command() {
+    local -a ___zi_args
+    :za-auto-ices "$@" || return
+    zi "${___zi_args[@]}"
+}
+
+:za-auto-ices() {
     builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
     builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc_quotes no_auto_pushd
 
@@ -129,7 +138,7 @@
     }
 
     debug "{func}[${___ehid}]{rst}" "{msg}${___argv[*]}{rst}"
-    zi "${___ices[@]}" for "${___etid}"
+    ___zi_args=("${___ices[@]}" for "${___etid}")
 }
 
 @zi-register-annex "z-a-auto" \
