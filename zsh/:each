@@ -1,14 +1,18 @@
 #!zsh
 
-local dirs=(${argv:1:((${argv[(Ie)do]}-1))})
-local cmd=(${argv:((${argv[(Ie)do]}+1))})
+# without `do`, every argument is a directory and there is no command
+local -i doidx=${argv[(Ie)do]}
+(( doidx )) || doidx=$(( $# + 1 ))
+local dirs=("${(@)argv[1,doidx-1]}")
+local cmd=("${(@)argv[doidx+1,-1]}")
 
 for dir in ${dirs[@]}; do
     echo -e "\n${dir:P}"
-    if [[ "${cmd[@]}" == "" ]]; then
-        pushd "${dir:P}"
+    pushd "${dir:P}" &>/dev/null
+    if (( ! $#cmd )); then
+        # no command: open a shell in each dir, exit it to move to the next
+        zsh -i
     else
-        pushd "${dir:P}" &>/dev/null
         eval "${cmd[@]}"
     fi
     popd &>/dev/null
