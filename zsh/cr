@@ -1,0 +1,70 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+[[ $TRACE -eq 1 ]] && set -x
+
+# cr: resume any Claude Code session from anywhere. Lists every transcript in
+# ~/.claude/projects (newest first) with its start directory and title, then
+# cds there and runs `claude --resume <id>`; extra args go to claude
+# (e.g. `cr --fork-session`). The preview shows the session's last prompts.
+
+zmodload -F zsh/stat b:zstat
+
+local projects=${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects
+local -a files=($projects/*/*.jsonl(N))
+(( $#files )) || { print -u2 "cr: no sessions in $projects"; return 1 }
+
+# One rg pass over all transcripts, newest file first: first cwd, last
+# customTitle (/rename), last aiTitle. Escaped quotes inside strings survive.
+local -a rows files_ cwds dates dirs titles
+local f cwd title dir
+local -a mt
+rg --no-heading --sortr modified -o \
+	'"(cwd|customTitle|aiTitle)":"((?:[^"\\]|\\.)*)"' $files |
+	awk '
+		function val(m) { sub(/^"[^"]*":"/, "", m); sub(/"$/, "", m); gsub(/\\"/, "\"", m); return m }
+		{
+			i = index($0, ":"); f = substr($0, 1, i - 1); m = substr($0, i + 1)
+			if (!(f in seen)) { seen[f] = 1; order[++n] = f }
+			if (m ~ /^"cwd":/) { if (!(f in cwd)) cwd[f] = val(m) }
+			else if (m ~ /^"customTitle":/) ct[f] = val(m)
+			else ai[f] = val(m)
+		}
+		END {
+			for (j = 1; j <= n; j++) {
+				f = order[j]
+				if (!(f in cwd)) continue
+				t = (f in ct) ? ct[f] : ai[f]
+				print f "\t" cwd[f] "\t" t
+			}
+		}' |
+	while IFS=$'\t' read -r f cwd title; do
+		zstat -A mt -F '%Y-%m-%d %H:%M' +mtime -- $f
+		# Short dir: repos under ~/src/remerge by bare name, other owners as
+		# owner/repo, the checkout root itself as remerge/, the rest ~-relative.
+		case $cwd in
+			$HOME/src/remerge) dir=remerge/ ;;
+			$HOME/src/remerge/*) dir=${cwd#$HOME/src/remerge/} ;;
+			$HOME/src/*) dir=${cwd#$HOME/src/} ;;
+			*) dir=${cwd/#$HOME/\~} ;;
+		esac
+		(( ${#dir} > 20 )) && dir=…${dir[-19,-1]}
+		files_+=$f cwds+=$cwd dates+=$mt[1] dirs+=$dir titles+=${title:-(untitled)}
+	done
+
+# Pad the dir column to its widest entry so all titles start in one column.
+local -i w=0 i
+for dir in $dirs; do (( ${#dir} > w )) && w=${#dir}; done
+for i in {1..$#files_}; do
+	rows+=("$files_[i]"$'\t'"$cwds[i]"$'\t'"$dates[i]  ${(r:w:)dirs[i]}  $titles[i]")
+done
+
+local preview='jq -r '\''select(.type=="user" and (.message.content|type)=="string" and (.isMeta|not)) | .message.content | select(startswith("<")|not)'\'' {1} | tail -n 60'
+
+local pick
+pick=$(print -rl -- $rows | fzf --delimiter=$'\t' --with-nth=3 --no-sort \
+	--prompt='resume> ' --preview=$preview --preview-window=right,50%,wrap) || return
+
+local -a fields=("${(@ps:\t:)pick}")
+f=$fields[1] cwd=$fields[2]
+[[ -d $cwd ]] || { print -u2 "cr: $cwd no longer exists"; return 1 }
+cd -- $cwd && claude --resume ${f:t:r} "$@"

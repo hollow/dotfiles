@@ -611,7 +611,6 @@ zi auto has"bat" for bat
 
 :claude-load() {
 	alias c="claude"
-	alias cr="claude -r"
 }
 
 zi auto has"claude" for claude
