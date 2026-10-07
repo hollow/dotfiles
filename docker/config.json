@@ -1,8 +1,9 @@
 {
-	"auths": {},
-	"credsStore": "osxkeychain",
-	"credHelpers": {
-		"europe-west4-docker.pkg.dev": "gcloud"
-	},
-	"currentContext": "colima"
+  "auths": {},
+  "credsStore": "osxkeychain",
+  "credHelpers": {
+    "europe-west4-docker.pkg.dev": "gcloud",
+    "europe-docker.pkg.dev": "gcloud"
+  },
+  "currentContext": "colima"
 }
