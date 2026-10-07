@@ -610,6 +610,12 @@ zi auto has"bat" for bat
 }
 
 :claude-load() {
+	# MCP server secrets are 1Password references in untracked ~/.claude/mcp.env, resolved
+	# at launch in the 1Password account named by ~/.claude/mcp.account (kept out of this
+	# public repo); --no-masking keeps stdout a TTY, masking pipes it and claude falls back to --print
+	if [[ -f "${HOME}/.claude/mcp.env" && -f "${HOME}/.claude/mcp.account" ]]; then
+		alias claude='OP_ACCOUNT="$(<"${HOME}/.claude/mcp.account")" op run --no-masking --env-file="${HOME}/.claude/mcp.env" -- claude'
+	fi
 	alias c="claude"
 }
 
