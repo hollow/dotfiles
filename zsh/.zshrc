@@ -859,6 +859,7 @@ zi auto has"nomad" for nomad
 # region terraform: infrastructure as code
 # https://github.com/hashicorp/terraform
 :terraform-init() {
+	export TF_CLI_CONFIG_FILE="${XDG_CONFIG_HOME}/terraform/terraformrc"
 	export TF_PLUGIN_CACHE_DIR="${XDG_CACHE_HOME}/terraform/plugins"
 	mkdirp "${TF_PLUGIN_CACHE_DIR}"
 	link terraform .terraform.d
