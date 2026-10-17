@@ -9,7 +9,3 @@ python.uv_venv_auto = "create|source"
 # mise again and re-enters venv creation -> unbounded recursion. Costs the
 # command-not-found auto-install, which the shims are only kept for.
 not_found_auto_install = false
-
-[tools]
-node = "latest"
-yarn = "latest"
