@@ -1,8 +1,12 @@
 #!/bin/sh
-# Remerge dotfiles installer.
+# Dotfiles installer for remerge/dotfiles and its forks.
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/remerge/dotfiles/main/install.sh | sh
+#
+# To install a fork, name it as the first argument (or in $DOTFILES_REPO), as
+# `owner/repo`, just `owner` (meaning owner/dotfiles), or a full git URL:
+#   curl -fsSL https://raw.githubusercontent.com/hollow/dotfiles/main/install.sh | sh -s -- hollow/dotfiles
 #
 # Installs Apple Command Line Tools (for git) on macOS, clones this repo into
 # ~/.config, links ~/.zshrc, then (macOS) installs Homebrew and the Brewfile and
@@ -12,7 +16,12 @@
 # first launch.
 set -eu
 
-REPO_URL="https://github.com/remerge/dotfiles"
+REPO="${1:-${DOTFILES_REPO:-remerge/dotfiles}}"
+case "$REPO" in
+    */*/* | *:*) REPO_URL=$REPO ;;
+    */*) REPO_URL="https://github.com/$REPO" ;;
+    *) REPO_URL="https://github.com/$REPO/dotfiles" ;;
+esac
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 
 log() { printf '\033[1;34m==>\033[0m %s\n' "$1"; }
@@ -34,18 +43,23 @@ confirm() {
     esac
 }
 
-# True when the given remote URL refers to remerge/dotfiles, in any of the forms
-# git prints (https, https with .git, ssh shorthand, ssh URL).
-is_remerge_remote() {
+# Reduce a GitHub remote URL, in any of the forms git prints (https, https with
+# .git, ssh shorthand, ssh URL), to owner/repo. Anything else (another host, a
+# local path) is printed as-is, minus a trailing .git or slash.
+repo_slug() {
     _url=${1%.git}
     _url=${_url%/}
     case "$_url" in
-        https://github.com/remerge/dotfiles) return 0 ;;
-        http://github.com/remerge/dotfiles) return 0 ;;
-        git@github.com:remerge/dotfiles) return 0 ;;
-        ssh://git@github.com/remerge/dotfiles) return 0 ;;
-        *) return 1 ;;
+        https://github.com/* | http://github.com/*) _url=${_url#*://github.com/} ;;
+        git@github.com:*) _url=${_url#git@github.com:} ;;
+        ssh://git@github.com/*) _url=${_url#ssh://git@github.com/} ;;
     esac
+    printf '%s\n' "$_url"
+}
+
+# True when remote URLs $1 and $2 refer to the same repo.
+is_same_repo() {
+    [ "$(repo_slug "$1")" = "$(repo_slug "$2")" ]
 }
 
 # Point local main at origin/main and track it, without touching the working
@@ -59,30 +73,31 @@ ensure_main_branch() {
 }
 
 # Fetch origin/main and force the working tree to match it, after showing what
-# will change and confirming twice. Untracked files that are not in the repo
+# will change and confirming twice. $2 is the repo URL, used in messages. Untracked files that are not in the repo
 # (e.g. git/local, mise/age.txt) are preserved. Aborts (exit 1) if the user
 # declines or there is no terminal to confirm on.
 restore_dotfiles() {
     _dir=$1
+    _name=$(repo_slug "$2")
     if ! git -C "$_dir" fetch -q origin main; then
         err "Could not fetch from origin for $_dir. Check your network/credentials, then re-run."
         exit 1
     fi
 
     if git -C "$_dir" diff --quiet origin/main 2> /dev/null; then
-        log "$_dir is already up to date with remerge/dotfiles."
+        log "$_dir is already up to date with $_name."
         ensure_main_branch "$_dir"
         return 0
     fi
 
-    log "These files in $_dir will be reset to match remerge/dotfiles:"
+    log "These files in $_dir will be reset to match $_name:"
     git -C "$_dir" --no-pager diff --stat origin/main
 
     if confirm "Show the full diff first? [y/N] "; then
         git -C "$_dir" --no-pager diff origin/main || true
     fi
 
-    if ! confirm "Discard these local changes and restore $_dir to remerge/dotfiles? [y/N] "; then
+    if ! confirm "Discard these local changes and restore $_dir to $_name? [y/N] "; then
         err "Left $_dir untouched. To restore it manually later, run:"
         err "  git -C $_dir restore --source=origin/main --staged --worktree -- :/"
         exit 1
@@ -90,29 +105,30 @@ restore_dotfiles() {
 
     git -C "$_dir" restore --source=origin/main --staged --worktree -- :/
     ensure_main_branch "$_dir"
-    log "Restored $_dir to match remerge/dotfiles."
+    log "Restored $_dir to match $_name."
 }
 
-# Put remerge/dotfiles into $1 (the config dir), adopting whatever is already
-# there: an existing repo whose origin is remerge/dotfiles is just refreshed; a
-# repo pointing elsewhere (a fork) is offered for replacement; a non-empty plain
+# Put the dotfiles repo $2 into $1 (the config dir), adopting whatever is
+# already there: an existing repo whose origin is $2 is just refreshed; a repo
+# pointing elsewhere (another fork) is offered for replacement; a non-empty plain
 # directory is adopted in place; an empty/missing directory is cloned.
 place_dotfiles() {
     _dir=$1
     _repo=$2
+    _name=$(repo_slug "$_repo")
 
     if [ -e "$_dir/.git" ]; then
         _origin=$(git -C "$_dir" remote get-url origin 2> /dev/null || true)
-        if [ -n "$_origin" ] && is_remerge_remote "$_origin"; then
-            log "Dotfiles already present in $_dir (remerge/dotfiles)."
+        if [ -n "$_origin" ] && is_same_repo "$_origin" "$_repo"; then
+            log "Dotfiles already present in $_dir ($_name)."
         else
             if [ -n "$_origin" ]; then
                 log "$_dir is a git repo for $_origin,"
-                log "not remerge/dotfiles."
+                log "not $_name."
             else
                 log "$_dir is a git repo with no 'origin' remote."
             fi
-            if ! confirm "Replace it with remerge/dotfiles? [y/N] "; then
+            if ! confirm "Replace it with $_name? [y/N] "; then
                 err "Left $_dir untouched. To migrate it manually later, run:"
                 err "  git -C $_dir remote set-url origin $_repo"
                 err "  git -C $_dir fetch origin main"
@@ -125,13 +141,13 @@ place_dotfiles() {
                 git -C "$_dir" remote add origin "$_repo"
             fi
         fi
-        restore_dotfiles "$_dir"
+        restore_dotfiles "$_dir" "$_repo"
     elif [ -d "$_dir" ] && [ -n "$(find "$_dir" -mindepth 1 -maxdepth 1 2> /dev/null | head -n 1)" ]; then
         log "$_dir exists and is not empty; adopting the dotfiles in place..."
         git -C "$_dir" init -q
         git -C "$_dir" remote add origin "$_repo" 2> /dev/null \
             || git -C "$_dir" remote set-url origin "$_repo"
-        restore_dotfiles "$_dir"
+        restore_dotfiles "$_dir" "$_repo"
     else
         log "Cloning dotfiles into $_dir..."
         git clone -q "$_repo" "$_dir"

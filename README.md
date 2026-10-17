@@ -40,6 +40,13 @@ Open the **Terminal** app, paste this line, and press Enter:
 curl -fsSL https://raw.githubusercontent.com/remerge/dotfiles/main/install.sh | sh
 ```
 
+To install a fork instead, name it after `sh -s --` — as `owner/repo`, just
+`owner` (for `owner/dotfiles`), or a full git URL:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/hollow/dotfiles/main/install.sh | sh -s -- hollow/dotfiles
+```
+
 > [!WARNING]
 > The installer takes over `~/.config` as a checkout of this repository. If you
 > already keep configuration there, any file whose path collides with one
