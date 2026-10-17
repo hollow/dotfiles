@@ -336,8 +336,6 @@ zi auto has"brew" for brew
 # https://github.com/jdx/mise
 :mise-init() {
 	export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
-	# cargo has no XDG support; mise's cargo: backend builds with it
-	export CARGO_HOME="${XDG_DATA_HOME}/cargo"
 }
 
 :mise-load() {
@@ -418,6 +416,17 @@ zi auto with"uv" for argcomplete
 }
 
 zi auto has"go" for go
+# endregion
+
+# region rust/cargo: rust package manager
+# https://doc.rust-lang.org/cargo/
+:cargo-init() {
+	# cargo has no XDG support; mise's cargo: backend builds with it too
+	export CARGO_HOME="${XDG_DATA_HOME}/cargo"
+	add path "${CARGO_HOME}/bin"
+}
+
+zi auto has"cargo" for cargo
 # endregion
 
 # region js/node: JavaScript runtime
@@ -854,15 +863,6 @@ zi auto has"leaf" for leaf
 }
 
 zi auto has"less" for less
-# endregion
-
-# region ncdu: disk usage analyzer
-# https://dev.yorhel.nl/ncdu
-:ncdu-init() {
-	link ncduignore .ncduignore
-}
-
-zi auto has"ncdu" for ncdu
 # endregion
 
 # region nomad: workload orchestrator
