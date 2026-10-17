@@ -24,7 +24,7 @@ local -a gws_scopes=(
 	https://www.googleapis.com/auth/admin.directory.user.readonly
 )
 local -A steps=(
-	aws    'aws sso login --profile remerge'
+	#aws    'aws sso login --profile remerge'
 	gcloud 'gcloud auth login --update-adc'
 	gws    "gws auth login --scopes ${(j:,:)gws_scopes}"
 )
@@ -41,9 +41,30 @@ if (( $# )); then
 	order=("$@")
 fi
 
+# steps whose login only prints the consent URL: open the first one printed
+local -a print_only=(gws)
+local line opened
+
 for name in "${order[@]}"; do
 	print -P -- "%F{cyan}==>%f %B${name}%b: ${steps[$name]}"
-	eval "${steps[$name]}" || failed+=("${name}")
+	if (( ${print_only[(Ie)$name]} )); then
+		opened=0
+		# pipefail keeps the login's exit status; the last pipeline stage runs
+		# in this shell, so $opened survives the loop
+		if ! { setopt local_options pipefail
+			eval "${steps[$name]}" 2>&1 | while IFS= read -r line; do
+				print -r -- "$line"
+				if (( ! opened )) && [[ $line =~ 'https://[^[:space:]]+' ]]; then
+					opened=1
+					open "$MATCH"
+				fi
+			done
+		}; then
+			failed+=("${name}")
+		fi
+	else
+		eval "${steps[$name]}" || failed+=("${name}")
+	fi
 done
 
 if (( ${#failed} )); then
