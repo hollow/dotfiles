@@ -7,6 +7,10 @@ HashKnownHosts no
 ServerAliveInterval 900
 ServerAliveCountMax 0
 
+# dev container on the NAS: forward the agent for git signing and onward ssh
+Host xnull.de
+    ForwardAgent yes
+
 Host *.rmge.net
     SetEnv TERM=xterm-256color
     StrictHostKeyChecking no

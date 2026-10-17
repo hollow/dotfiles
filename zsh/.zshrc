@@ -25,6 +25,11 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
 	export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
 	export HOMEBREW_REPOSITORY="/opt/homebrew"
 	path=("${HOMEBREW_PREFIX}/bin" "${HOMEBREW_PREFIX}/sbin" ${path[@]})
+elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+	export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+	export HOMEBREW_CELLAR="/home/linuxbrew/.linuxbrew/Cellar"
+	export HOMEBREW_REPOSITORY="/home/linuxbrew/.linuxbrew/Homebrew"
+	path=("${HOMEBREW_PREFIX}/bin" "${HOMEBREW_PREFIX}/sbin" ${path[@]})
 fi
 
 # LDFLAGS/CPPFLAGS as tied arrays so tool sections can append -L/-I entries
@@ -271,6 +276,12 @@ link "${HISTFILE}" .zsh_history
 	export HOMEBREW_CLEANUP_MAX_AGE_DAYS=7
 	export HOMEBREW_CLEANUP_PERIODIC_FULL_DAYS=1
 
+	# brew skips macOS-only casks on linux by itself; these formulae are macOS-only,
+	# useless there, or (rename) clash with util-linux, which linux brew pulls in
+	if [[ ${OSTYPE} != darwin* ]]; then
+		export HOMEBREW_BUNDLE_BREW_SKIP="colima iproute2mac rename"
+	fi
+
 	add path "${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin"
 	add path "${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin"
 	add path "${HOMEBREW_PREFIX}/opt/gawk/libexec/gnubin"
@@ -302,15 +313,23 @@ link "${HISTFILE}" .zsh_history
 	local -x HOMEBREW_NO_ASK=1
 	local -x HOMEBREW_NO_ENV_HINTS=1
 
+	# vscode extensions have no skip variable and fail without `code`, so linux
+	# installs from a copy without them; the Brewfile itself stays `bbd`-generated
+	local bundle_file="${HOMEBREW_BUNDLE_FILE}"
+	if [[ ${OSTYPE} != darwin* ]]; then
+		bundle_file="${XDG_CACHE_HOME}/Brewfile.linux"
+		grep -v '^vscode ' "${HOMEBREW_BUNDLE_FILE}" >|"${bundle_file}"
+	fi
+
 	brew update --quiet
 	brew upgrade --quiet
-	brew bundle install --quiet
+	brew bundle install --quiet --file="${bundle_file}"
 	brew autoremove
 	brew cleanup -s --prune=all --quiet
 	chmod go-w "${HOMEBREW_PREFIX}/share"
 }
 
-zi auto has"dscl" for brew
+zi auto has"brew" for brew
 # endregion
 
 # region mise: dev tools, env vars, task runner
@@ -445,6 +464,13 @@ add path "${HOME}/.local/bin"
 # https://1password.com
 :1password-cli-init() {
 	mkdirp "${XDG_CONFIG_HOME}/op" 0700
+
+	# op refuses a group/world-accessible config dir, but a fresh clone creates
+	# it 0755; enforce 0700 without forking chmod unless the mode has drifted
+	local -a st
+	zmodload -F zsh/stat b:zstat
+	zstat -A st +mode -- "${XDG_CONFIG_HOME}/op" 2>/dev/null &&
+		(((st[1] & 8#777) != 8#700)) && chmod 0700 "${XDG_CONFIG_HOME}/op"
 }
 
 :1password-cli-completion() {
@@ -663,7 +689,10 @@ zi auto has"direnv" for direnv/direnv
 # region docker: container runtime CLI
 # https://github.com/docker/cli
 :docker-init() {
-	link docker .docker
+	# the repo config targets colima and the macOS keychain; linux keeps its own ~/.docker
+	if [[ ${OSTYPE} == darwin* ]]; then
+		link docker .docker
+	fi
 }
 
 zi auto has"docker" for docker
@@ -741,7 +770,7 @@ zi auto has"gcloud" for gcloud
 
 # region ghostty: fast, native, GPU-accelerated terminal emulator
 # https://ghostty.org
-add path "${GHOSTTY_BIN_DIR}"
+[[ -n ${GHOSTTY_BIN_DIR-} ]] && add path "${GHOSTTY_BIN_DIR}"
 # endregion
 
 # region git: distributed version control system
@@ -908,8 +937,14 @@ zi auto has"sqlite3" for sqlite
 	# prefer 1password's ssh agent socket when present, else OMZP::ssh-agent
 	# https://1password.community/discussion/comment/660153/#Comment_660153
 	local op_sock="${HOME}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+	local fwd_sock="${XDG_RUNTIME_DIR}/ssh-agent.sock"
 	if [[ -e "${op_sock}" ]]; then
 		export SSH_AUTH_SOCK="${op_sock}"
+	elif [[ -n ${SSH_CONNECTION-} && -n ${SSH_AUTH_SOCK-} ]]; then
+		# logged in with a forwarded agent: keep it, behind a stable symlink that
+		# each login repoints so long-lived tmux panes survive reconnects
+		[[ ${SSH_AUTH_SOCK} != ${fwd_sock} ]] && link "${SSH_AUTH_SOCK}" "${fwd_sock}"
+		export SSH_AUTH_SOCK="${fwd_sock}"
 	else
 		zi auto silent for OMZP::ssh-agent
 	fi
