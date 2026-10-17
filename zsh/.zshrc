@@ -336,6 +336,8 @@ zi auto has"brew" for brew
 # https://github.com/jdx/mise
 :mise-init() {
 	export MISE_SOPS_AGE_KEY_FILE="${XDG_CONFIG_HOME}/sops/age/keys.txt"
+	# cargo has no XDG support; mise's cargo: backend builds with it
+	export CARGO_HOME="${XDG_DATA_HOME}/cargo"
 }
 
 :mise-load() {
@@ -344,6 +346,15 @@ zi auto has"brew" for brew
 }
 
 zi auto has"mise" for mise
+# endregion
+
+# region supabase: local development stack and project CLI
+# https://supabase.com/docs/guides/local-development
+:supabase-init() {
+	export SUPABASE_HOME="${XDG_STATE_HOME}/supabase"
+}
+
+zi auto has"supabase" for supabase
 # endregion
 
 # region python: programming language
@@ -490,6 +501,7 @@ export ANDROID_EMULATOR_HOME="${XDG_CONFIG_HOME}/android"
 # ANSIBLE_HOME is the base for collections, roles, plugins and the galaxy token
 # (all data); tmp/cp go to runtime and the galaxy cache to cache instead.
 :ansible-init() {
+	export ANSIBLE_HOME="${XDG_DATA_HOME}/ansible"
 	export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible"
 	export ANSIBLE_LOCAL_TEMP="${XDG_RUNTIME_DIR}/ansible/tmp"
 	export ANSIBLE_PERSISTENT_CONTROL_PATH_DIR="${XDG_RUNTIME_DIR}/ansible/cp"
