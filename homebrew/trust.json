@@ -6,6 +6,7 @@
     "hashicorp/tap/nomad-pack",
     "hashicorp/tap/terraform",
     "hashicorp/tap/terraform-ls",
-    "hashicorp/tap/vault"
+    "hashicorp/tap/vault",
+    "supabase/tap/supabase"
   ]
 }

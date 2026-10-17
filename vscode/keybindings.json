@@ -1,21 +1,35 @@
-// Place your key bindings in this file to override the defaults
 [
-  {
-    "key": "cmd+[IntlBackslash]",
-    "command": "workbench.action.terminal.toggleTerminal"
-  },
-  {
-    "key": "alt+[IntlBackslash]",
-    "command": "workbench.action.terminal.new",
-    "when": "terminalFocus"
-  },
-  {
-    "key": "cmd+enter",
-    "command": "workbench.action.toggleMaximizedPanel",
-    "when": "terminalFocus"
-  },
-  {
-    "key": "shift+cmd+r",
-    "command": "workbench.action.openRecent"
-  }
+	{
+		"key": "cmd+[IntlBackslash]",
+		"command": "workbench.action.terminal.toggleTerminal",
+		"when": "terminal.active"
+	},
+	{
+		"key": "ctrl+`",
+		"command": "-workbench.action.terminal.toggleTerminal",
+		"when": "terminal.active"
+	},
+	{
+		"key": "alt+[IntlBackslash]",
+		"command": "workbench.action.terminal.new",
+		"when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+	},
+	{
+		"key": "ctrl+shift+`",
+		"command": "-workbench.action.terminal.new",
+		"when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+	},
+	{
+		"key": "cmd+enter",
+		"command": "workbench.action.toggleMaximizedPanel",
+		"when": "panelFocus"
+	},
+	{
+		"key": "shift+cmd+r",
+		"command": "workbench.action.openRecent"
+	},
+	{
+		"key": "ctrl+r",
+		"command": "-workbench.action.openRecent"
+	}
 ]

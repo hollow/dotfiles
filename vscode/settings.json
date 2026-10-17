@@ -48,12 +48,6 @@
 	"[yaml]": {
 		"editor.defaultFormatter": "redhat.vscode-yaml"
 	},
-	"ansible.lightspeed.enabled": false,
-	"ansible.lightspeed.suggestions.enabled": false,
-	"ansible.validation.lint.enabled": false,
-	"catppuccin.italicKeywords": false,
-	"chat.titleBar.openInAgentsWindow.enabled": false,
-	"csv-preview.resizeColumns": "all",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.biome": "explicit",
 		"source.fixAll.ruff": "explicit",
@@ -69,6 +63,7 @@
 	"editor.tabSize": 2,
 	"editor.wordWrap": "on",
 	"explorer.confirmDelete": false,
+	"explorer.confirmDragAndDrop": false,
 	"files.eol": "\n",
 	"files.insertFinalNewline": true,
 	"files.trimFinalNewlines": true,
@@ -95,7 +90,6 @@
 	"markdown.preview.markEditorSelection": true,
 	"mise.checkForNewMiseVersion": false,
 	"python.terminal.activateEnvironment": false,
-	"redhat.telemetry.enabled": false,
 	"search.followSymlinks": false,
 	"search.showLineNumbers": true,
 	"terminal.integrated.initialHint": false,
@@ -103,14 +97,13 @@
 	"terminal.integrated.shellIntegration.decorationsEnabled": "never",
 	"terminal.integrated.stickyScroll.enabled": false,
 	"terminal.integrated.suggest.enabled": false,
-	"window.commandCenter": false,
 	"window.newWindowDimensions": "inherit",
-	"workbench.activityBar.location": "hidden",
-	"workbench.browser.showInTitleBar": false,
+	"workbench.activityBar.location": "top",
 	"workbench.colorTheme": "Catppuccin Mocha",
-	"workbench.experimental.modernUI": false,
+	"workbench.editor.enablePreview": false,
+	"workbench.editorAssociations": {
+		"*.md": "vscode.markdown.editor"
+	},
 	"workbench.iconTheme": "catppuccin-mocha",
-	"workbench.layoutControl.enabled": false,
-	"workbench.secondarySideBar.defaultVisibility": "hidden",
 	"workbench.startupEditor": "none"
 }
