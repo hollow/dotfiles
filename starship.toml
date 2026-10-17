@@ -145,6 +145,7 @@ symbol = " "
 symbol = " "
 
 [container]
+disabled = true
 symbol = " "
 
 [crystal]
@@ -226,7 +227,8 @@ symbol = " "
 symbol = " "
 
 [hostname]
-ssh_symbol = " "
+format = "[$hostname]($style):"
+trim_at = ""
 
 [java]
 symbol = " "
@@ -407,6 +409,9 @@ symbol = " "
 
 [terraform]
 symbol = " "
+
+[username]
+format = "[$user]($style)@"
 
 [vlang]
 symbol = " "
