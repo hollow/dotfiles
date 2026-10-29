@@ -1,5 +1,4 @@
-Include %d/.config/ssh/config.crypto
-Include %d/.config/colima/ssh_config
+Include %d/.config/ssh/config.crypto %d/.config/colima/ssh_config
 
 HashKnownHosts no
 
