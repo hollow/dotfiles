@@ -628,6 +628,13 @@ zi auto has"bat" for bat
 	local src="${HOME}/Library/Application Support/Claude/claude_desktop_config.json"
 	local dst="${HOME}/.claude/claude_desktop_config.json"
 	[[ -e ${src} ]] && cp "${src}" "${dst}"
+
+	# keep claude's global state file inside the ~/.claude repo; claude writes
+	# through the symlink. move a real file in first, since link's `ln -f` would
+	# otherwise drop the live config
+	[[ -f ${HOME}/.claude.json && ! -L ${HOME}/.claude.json ]] &&
+		mv "${HOME}/.claude.json" "${HOME}/.claude/.claude.json"
+	link "${HOME}/.claude/.claude.json" .claude.json
 }
 
 :claude-load() {
