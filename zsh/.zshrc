@@ -1095,7 +1095,7 @@ fi
 # (argcomplete's -default-, tmux aliases, `complete -C` via bashcompinit) — a
 # turbo block loaded after this one calling compdef is lost.
 # https://github.com/zsh-users/zsh-completions
-zi auto blockf atpull'zinit creinstall -q .' \
+zi auto blockf atpull'zinit creinstall -q zsh-completions' \
 	atload"zicompinit; zicdreplay" \
 	wait for zsh-users/zsh-completions
 # endregion
