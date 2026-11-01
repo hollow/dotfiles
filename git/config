@@ -3,7 +3,7 @@
 	amend = ci --amend --reuse-message=HEAD
 	b = !git --no-pager log --decorate --format="%D" -1
 	ci = commit
-	cleanup = !git up && git dmb -y
+	cleanup = "!req=$(git config --get-regexp \"^branch\\..*\\.dmb-required$\" | sed -n \"s/^branch\\.\\(.*\\)\\.dmb-required true$/\\1/p\") && x=$(for o in $req; do printf \" -x %s\" \"$o\"; done) && for b in $req; do git switch -q \"$b\" && git pull -q && git dmb -y -b \"$b\" $x || exit 1; done && git up"
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	ls = ls-tree -r HEAD
 	st = status --short
