@@ -69,7 +69,6 @@
 [fetch]
 	all = true
 	prune = true
-	pruneTags = true
 	recurseSubmodules = yes
 	writeCommitGraph = true
 

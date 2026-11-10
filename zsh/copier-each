@@ -1,2 +1,3 @@
 #!zsh
-:each */.copier-answers.yml(:h) do "$@"
+# template v2 repos only: their answers carry `project_id`, v3 answers carry `layers_selection`
+:each */.copier-answers.yml(.e['grep -q "^project_id:" $REPLY']:h) do "$@"
