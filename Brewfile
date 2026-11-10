@@ -142,6 +142,7 @@ brew "supabase/tap/supabase", trusted: true
 cask "1password"
 cask "1password-cli@beta"
 cask "adguard"
+cask "android-platform-tools"
 cask "calibre"
 cask "claude"
 cask "font-meslo-lg-nerd-font"
