@@ -1,0 +1,10 @@
+#!zsh
+
+# `which` on an autoloaded function that has not run yet prints only the stub
+# (`builtin autoload -X`). load each such function first so the real body shows
+local f
+for f in "$@"; do
+	[[ $(builtin whence -c -- "$f" 2>/dev/null) == *'builtin autoload -X'* ]] &&
+		autoload +X -- "$f"
+done
+builtin which "$@"
